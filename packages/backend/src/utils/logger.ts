@@ -15,11 +15,9 @@ const logger = winston.createLogger({
   level: process.env['LOG_LEVEL'],
   format: logFormat,
   transports: [
-    // Console transport
     new winston.transports.Console({
       format: winston.format.combine(winston.format.colorize(), winston.format.simple()),
     }),
-    // File transport for errors
     new DailyRotateFile({
       filename: 'logs/error-%DATE%.log',
       datePattern: 'YYYY-MM-DD',
@@ -27,25 +25,8 @@ const logger = winston.createLogger({
       maxSize: '20m',
       maxFiles: '14d',
     }),
-    // File transport for all logs
     new DailyRotateFile({
       filename: 'logs/combined-%DATE%.log',
-      datePattern: 'YYYY-MM-DD',
-      maxSize: '20m',
-      maxFiles: '14d',
-    }),
-  ],
-  exceptionHandlers: [
-    new DailyRotateFile({
-      filename: 'logs/exceptions-%DATE%.log',
-      datePattern: 'YYYY-MM-DD',
-      maxSize: '20m',
-      maxFiles: '14d',
-    }),
-  ],
-  rejectionHandlers: [
-    new DailyRotateFile({
-      filename: 'logs/rejections-%DATE%.log',
       datePattern: 'YYYY-MM-DD',
       maxSize: '20m',
       maxFiles: '14d',
