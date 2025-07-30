@@ -1,77 +1,195 @@
-# Progress - MVP Features
+# Progress - Small MVP Features
 
-## Current Status: Backend Setup ✅
+## Current Status: Backend Foundation ✅
 
 ### Completed
 
-- ✅ Basic Express server with tRPC
+- ✅ Express server with tRPC
 - ✅ Database schema and migrations
 - ✅ Authentication middleware
 - ✅ Basic validation utilities
 - ✅ Test setup with Vitest
 - ✅ ESLint and TypeScript configuration
-- ✅ Git hooks with pre-commit checks
 
-### Next: Core MVP Features
+---
 
-## 1. User Registration & Login ✅
+## MVP Feature 1: User Registration ✅
 
-**MVP Goal:** Users can create accounts and sign in
+**Goal:** Users can create accounts
 
-- ✅ Simple email/password registration
-- ✅ Email verification (basic)
-- ✅ Login/logout functionality
-- ✅ Basic profile storage
+**Backend:**
 
-## 2. Case Submission
+- ✅ POST /auth/register endpoint
+- ✅ Email/password validation
+- ✅ User table storage
+- ✅ Basic error handling
 
-**MVP Goal:** Help seekers can submit requests
+**Frontend:**
 
-- Simple form: name, email, phone, description
-- Basic image upload (1-2 images max)
-- Save to database with "pending" status
-- No complex validation initially
+- ✅ Registration form component
+- ✅ Form validation
+- ✅ Success/error feedback
+- ✅ Redirect to login
 
-## 3. Admin Review
+**Success:** User can register and see confirmation
 
-**MVP Goal:** Admins can approve/reject cases
+---
 
-- Admin login (hardcoded admin account)
-- List pending cases
-- Approve or reject with simple reason
-- Mark as "verified" or "flagged"
+## MVP Feature 2: User Login ✅
 
-## 4. Public Case Display
+**Goal:** Users can sign in
 
-**MVP Goal:** Anyone can view approved cases
+**Backend:**
 
-- Simple list of verified cases
-- Basic case details (no contact info initially)
-- Simple image display
-- No search/filtering initially
+- ✅ POST /auth/login endpoint
+- ✅ JWT token generation
+- ✅ Password verification
+- ✅ Session management
 
-## 5. Basic Frontend
+**Frontend:**
 
-**MVP Goal:** Simple web interface
+- Login form component
+- Token storage (localStorage)
+- Protected route wrapper
+- Logout functionality
 
-- Home page with case listings
-- Registration/login forms
+**Success:** User can login and access protected pages
+
+---
+
+## MVP Feature 3: Basic Profile ✅
+
+**Goal:** Users have profile information
+
+**Backend:**
+
+- ✅ GET /user/profile endpoint
+- ✅ Profile data storage
+- ✅ Basic profile update
+
+**Frontend:**
+
+- Profile display component
+- Profile edit form
+- Avatar placeholder
+
+**Success:** User can view and edit their profile
+
+---
+
+## MVP Feature 4: Case Submission Form
+
+**Goal:** Users can submit help requests
+
+**Backend:**
+
+- POST /cases/submit endpoint
+- Case table with basic fields
+- File upload handling (1-2 images)
+- Status: "pending"
+
+**Frontend:**
+
 - Case submission form
-- Admin review page
-- Basic responsive design
+- Image upload component
+- Form validation
+- Success confirmation
+
+**Success:** User can submit a case with images
+
+---
+
+## MVP Feature 5: Admin Case Review
+
+**Goal:** Admins can approve/reject cases
+
+**Backend:**
+
+- GET /admin/cases (pending list)
+- PUT /admin/cases/:id/approve
+- PUT /admin/cases/:id/reject
+- Admin role middleware
+
+**Frontend:**
+
+- Admin dashboard
+- Case list with actions
+- Approve/reject buttons
+- Status indicators
+
+**Success:** Admin can review and approve/reject cases
+
+---
+
+## MVP Feature 6: Public Case Display
+
+**Goal:** Anyone can view approved cases
+
+**Backend:**
+
+- GET /cases/public (approved only)
+- Case details endpoint
+- Image serving
+
+**Frontend:**
+
+- Public case listings
+- Case detail view
+- Image gallery
+- Basic pagination
+
+**Success:** Public can browse approved cases
+
+---
+
+## MVP Feature 7: Home Page & Navigation
+
+**Goal:** Basic site structure
+
+**Frontend:**
+
+- Home page with case previews
+- Navigation menu
+- Responsive layout
+- Basic styling
+
+**Success:** Site has clear navigation and structure
+
+---
+
+## MVP Feature 8: Search & Filter
+
+**Goal:** Users can find specific cases
+
+**Backend:**
+
+- GET /cases/search endpoint
+- Basic text search
+- Category filtering
+
+**Frontend:**
+
+- Search bar
+- Filter dropdowns
+- Search results display
+
+**Success:** Users can search and filter cases
+
+---
 
 ## Technical Priorities
 
-1. **Database**: Complete user and case tables
-2. **API**: Basic CRUD endpoints for cases
-3. **Auth**: Simple JWT-based authentication
-4. **Frontend**: React app with basic routing
-5. **Deployment**: Simple hosting setup
+1. **Database**: User and case tables complete
+2. **API**: RESTful endpoints for all features
+3. **Auth**: JWT with role-based access
+4. **Frontend**: React with routing and forms
+5. **File Upload**: Basic image handling
+6. **Deployment**: Simple hosting setup
 
 ## Success Criteria
 
-- Users can register and submit cases
-- Admins can review and approve cases
-- Public can view approved cases
-- Basic security and validation
+- Users can register, login, and submit cases
+- Admins can review and approve/reject cases
+- Public can browse and search approved cases
+- Basic security and validation throughout
 - Deployed and accessible online

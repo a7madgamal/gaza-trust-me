@@ -1,16 +1,18 @@
+import dotenv from 'dotenv';
+
+// Load environment variables FIRST, before any other imports
+dotenv.config();
+
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import rateLimit from 'express-rate-limit';
-import dotenv from 'dotenv';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import { initTRPC } from '@trpc/server';
 import { z } from 'zod';
 import { ApiResponseSchema } from './schemas/api';
 import { UserRegistrationSchema, UserLoginSchema } from './schemas/user';
-import logger from './utils/logger';
-import { supabase } from './utils/supabase';
 import { createAuthContext } from './middleware/auth';
 
 // Define context type
@@ -24,8 +26,9 @@ interface Context {
     | undefined;
 }
 
-// Load environment variables
-dotenv.config();
+// Import logger and supabase after environment variables are loaded
+import logger from './utils/logger';
+import { supabase } from './utils/supabase';
 
 // Initialize tRPC with context
 const t = initTRPC.context<Context>().create();
@@ -33,7 +36,7 @@ const t = initTRPC.context<Context>().create();
 // Create context function
 const createContext = async (opts: { req: express.Request; res: express.Response }): Promise<Context> => {
   try {
-    return await createAuthContext(opts);
+    return await createAuthContext(supabase)(opts);
   } catch {
     return {};
   }

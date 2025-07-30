@@ -9,12 +9,13 @@ alwaysApply: true
 - When replying to me: Always be concise, sarcastic, and to the point.
 - Ask if not sure. Stop me from doing stupid things.
 
-## Git & Command Rules
+## ABSOLUTLY CRITICAL RULES. NEVER EVER EVER BREAK. EVER!!!
 
 - Never perform git commit, push, or other git commands automatically. Only use safe commands like diff or status.
 - Only make changes when clearly instructed. If unsure, ask for clarification.
 - Always confirm before making big changes.
 - Use Windows commands for PowerShell.
+- dont use random fallbacks or default in code. BREAK EARLY AND OFTEN.
 
 ## Coding Rules
 
