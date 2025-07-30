@@ -16,8 +16,6 @@
     "clean": "npm run clean --workspaces && rimraf node_modules packages/*/node_modules packages/*/dist packages/*/build"
   },
   "devDependencies": {
-    "@commitlint/cli": "^19.8.1",
-    "@commitlint/config-conventional": "^19.8.1",
     "husky": "^8.0.3",
     "rimraf": "^5.0.5"
   },
