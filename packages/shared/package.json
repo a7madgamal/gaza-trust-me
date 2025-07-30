@@ -1,0 +1,19 @@
+{
+  "name": "@gazaconfirm/shared",
+  "version": "1.0.0",
+  "description": "Shared types, contracts, and utilities for Gazaconfirm platform",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "echo 'Shared build script - to be implemented'",
+    "lint": "echo 'Shared lint script - to be implemented'",
+    "type-check": "echo 'Shared type-check script - to be implemented'",
+    "test": "echo 'Shared test script - to be implemented'",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "rimraf": "^5.0.5"
+  }
+} 

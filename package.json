@@ -1,0 +1,29 @@
+{
+  "name": "gazaconfirm",
+  "version": "1.0.0",
+  "description": "Help-seeking platform with case management and verification system",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "prepare": "husky install",
+    "lint": "npm run lint --workspaces",
+    "type-check": "npm run type-check --workspaces",
+    "test": "npm run test --workspaces",
+    "build": "npm run build --workspaces",
+    "dev": "npm run dev --workspaces",
+    "clean": "npm run clean --workspaces && rimraf node_modules packages/*/node_modules packages/*/dist packages/*/build"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
+    "husky": "^8.0.3",
+    "rimraf": "^5.0.5"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "packageManager": "npm@9.0.0"
+}

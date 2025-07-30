@@ -1,0 +1,19 @@
+{
+  "name": "@gazaconfirm/frontend",
+  "version": "1.0.0",
+  "description": "Frontend React application for Gazaconfirm platform",
+  "private": true,
+  "scripts": {
+    "dev": "echo 'Frontend dev script - to be implemented'",
+    "build": "echo 'Frontend build script - to be implemented'",
+    "preview": "echo 'Frontend preview script - to be implemented'",
+    "lint": "echo 'Frontend lint script - to be implemented'",
+    "type-check": "echo 'Frontend type-check script - to be implemented'",
+    "test": "echo 'Frontend test script - to be implemented'",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "rimraf": "^5.0.5"
+  }
+} 

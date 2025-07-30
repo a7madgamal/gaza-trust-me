@@ -1,0 +1,20 @@
+{
+  "name": "@gazaconfirm/backend",
+  "version": "1.0.0",
+  "description": "Backend API server for Gazaconfirm platform",
+  "private": true,
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "echo 'Backend dev script - to be implemented'",
+    "build": "echo 'Backend build script - to be implemented'",
+    "start": "echo 'Backend start script - to be implemented'",
+    "lint": "echo 'Backend lint script - to be implemented'",
+    "type-check": "echo 'Backend type-check script - to be implemented'",
+    "test": "echo 'Backend test script - to be implemented'",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "rimraf": "^5.0.5"
+  }
+} 
