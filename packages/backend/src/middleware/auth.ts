@@ -1,16 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
-import { createClient } from '@supabase/supabase-js';
 import { TRPCError } from '@trpc/server';
 import logger from '../utils/logger';
-
-const supabaseUrl = process.env['SUPABASE_URL'];
-const supabaseKey = process.env['SUPABASE_SECRET_KEY'];
-
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error('Missing required environment variables: SUPABASE_URL and SUPABASE_SECRET_KEY');
-}
-
-const supabase = createClient(supabaseUrl, supabaseKey);
+import { supabase } from '../utils/supabase';
 
 import type { User } from '../types';
 
