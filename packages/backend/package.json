@@ -15,7 +15,11 @@
     "test:coverage": "vitest --coverage",
     "clean": "rimraf dist",
     "format": "prettier --write src/**/*.{ts,tsx,json}",
-    "format:check": "prettier --check src/**/*.{ts,tsx,json}"
+    "format:check": "prettier --check src/**/*.{ts,tsx,json}",
+    "format:sql": "sqlfluff fix database/migrations/*.sql --disable-progress-bar",
+    "lint:sql": "sqlfluff lint database/migrations/*.sql --disable-progress-bar",
+    "db:migrate": "node scripts/migrate.js",
+    "db:create-migration": "node scripts/create-migration.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.38.4",

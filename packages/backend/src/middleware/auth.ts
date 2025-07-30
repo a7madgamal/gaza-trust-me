@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { TRPCError } from '@trpc/server';
 import logger from '../utils/logger';
 
-const supabase = createClient(process.env['SUPABASE_URL']!, process.env['SUPABASE_SERVICE_ROLE_KEY']!);
+const supabase = createClient(process.env['SUPABASE_URL']!, process.env['SUPABASE_SECRET_KEY']!);
 
 import type { User } from '../types';
 

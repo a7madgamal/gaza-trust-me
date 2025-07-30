@@ -3,14 +3,14 @@ import { z } from 'zod';
 export const AdminActionSchema = z.object({
   id: z.string().uuid(),
   adminId: z.string().uuid(),
-  caseId: z.string().uuid(),
+  userId: z.string().uuid(),
   action: z.enum(['verify', 'flag']),
   remarks: z.string().optional(),
   createdAt: z.date(),
 });
 
 export const AdminActionInputSchema = z.object({
-  caseId: z.string().uuid('Invalid case ID'),
+  userId: z.string().uuid('Invalid user ID'),
   action: z.enum(['verify', 'flag'], {
     errorMap: () => ({ message: 'Action must be either verify or flag' }),
   }),

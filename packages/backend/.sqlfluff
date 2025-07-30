@@ -1,0 +1,7 @@
+[sqlfluff]
+dialect = postgres
+templater = jinja
+exclude_rules = RF05,LT05,CP01,CP03,CP05,RF06
+
+[sqlfluff:rules:layout.long_lines]
+max_line_length = 120 

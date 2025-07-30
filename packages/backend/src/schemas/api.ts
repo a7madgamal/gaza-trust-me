@@ -24,7 +24,7 @@ export const PaginationSchema = z.object({
   limit: z.number().int().positive().max(100).default(20),
 });
 
-export const CaseFilterSchema = z.object({
+export const UserFilterSchema = z.object({
   status: z.enum(['pending', 'verified', 'flagged']).optional(),
   urgencyLevel: z.enum(['low', 'medium', 'high', 'critical']).optional(),
   location: z.string().optional(),

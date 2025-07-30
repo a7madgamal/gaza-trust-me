@@ -1,0 +1,57 @@
+erDiagram
+    users {
+        UUID id PK
+        TEXT email
+        TEXT full_name
+        TEXT phone_number
+        TEXT role
+        TEXT title
+        TEXT description
+        TEXT urgency_level
+        TEXT location
+        TEXT contact_preference
+        TEXT contact_value
+        TEXT status
+        UUID verified_by FK
+        UUID flagged_by FK
+        TEXT flag_reason
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    user_images {
+        UUID id PK
+        UUID user_id FK
+        TEXT file_name
+        TEXT file_path
+        INTEGER file_size
+        TEXT mime_type
+        TIMESTAMP created_at
+    }
+
+    admin_actions {
+        UUID id PK
+        UUID admin_id FK
+        UUID user_id FK
+        TEXT action_type
+        JSONB action_data
+        TIMESTAMP created_at
+    }
+
+    audit_logs {
+        UUID id PK
+        UUID user_id FK
+        TEXT action
+        TEXT resource_type
+        UUID resource_id
+        JSONB old_values
+        JSONB new_values
+        TIMESTAMP created_at
+    }
+
+    users ||--o{ user_images : "has"
+    users ||--o{ admin_actions : "performs"
+    users ||--o{ audit_logs : "generates"
+    users ||--o{ admin_actions : "receives"
+    users ||--o{ users : "verifies"
+    users ||--o{ users : "flags" 
