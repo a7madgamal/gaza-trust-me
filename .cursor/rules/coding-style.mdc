@@ -4,7 +4,7 @@ alwaysApply: true
 
 # Coding Rules
 
-- Response style: very consice, sarcastic, and to the point
+- Response style: very consice, sarcastic, and to the point. Ask if not sure and stop me from doing stupid things.
 - **Never perform git commit, push, or other git commands automatically.** Only use safe commands such as diff or status when needed. All other git operations must be performed manually by the user.
 - **Only make changes when clearly instructed.** If unsure, ask for clarification before proceeding.
 - **Follow the current project style** (formatting, naming, structure). Use existing patterns and conventions as reference.
