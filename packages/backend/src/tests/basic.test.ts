@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { validateInput, safeValidateInput } from '../utils/validation';
-import { UserRegistrationSchema } from '../schemas/user';
-import { CaseSubmissionSchema } from '../schemas/case';
+import { UserRegistrationSchema, HelpSeekerSubmissionSchema } from '../schemas/user';
 
 describe('Backend Setup', () => {
   it('should validate user registration input correctly', () => {
@@ -26,17 +25,17 @@ describe('Backend Setup', () => {
     expect(() => validateInput(UserRegistrationSchema, invalidInput)).toThrow();
   });
 
-  it('should validate case submission input correctly', () => {
+  it('should validate help seeker submission input correctly', () => {
     const validInput = {
-      fullName: 'Jane Smith',
+      title: 'Help Needed',
       description: 'This is a detailed description of the help needed',
       contactPreference: 'whatsapp' as const,
-      contactInfo: '+1234567890',
+      contactValue: '+1234567890',
       urgencyLevel: 'high' as const,
       location: 'New York, NY',
     };
 
-    const result = validateInput(CaseSubmissionSchema, validInput);
+    const result = validateInput(HelpSeekerSubmissionSchema, validInput);
     expect(result).toEqual(validInput);
   });
 

@@ -1,11 +1,17 @@
 import { z } from 'zod';
 
 // Re-export schemas from local schemas for consistency
-export { UserRegistrationSchema, UserLoginSchema, UserProfileUpdateSchema } from '../schemas/user';
+export {
+  UserRegistrationSchema,
+  UserLoginSchema,
+  UserProfileUpdateSchema,
+  HelpSeekerSubmissionSchema,
+  HelpSeekerUpdateSchema,
+  HelpSeekerVerificationSchema,
+  UserImageSchema,
+} from '../schemas/user';
 
-export { CaseSubmissionSchema, CaseUpdateSchema, CaseVerificationSchema } from '../schemas/case';
-
-export { CaseFilterSchema } from '../schemas/api';
+export { UserFilterSchema } from '../schemas/api';
 
 export { AdminActionInputSchema } from '../schemas/admin';
 

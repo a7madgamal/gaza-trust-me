@@ -1,9 +1,10 @@
 // TypeScript types derived from Zod schemas for airtight type safety
 import { z } from 'zod';
-import { UserSchema, UserRegistrationSchema, UserLoginSchema, UserProfileUpdateSchema } from './schemas/user';
-
 import {
   UserSchema,
+  UserRegistrationSchema,
+  UserLoginSchema,
+  UserProfileUpdateSchema,
   UserImageSchema,
   HelpSeekerSubmissionSchema,
   HelpSeekerUpdateSchema,
