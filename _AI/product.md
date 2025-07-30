@@ -25,12 +25,8 @@
 1.1. User registration with email verification (Supabase Auth)
 1.2. Profile creation with personal information (Supabase Storage)
 1.3. Case submission with:
-1.3.1. Full Name
-1.3.2. Description
-1.3.3. Image uploads (multiple images supported)
-1.3.4. Contact preference (GoFundMe link OR WhatsApp number)
-1.3.5. Urgency level
-1.3.6. Location
+1.3.1. Description
+1.3.2. Image uploads (multiple images supported)
 1.4. View submission status (pending, verified, flagged)
 1.5. Edit profile information
 1.6. Delete account
@@ -40,8 +36,7 @@
 1.7. Email address (verified)
 1.8. Full name
 1.9. Phone number
-1.10. Case details
-1.11. Donation link (GoFundMe link etc.)
+1.10. Case description
 
 ### 2. Help Providers (Optional Registration)
 
@@ -49,14 +44,11 @@
 
 2.1. Browse verified help seeker cases
 2.2. Search and filter cases by:
-2.2.1. Location
-2.2.2. Urgency level
-2.2.3. Category/type of help needed
+2.2.1. Category/type of help needed
 2.3. View case details including:
 2.3.1. Seeker's basic information
 2.3.2. Case description
 2.3.3. Images
-2.3.4. Contact information (GoFundMe or WhatsApp)
 
 ### 3. Admins (Secure Login Required)
 

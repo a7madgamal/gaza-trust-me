@@ -9,8 +9,6 @@ CREATE TYPE user_role AS ENUM ('help_seeker', 'admin', 'super_admin');
 
 CREATE TYPE seeker_status AS ENUM ('pending', 'verified', 'flagged');
 
-CREATE TYPE urgency_level AS ENUM ('low', 'medium', 'high', 'critical');
-
 -- Users table (extends Supabase auth.users)
 CREATE TABLE IF NOT EXISTS public.users (
     id UUID REFERENCES auth.users (id) ON DELETE CASCADE PRIMARY KEY,
@@ -19,18 +17,10 @@ CREATE TABLE IF NOT EXISTS public.users (
     phone_number TEXT,
     role USER_ROLE NOT NULL DEFAULT 'help_seeker',
     -- Seeker-specific fields (for help_seeker role)
-    title TEXT,
     description TEXT,
-    urgency_level URGENCY_LEVEL DEFAULT 'medium',
-    location TEXT,
-    contact_preference TEXT, -- 'gofundme' or 'whatsapp'
-    contact_value TEXT, -- GoFundMe link or WhatsApp number
     status SEEKER_STATUS DEFAULT 'pending',
     verified_at TIMESTAMP WITH TIME ZONE,
     verified_by UUID REFERENCES public.users (id),
-    flagged_at TIMESTAMP WITH TIME ZONE,
-    flagged_by UUID REFERENCES public.users (id),
-    flag_reason TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -79,7 +69,6 @@ CREATE INDEX IF NOT EXISTS idx_users_role ON public.users (role);
 
 CREATE INDEX IF NOT EXISTS idx_users_status ON public.users (status);
 
-CREATE INDEX IF NOT EXISTS idx_users_urgency ON public.users (urgency_level);
 
 CREATE INDEX IF NOT EXISTS idx_users_created_at ON public.users (created_at);
 

@@ -8,6 +8,7 @@ import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import { initTRPC } from '@trpc/server';
 import { z } from 'zod';
 import { ApiResponseSchema } from './schemas/api';
+import logger from './utils/logger';
 
 // Load environment variables
 dotenv.config();
@@ -77,7 +78,7 @@ app.get('/health', (_req, res) => {
 
 // Error handling middleware
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-  console.error(err.stack);
+  logger.error('Unhandled error:', err);
   res.status(500).json({ error: 'Something went wrong!' });
 });
 
@@ -87,7 +88,7 @@ app.use('*', (_req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📊 Health check: http://localhost:${PORT}/health`);
-  console.log(`🔗 tRPC endpoint: http://localhost:${PORT}/trpc`);
+  logger.info(`🚀 Server running on port ${PORT}`);
+  logger.info(`📊 Health check: http://localhost:${PORT}/health`);
+  logger.info(`🔗 tRPC endpoint: http://localhost:${PORT}/trpc`);
 });

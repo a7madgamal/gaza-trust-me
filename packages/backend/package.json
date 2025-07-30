@@ -17,7 +17,7 @@
     "format": "prettier --write src/**/*.{ts,tsx,json}",
     "format:check": "prettier --check src/**/*.{ts,tsx,json}",
     "format:sql": "sqlfluff fix database/migrations/*.sql --disable-progress-bar",
-    "lint:sql": "sqlfluff lint database/migrations/*.sql --disable-progress-bar",
+    "lint:sql": "python -m sqlfluff lint database/migrations/*.sql --disable-progress-bar",
     "db:migrate": "node scripts/migrate.js",
     "db:create-migration": "node scripts/create-migration.js"
   },

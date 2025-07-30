@@ -1,4 +1,13 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
+# Source environment to ensure PATH includes Python packages
+if [ -f ~/.bashrc ]; then
+  . ~/.bashrc
+elif [ -f ~/.zshrc ]; then
+  . ~/.zshrc
+elif [ -f ~/.profile ]; then
+  . ~/.profile
+fi
+
 npm run check

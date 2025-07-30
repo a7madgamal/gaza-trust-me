@@ -7,8 +7,12 @@ const logFormat = winston.format.combine(
   winston.format.json()
 );
 
+if (!process.env['LOG_LEVEL']) {
+  throw new Error('LOG_LEVEL environment variable is required');
+}
+
 const logger = winston.createLogger({
-  level: process.env['LOG_LEVEL'] || 'info',
+  level: process.env['LOG_LEVEL'],
   format: logFormat,
   transports: [
     // Console transport

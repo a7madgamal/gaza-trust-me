@@ -53,8 +53,6 @@ export interface PaginatedResponse<T> {
 // Utility types
 export type UserRole = User['role'];
 export type SeekerStatus = User['status'];
-export type UrgencyLevel = User['urgencyLevel'];
-export type ContactPreference = User['contactPreference'];
 export type AdminActionType = AdminAction['action'];
 
 // Re-export schemas for runtime validation

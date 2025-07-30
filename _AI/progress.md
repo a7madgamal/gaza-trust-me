@@ -32,7 +32,7 @@ Read this files carefuly for an over view of the project
 ## 2. Supabase Configuration & Database Schema
 
 - [ ] 2.1. Create Supabase project and configure authentication with email/password and role-based access
-- [x] 2.2. Design database schema with tables for users, cases, admin_actions, and audit_logs with proper relationships
+- [x] 2.2. Design database schema with tables for users, user_images, admin_actions, and audit_logs with proper relationships
 - [x] 2.3. Implement Row-Level Security policies for each table based on user roles (help_seeker, admin, super_admin)
 - [ ] 2.4. Set up Supabase Storage bucket for case images with RLS policies and signed URL configuration
 - [x] 2.5. Create database functions and triggers for automated audit logging of all CRUD operations
@@ -52,8 +52,8 @@ Read this files carefuly for an over view of the project
 
 - [ ] 4.1. Initialize Express server with tRPC integration, CORS configuration, and security middleware
 - [ ] 4.2. Implement authentication middleware using Supabase JWT verification and role extraction
-- [ ] 4.3. Create case management router with endpoints for submission, listing, and status updates
-- [ ] 4.4. Implement admin router with case verification, flagging, and remark functionality
+- [ ] 4.3. Create user management router with endpoints for help seeker submission, listing, and status updates
+- [ ] 4.4. Implement admin router with user verification, flagging, and remark functionality
 - [ ] 4.5. Create super-admin router with user role management and audit log retrieval
 - [ ] 4.6. Set up image upload handler with validation, virus scanning, and Supabase Storage integration
 - [ ] 4.7. Implement comprehensive error handling with proper HTTP status codes and user-friendly messages
@@ -66,9 +66,9 @@ Read this files carefuly for an over view of the project
 - [ ] 5.1. Initialize Vite React application with TypeScript strict mode and Material UI theme configuration
 - [ ] 5.2. Set up routing with protected routes based on authentication status and user roles
 - [ ] 5.3. Create authentication components for registration, login, and role-based navigation
-- [ ] 5.4. Implement help seeker dashboard with case submission form and image upload functionality
-- [ ] 5.5. Build public case listing page with filtering, pagination, and responsive card layout
-- [ ] 5.6. Create admin panel with case review interface, verification controls, and remark system
+- [ ] 5.4. Implement help seeker dashboard with submission form and image upload functionality
+- [ ] 5.5. Build public help seeker listing page with filtering, pagination, and responsive card layout
+- [ ] 5.6. Create admin panel with help seeker review interface, verification controls, and remark system
 - [ ] 5.7. Implement super-admin interface with user management and comprehensive audit log viewer
 - [ ] 5.8. Add image gallery component with lazy loading, transformations, and accessibility features
 - [ ] 5.9. Implement form validation using react-hook-form with Zod schema integration

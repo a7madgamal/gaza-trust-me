@@ -27,12 +27,7 @@ describe('Backend Setup', () => {
 
   it('should validate help seeker submission input correctly', () => {
     const validInput = {
-      title: 'Help Needed',
       description: 'This is a detailed description of the help needed',
-      contactPreference: 'whatsapp' as const,
-      contactValue: '+1234567890',
-      urgencyLevel: 'high' as const,
-      location: 'New York, NY',
     };
 
     const result = validateInput(HelpSeekerSubmissionSchema, validInput);

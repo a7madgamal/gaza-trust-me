@@ -3,7 +3,14 @@ import { createClient } from '@supabase/supabase-js';
 import { TRPCError } from '@trpc/server';
 import logger from '../utils/logger';
 
-const supabase = createClient(process.env['SUPABASE_URL']!, process.env['SUPABASE_SECRET_KEY']!);
+const supabaseUrl = process.env['SUPABASE_URL'];
+const supabaseKey = process.env['SUPABASE_SECRET_KEY'];
+
+if (!supabaseUrl || !supabaseKey) {
+  throw new Error('Missing required environment variables: SUPABASE_URL and SUPABASE_SECRET_KEY');
+}
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 import type { User } from '../types';
 
@@ -40,9 +47,14 @@ export const authenticateUser = async (req: AuthenticatedRequest, res: Response,
       return;
     }
 
+    if (!user.email) {
+      res.status(401).json({ error: 'User email not found' });
+      return;
+    }
+
     req.user = {
       id: user.id,
-      email: user.email!,
+      email: user.email,
       role: userData.role,
     };
 
@@ -98,10 +110,14 @@ export const createAuthContext = async (opts: { req: Request; res: Response }) =
     throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User not found' });
   }
 
+  if (!user.email) {
+    throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User email not found' });
+  }
+
   return {
     user: {
       id: user.id,
-      email: user.email!,
+      email: user.email,
       role: userData.role,
     },
   };

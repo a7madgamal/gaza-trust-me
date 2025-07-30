@@ -5,16 +5,10 @@ erDiagram
         TEXT full_name
         TEXT phone_number
         TEXT role
-        TEXT title
         TEXT description
-        TEXT urgency_level
-        TEXT location
-        TEXT contact_preference
-        TEXT contact_value
         TEXT status
         UUID verified_by FK
-        UUID flagged_by FK
-        TEXT flag_reason
+        TIMESTAMP verified_at
         TIMESTAMP created_at
         TIMESTAMP updated_at
     }
@@ -26,6 +20,7 @@ erDiagram
         TEXT file_path
         INTEGER file_size
         TEXT mime_type
+        TEXT storage_bucket
         TIMESTAMP created_at
     }
 
@@ -46,6 +41,8 @@ erDiagram
         UUID resource_id
         JSONB old_values
         JSONB new_values
+        INET ip_address
+        TEXT user_agent
         TIMESTAMP created_at
     }
 
@@ -53,5 +50,4 @@ erDiagram
     users ||--o{ admin_actions : "performs"
     users ||--o{ audit_logs : "generates"
     users ||--o{ admin_actions : "receives"
-    users ||--o{ users : "verifies"
-    users ||--o{ users : "flags" 
+    users ||--o{ users : "verifies" 

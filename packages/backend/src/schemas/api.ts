@@ -26,7 +26,5 @@ export const PaginationSchema = z.object({
 
 export const UserFilterSchema = z.object({
   status: z.enum(['pending', 'verified', 'flagged']).optional(),
-  urgencyLevel: z.enum(['low', 'medium', 'high', 'critical']).optional(),
-  location: z.string().optional(),
   search: z.string().optional(),
 });
