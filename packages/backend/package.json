@@ -16,10 +16,12 @@
     "clean": "rimraf dist",
     "format": "prettier --write src/**/*.{ts,tsx,json}",
     "format:check": "prettier --check src/**/*.{ts,tsx,json}",
-    "format:sql": "sqlfluff fix database/migrations/*.sql --disable-progress-bar",
-    "lint:sql": "python -m sqlfluff lint database/migrations/*.sql --disable-progress-bar",
-    "db:migrate": "node scripts/migrate.js",
-    "db:create-migration": "node scripts/create-migration.js"
+    "format:sql": "sqlfluff fix supabase/migrations/*.sql --disable-progress-bar",
+    "lint:sql": "python -m sqlfluff lint supabase/migrations/*.sql --disable-progress-bar",
+    "db:migrate": "supabase db push --db-url \"postgresql://postgres.sivaovkdxiluefuhlqoj:kQiJZS7OFUXE4S4I@aws-0-eu-central-1.pooler.supabase.com:6543/postgres\"",
+    "db:migrate:reset": "supabase db reset",
+    "db:migrate:status": "supabase migration list",
+    "db:create-migration": "supabase migration new"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.38.4",

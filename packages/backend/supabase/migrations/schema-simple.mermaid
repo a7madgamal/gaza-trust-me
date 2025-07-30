@@ -46,8 +46,16 @@ erDiagram
         TIMESTAMP created_at
     }
 
+    migrations {
+        SERIAL id PK
+        VARCHAR migration_name
+        TIMESTAMP applied_at
+        VARCHAR checksum
+        INTEGER execution_time_ms
+    }
+
     users ||--o{ user_images : "has"
     users ||--o{ admin_actions : "performs"
-    users ||--o{ audit_logs : "generates"
     users ||--o{ admin_actions : "receives"
+    users ||--o{ audit_logs : "generates"
     users ||--o{ users : "verifies" 
