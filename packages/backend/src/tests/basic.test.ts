@@ -1,0 +1,63 @@
+import { describe, it, expect } from 'vitest';
+import { validateInput, safeValidateInput } from '../utils/validation';
+import { UserRegistrationSchema } from '../schemas/user';
+import { CaseSubmissionSchema } from '../schemas/case';
+
+describe('Backend Setup', () => {
+  it('should validate user registration input correctly', () => {
+    const validInput = {
+      email: 'test@example.com',
+      password: 'password123',
+      fullName: 'John Doe',
+      phoneNumber: '+1234567890',
+    };
+
+    const result = validateInput(UserRegistrationSchema, validInput);
+    expect(result).toEqual(validInput);
+  });
+
+  it('should reject invalid email in user registration', () => {
+    const invalidInput = {
+      email: 'invalid-email',
+      password: 'password123',
+      fullName: 'John Doe',
+    };
+
+    expect(() => validateInput(UserRegistrationSchema, invalidInput)).toThrow();
+  });
+
+  it('should validate case submission input correctly', () => {
+    const validInput = {
+      fullName: 'Jane Smith',
+      description: 'This is a detailed description of the help needed',
+      contactPreference: 'whatsapp' as const,
+      contactInfo: '+1234567890',
+      urgencyLevel: 'high' as const,
+      location: 'New York, NY',
+    };
+
+    const result = validateInput(CaseSubmissionSchema, validInput);
+    expect(result).toEqual(validInput);
+  });
+
+  it('should safely validate input and return null for invalid data', () => {
+    const invalidInput = {
+      email: 'invalid-email',
+      password: 'short',
+    };
+
+    const result = safeValidateInput(UserRegistrationSchema, invalidInput);
+    expect(result).toBeNull();
+  });
+
+  it('should handle missing optional fields', () => {
+    const inputWithoutPhone = {
+      email: 'test@example.com',
+      password: 'password123',
+      fullName: 'John Doe',
+    };
+
+    const result = validateInput(UserRegistrationSchema, inputWithoutPhone);
+    expect(result.phoneNumber).toBeUndefined();
+  });
+});
