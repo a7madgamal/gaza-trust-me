@@ -1,0 +1,26 @@
+# Coding Rules
+
+- **Never perform git commit, push, or other git commands automatically.** Only use safe commands such as diff or status when needed. All other git operations must be performed manually by the user.
+- **Only make changes when clearly instructed.** If unsure, ask for clarification before proceeding.
+- **Follow the current project style** (formatting, naming, structure). Use existing patterns and conventions as reference.
+- **Focus on the current in-progress step** in \_AI/progress.md. Avoid unrelated changes or distractions.
+- **Keep code comments minimal.** Only add comments when necessary to clarify non-obvious logic or prevent confusion. Do not comment on every small change.
+- **Unit tests are required for each main feature or fix.** Tests should be committed together with the implementation.
+- **TypeScript best practices:**
+  - Avoid using the `any` type. Prefer strict typing and type inference.
+  - Avoid using the `as` keyword for type assertions unless absolutely necessary.
+  - Minimize or avoid the use of TypeScript/ESLint ignore comments (e.g., `// @ts-ignore`, `// eslint-disable-next-line`).
+- **ESLint/code quality:**
+  - When code smells or anti-patterns are detected, always consider and suggest appropriate ESLint rules to enforce better practices.
+- **Error handling:**
+  - Show user-friendly error messages for failed API calls or invalid input.
+  - Use loading indicators for async operations.
+- **Security:**
+  - Never expose sensitive data in the frontend.
+  - Always handle authentication tokens securely.
+- **Keep the codebase clean:**
+  - Remove unused code, imports, and variables.
+  - Avoid duplicating logic—reuse services and utilities where possible.
+- **UI/UX:**
+  - Ensure the app is usable and visually consistent.
+  - Follow accessibility best practices where practical.
