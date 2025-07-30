@@ -29,6 +29,18 @@ export const validatePassword = (password: string): string | undefined => {
   return undefined;
 };
 
+export const validateFullName = (fullName: string): string | undefined => {
+  if (!fullName) {
+    return "Full name is required";
+  }
+
+  if (fullName.trim().length < 2) {
+    return "Full name must be at least 2 characters long";
+  }
+
+  return undefined;
+};
+
 export const validateConfirmPassword = (
   password: string,
   confirmPassword: string
@@ -48,6 +60,11 @@ export const validateRegistrationForm = (
   formData: RegistrationFormData
 ): ValidationErrors => {
   const errors: ValidationErrors = {};
+
+  const fullNameError = validateFullName(formData.fullName);
+  if (fullNameError) {
+    errors.fullName = fullNameError;
+  }
 
   const emailError = validateEmail(formData.email);
   if (emailError) {

@@ -1,7 +1,6 @@
-import dotenv from 'dotenv';
-
-// Load environment variables FIRST, before any other imports
-dotenv.config();
+// Import environment validation first - this will load and validate all env vars
+import './utils/env';
+import { env } from './utils/env';
 
 import express from 'express';
 import cors from 'cors';
@@ -13,6 +12,10 @@ import { initTRPC } from '@trpc/server';
 import { z } from 'zod';
 import { ApiResponseSchema } from './schemas/api';
 import { UserRegistrationSchema, UserLoginSchema } from './schemas/user';
+
+// Import logger and supabase after environment variables are loaded
+import logger from './utils/logger';
+import { supabase } from './utils/supabase';
 import { createAuthContext } from './middleware/auth';
 
 // Define context type
@@ -26,10 +29,6 @@ interface Context {
     | undefined;
 }
 
-// Import logger and supabase after environment variables are loaded
-import logger from './utils/logger';
-import { supabase } from './utils/supabase';
-
 // Initialize tRPC with context
 const t = initTRPC.context<Context>().create();
 
@@ -38,7 +37,7 @@ const createContext = async (opts: { req: express.Request; res: express.Response
   try {
     return await createAuthContext(supabase)(opts);
   } catch {
-    return {};
+    return { user: undefined };
   }
 };
 
@@ -247,7 +246,7 @@ const appRouter = t.router({
 export type AppRouter = typeof appRouter;
 
 const app = express();
-const PORT = process.env['PORT'] || 3001;
+const PORT = env.PORT;
 
 // Security middleware
 app.use(helmet());
@@ -274,6 +273,111 @@ app.use('/api/', limiter);
 // Body parsing
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// REST API endpoints
+app.post('/api/auth/register', async (req, res) => {
+  try {
+    const { email, password, fullName, phoneNumber } = req.body;
+
+    // Validate input
+    if (!email || !password || !fullName) {
+      return res.status(400).json({
+        error: 'Email, password, and full name are required',
+      });
+    }
+
+    // Create user in Supabase Auth
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+
+    if (authError) {
+      logger.error('Auth signup error:', authError);
+      return res.status(400).json({
+        error: authError.message || 'Registration failed',
+      });
+    }
+
+    if (!authData.user) {
+      return res.status(400).json({
+        error: 'Failed to create user',
+      });
+    }
+
+    // Create user profile in database
+    const { error: profileError } = await supabase.from('users').insert({
+      id: authData.user.id,
+      email,
+      full_name: fullName,
+      phone_number: phoneNumber,
+      role: 'help_seeker',
+    });
+
+    if (profileError) {
+      // Clean up auth user if profile creation fails
+      await supabase.auth.admin.deleteUser(authData.user.id);
+      logger.error('Profile creation error:', profileError);
+      return res.status(400).json({
+        error: 'Failed to create user profile',
+      });
+    }
+
+    return res.status(201).json({
+      success: true,
+      message: 'User registered successfully',
+    });
+  } catch (error) {
+    logger.error('Registration error:', error);
+    return res.status(500).json({
+      error: 'Internal server error',
+    });
+  }
+});
+
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        error: 'Email and password are required',
+      });
+    }
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      logger.error('Login error:', error);
+      return res.status(401).json({
+        error: error.message || 'Invalid credentials',
+      });
+    }
+
+    if (!data.user) {
+      return res.status(401).json({
+        error: 'Invalid credentials',
+      });
+    }
+
+    return res.json({
+      success: true,
+      user: {
+        id: data.user.id,
+        email: data.user.email,
+      },
+      session: data.session,
+    });
+  } catch (error) {
+    logger.error('Login error:', error);
+    return res.status(500).json({
+      error: 'Internal server error',
+    });
+  }
+});
 
 // tRPC middleware
 app.use(

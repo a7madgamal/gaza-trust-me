@@ -57,6 +57,20 @@ const RegistrationForm = () => {
         <Box component="form" onSubmit={handleSubmit} sx={{mt: 2}}>
           <TextField
             fullWidth
+            label="Full Name"
+            type="text"
+            margin="normal"
+            required
+            error={!!errors.fullName}
+            helperText={errors.fullName}
+            value={formData.fullName}
+            onChange={handleChange("fullName")}
+            disabled={loading}
+            autoComplete="name"
+          />
+
+          <TextField
+            fullWidth
             label="Email"
             type="email"
             margin="normal"

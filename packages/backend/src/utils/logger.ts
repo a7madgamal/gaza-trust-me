@@ -1,5 +1,6 @@
 import winston from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
+import { env } from './env';
 
 const logFormat = winston.format.combine(
   winston.format.timestamp(),
@@ -7,12 +8,8 @@ const logFormat = winston.format.combine(
   winston.format.json()
 );
 
-if (!process.env['LOG_LEVEL']) {
-  throw new Error('LOG_LEVEL environment variable is required');
-}
-
 const logger = winston.createLogger({
-  level: process.env['LOG_LEVEL'],
+  level: env.LOG_LEVEL,
   format: logFormat,
   transports: [
     new winston.transports.Console({

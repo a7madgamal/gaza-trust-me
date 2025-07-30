@@ -2,6 +2,7 @@ export interface RegistrationFormData {
   email: string;
   password: string;
   confirmPassword: string;
+  fullName: string;
 }
 
 export interface LoginFormData {
@@ -22,4 +23,5 @@ export interface ValidationErrors {
   email?: string;
   password?: string;
   confirmPassword?: string;
+  fullName?: string;
 }

@@ -9,6 +9,7 @@ export const useRegistrationForm = () => {
     email: "",
     password: "",
     confirmPassword: "",
+    fullName: "",
   });
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [loading, setLoading] = useState(false);
@@ -59,6 +60,7 @@ export const useRegistrationForm = () => {
           body: JSON.stringify({
             email: formData.email,
             password: formData.password,
+            fullName: formData.fullName,
           }),
         });
 
