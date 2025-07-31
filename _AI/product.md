@@ -24,10 +24,10 @@
 
 1.1. User registration with email verification (Supabase Auth)
 1.2. Profile creation with personal information (Supabase Storage)
-1.3. Case submission with:
+1.3. Profile management with:
 1.3.1. Description
 1.3.2. Image uploads (multiple images supported)
-1.4. View submission status (pending, verified, flagged)
+1.4. View profile status (pending, verified, flagged)
 1.5. Edit profile information
 1.6. Delete account
 
@@ -36,18 +36,18 @@
 1.7. Email address (verified)
 1.8. Full name
 1.9. Phone number
-1.10. Case description
+1.10. Profile description
 
 ### 2. Help Providers (Optional Registration)
 
 **Core Features:**
 
-2.1. Browse verified help seeker cases
-2.2. Search and filter cases by:
+2.1. Browse verified help seeker profiles
+2.2. Search and filter profiles by:
 2.2.1. Category/type of help needed
-2.3. View case details including:
+2.3. View profile details including:
 2.3.1. Seeker's basic information
-2.3.2. Case description
+2.3.2. Profile description
 2.3.3. Images
 
 ### 3. Admins (Secure Login Required)
@@ -56,19 +56,19 @@
 
 3.1. Secure login with email/password
 3.2. Review pending help seeker submissions
-3.3. Verify or flag cases with:
+3.3. Verify or flag profiles with:
 3.3.1. Approval/rejection decision
 3.3.2. Remarks/notes for each action
 3.3.3. Timestamp and admin identification
-3.4. View verified and flagged cases
-3.5. Search and filter cases by status
-3.6. Bulk operations for multiple cases
+3.4. View verified and flagged profiles
+3.5. Search and filter profiles by status
+3.6. Bulk operations for multiple profiles
 3.7. View admin activity history
 
 **Permissions:**
 
-3.8. Can verify/flag cases
-3.9. Can view all case details
+3.8. Can verify/flag profiles
+3.9. Can view all profile details
 3.10. Can leave remarks
 3.11. Cannot assign other admins
 3.12. Cannot view audit logs
@@ -109,21 +109,21 @@
 5.5. Rate limiting on authentication endpoints
 5.6. Audit logging for all authentication events
 
-### Case Management
+### User Profile Management
 
-5.7. Case submission workflow:
+5.7. Profile submission workflow:
 5.7.1. User registers/logs in
-5.7.2. Fills case details form
+5.7.2. Fills profile details form
 5.7.3. Uploads images (max 5 images, 5MB each)
 5.7.4. Submits for admin review
 5.7.5. Receives status updates
-5.8. Case verification process:
+5.8. Profile verification process:
 5.8.1. Admin reviews submission
 5.8.2. Checks images and details
 5.8.3. Approves or flags with remarks
 5.8.4. System logs action with timestamp
-5.9. Case display:
-5.9.1. Public listing of verified cases only
+5.9. Profile display:
+5.9.1. Public listing of verified profiles only
 5.9.2. Responsive card layout
 5.9.3. Image gallery with lazy loading
 5.9.4. Contact information display
@@ -134,7 +134,7 @@
 5.10. Upload requirements:
 5.10.1. Supported formats: JPG, PNG, WebP
 5.10.2. Maximum file size: 5MB per image
-5.10.3. Maximum images per case: 5
+5.10.3. Maximum images per profile: 5
 5.10.4. Automatic image optimization
 5.11. Storage:
 5.11.1. Supabase Storage with RLS policies
@@ -150,14 +150,14 @@
 #### Core Tables
 
 5.13. Users Table: Store user accounts with roles, authentication data, and profile information
-5.14. Cases Table: Store help requests with status, verification data, and contact information
-5.15. Case Images Table: Store uploaded images with metadata and file information
+5.14. User Profiles Table: Store help requests with status, verification data, and contact information
+5.15. User Images Table: Store uploaded images with metadata and file information
 5.16. Audit Logs Table: Track all system actions for security and compliance
 
 #### Data Relationships
 
-5.17. Users can have multiple cases (one-to-many)
-5.18. Cases can have multiple images (one-to-many)
+5.17. Users can have multiple profiles (one-to-many)
+5.18. Profiles can have multiple images (one-to-many)
 5.19. All actions are logged in audit table with user and resource references
 5.20. Role-based access control enforced at database level
 
@@ -171,21 +171,21 @@
 5.24. POST /auth/refresh - Refresh token
 5.25. POST /auth/verify-email - Email verification
 
-#### Cases
+#### User Profiles
 
-5.26. GET /cases - List verified cases (public)
-5.27. POST /cases - Create new case (authenticated)
-5.28. GET /cases/:id - Get case details
-5.29. PUT /cases/:id - Update case (owner only)
-5.30. DELETE /cases/:id - Delete case (owner only)
-5.31. POST /cases/:id/images - Upload case images
-5.32. DELETE /cases/:id/images/:imageId - Delete case image
+5.26. GET /profiles - List verified profiles (public)
+5.27. POST /profiles - Create new profile (authenticated)
+5.28. GET /profiles/:id - Get profile details
+5.29. PUT /profiles/:id - Update profile (owner only)
+5.30. DELETE /profiles/:id - Delete profile (owner only)
+5.31. POST /profiles/:id/images - Upload profile images
+5.32. DELETE /profiles/:id/images/:imageId - Delete profile image
 
 #### Admin
 
-5.33. GET /admin/cases - List all cases (admin only)
-5.34. PUT /admin/cases/:id/verify - Verify case (admin only)
-5.35. PUT /admin/cases/:id/flag - Flag case (admin only)
+5.33. GET /admin/profiles - List all profiles (admin only)
+5.34. PUT /admin/profiles/:id/verify - Verify profile (admin only)
+5.35. PUT /admin/profiles/:id/flag - Flag profile (admin only)
 5.36. GET /admin/audit-logs - View audit logs (super admin only)
 
 #### Users
@@ -209,18 +209,18 @@
 
 #### Public Pages
 
-6.6. Home/Landing Page: Introduction, featured cases, call-to-action
-6.7. Cases Listing: Grid/list view of verified cases with filters
-6.8. Case Detail: Full case information with images and contact details
+6.6. Home/Landing Page: Introduction, featured profiles, call-to-action
+6.7. Profiles Listing: Grid/list view of verified profiles with filters
+6.8. Profile Detail: Full profile information with images and contact details
 6.9. Registration: User registration form
 6.10. Login: Authentication form
 
 #### Authenticated Pages
 
-6.11. Dashboard: User's cases and status
-6.12. Case Submission: Multi-step form for creating cases
+6.11. Dashboard: User's profiles and status
+6.12. Profile Submission: Multi-step form for creating profiles
 6.13. Profile Management: Edit personal information
-6.14. Admin Panel: Case review interface
+6.14. Admin Panel: Profile review interface
 6.15. Super Admin Panel: User and system management
 
 ### Responsive Breakpoints
@@ -307,7 +307,7 @@
 
 ### End-to-End Testing
 
-10.7. User registration and case submission
+10.7. User registration and profile submission
 10.8. Admin verification workflow
 10.9. Super admin role management
 
@@ -316,7 +316,7 @@
 ### User Engagement
 
 11.1. Registration rate for help seekers
-11.2. Case submission completion rate
+11.2. Profile submission completion rate
 11.3. Admin response time for verifications
 11.4. User retention rates
 
@@ -329,6 +329,6 @@
 
 ### Business Impact
 
-11.9. Number of verified cases published
-11.10. Help provider engagement with cases
+11.9. Number of verified profiles published
+11.10. Help provider engagement with profiles
 11.11. Successful connections made through platform

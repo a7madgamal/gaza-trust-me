@@ -1,37 +1,28 @@
-import {
-  Box,
-  Paper,
-  Typography,
-  TextField,
-  Button,
-  Link,
-  Alert,
-  CircularProgress,
-} from "@mui/material";
-import {Link as RouterLink, useNavigate} from "react-router-dom";
-import {useState} from "react";
-import {useAuth} from "../../hooks/useAuth";
+import { Box, Paper, Typography, TextField, Button, Link, Alert, CircularProgress } from '@mui/material';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useAuth } from '../../hooks/useAuth';
 
 const LoginForm = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [errors, setErrors] = useState<{email?: string; password?: string}>({});
-  const [apiError, setApiError] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [apiError, setApiError] = useState('');
   const [loading, setLoading] = useState(false);
-  const {login} = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
 
   const validateForm = () => {
-    const newErrors: {email?: string; password?: string} = {};
+    const newErrors: { email?: string; password?: string } = {};
 
     if (!email) {
-      newErrors.email = "Email is required";
+      newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = "Please enter a valid email address";
+      newErrors.email = 'Please enter a valid email address';
     }
 
     if (!password) {
-      newErrors.password = "Password is required";
+      newErrors.password = 'Password is required';
     }
 
     setErrors(newErrors);
@@ -40,7 +31,7 @@ const LoginForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setApiError("");
+    setApiError('');
     setLoading(true);
 
     if (!validateForm()) {
@@ -50,9 +41,9 @@ const LoginForm = () => {
 
     try {
       await login(email, password);
-      navigate("/dashboard");
+      navigate('/dashboard');
     } catch (error) {
-      setApiError("Invalid credentials. Please try again.");
+      setApiError('Invalid credentials. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -61,32 +52,32 @@ const LoginForm = () => {
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
     if (errors.email) {
-      setErrors((prev) => ({...prev, email: undefined}));
+      setErrors(prev => ({ ...prev, email: undefined }));
     }
     if (apiError) {
-      setApiError("");
+      setApiError('');
     }
   };
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
     if (errors.password) {
-      setErrors((prev) => ({...prev, password: undefined}));
+      setErrors(prev => ({ ...prev, password: undefined }));
     }
     if (apiError) {
-      setApiError("");
+      setApiError('');
     }
   };
 
   return (
     <Box
       sx={{
-        display: "flex",
-        flexDirection: "column",
-        minHeight: "100vh",
-        justifyContent: "center",
-        alignItems: "center",
-        px: {xs: 2, sm: 4, md: 0},
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: '100vh',
+        justifyContent: 'center',
+        alignItems: 'center',
+        px: { xs: 2, sm: 4, md: 0 },
         py: 4,
       }}
     >
@@ -95,29 +86,24 @@ const LoginForm = () => {
         sx={{
           p: 4,
           maxWidth: 400,
-          width: "100%",
+          width: '100%',
         }}
       >
         <Typography variant="h4" component="h1" gutterBottom align="center">
           Sign In
         </Typography>
 
-        <Typography
-          variant="body2"
-          color="text.secondary"
-          align="center"
-          sx={{mb: 3}}
-        >
+        <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 3 }}>
           Welcome back to Gazaconfirm
         </Typography>
 
         {apiError && (
-          <Alert severity="error" sx={{mb: 3}} data-testid="error-message">
+          <Alert severity="error" sx={{ mb: 3 }} data-testid="error-message">
             {apiError}
           </Alert>
         )}
 
-        <Box component="form" onSubmit={handleSubmit} sx={{mt: 2}} noValidate>
+        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }} noValidate>
           <TextField
             fullWidth
             label="Email"
@@ -130,7 +116,7 @@ const LoginForm = () => {
             disabled={loading}
             error={!!errors.email}
             helperText={errors.email}
-            inputProps={{"data-testid": "email"}}
+            inputProps={{ 'data-testid': 'email' }}
           />
 
           <TextField
@@ -145,7 +131,7 @@ const LoginForm = () => {
             disabled={loading}
             error={!!errors.password}
             helperText={errors.password}
-            inputProps={{"data-testid": "password"}}
+            inputProps={{ 'data-testid': 'password' }}
           />
 
           <Button
@@ -153,20 +139,16 @@ const LoginForm = () => {
             fullWidth
             variant="contained"
             size="large"
-            sx={{mt: 3, mb: 2}}
+            sx={{ mt: 3, mb: 2 }}
             disabled={loading}
             data-testid="login-button"
           >
-            {loading ? (
-              <CircularProgress size={24} color="inherit" />
-            ) : (
-              "Sign In"
-            )}
+            {loading ? <CircularProgress size={24} color="inherit" /> : 'Sign In'}
           </Button>
 
-          <Box sx={{textAlign: "center"}}>
+          <Box sx={{ textAlign: 'center' }}>
             <Typography variant="body2" color="text.secondary">
-              Don't have an account?{" "}
+              Don't have an account?{' '}
               <Link component={RouterLink} to="/register" variant="body2">
                 Create one
               </Link>

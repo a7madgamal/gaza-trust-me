@@ -90,16 +90,16 @@ Since email verification is disabled and you're using fake data:
 ```typescript
 PREDEFINED_TEST_USERS = {
   helpSeeker: {
-    email: "test-user@example.com",
-    password: "password123",
-    fullName: "Test User",
-    phoneNumber: "+1234567890",
+    email: 'test-user@example.com',
+    password: 'password123',
+    fullName: 'Test User',
+    phoneNumber: '+1234567890',
   },
   admin: {
-    email: "admin@example.com",
-    password: "admin123",
-    fullName: "Admin User",
-    phoneNumber: "+1234567891",
+    email: 'admin@example.com',
+    password: 'admin123',
+    fullName: 'Admin User',
+    phoneNumber: '+1234567891',
   },
 };
 ```
@@ -109,12 +109,12 @@ PREDEFINED_TEST_USERS = {
 ### Basic Test Structure
 
 ```typescript
-import {test, expect} from "@playwright/test";
-import {generateTestUser} from "../utils/test-data";
-import {registerAndLoginUser} from "../utils/auth-helpers";
+import { test, expect } from '@playwright/test';
+import { generateTestUser } from '../utils/test-data';
+import { registerAndLoginUser } from '../utils/auth-helpers';
 
-test.describe("Feature Name", () => {
-  test("should do something", async ({page}) => {
+test.describe('Feature Name', () => {
+  test('should do something', async ({ page }) => {
     const testUser = generateTestUser();
 
     // Setup
@@ -133,7 +133,7 @@ test.describe("Feature Name", () => {
 
 ```typescript
 // Login with predefined user
-await loginAsUser(page, "helpSeeker");
+await loginAsUser(page, 'helpSeeker');
 
 // Register and login new user
 const testUser = generateTestUser();
@@ -152,8 +152,8 @@ All tests use `data-testid` attributes for reliable element selection:
 await page.click('[data-testid="login-button"]');
 
 // Bad - using text or CSS selectors
-await page.click("text=Login");
-await page.click(".login-btn");
+await page.click('text=Login');
+await page.click('.login-btn');
 ```
 
 ## Configuration
@@ -188,7 +188,7 @@ TEST_TIMEOUT=30000
 const testUser = generateTestUser();
 
 // ❌ Bad - Hardcoded data
-const testUser = {email: "test@example.com"};
+const testUser = { email: 'test@example.com' };
 ```
 
 ### 2. Use Helper Functions
@@ -198,7 +198,7 @@ const testUser = {email: "test@example.com"};
 await registerAndLoginUser(page, testUser);
 
 // ❌ Bad - Duplicated code
-await page.goto("/register");
+await page.goto('/register');
 await page.fill('[data-testid="email"]', testUser.email);
 // ... more duplicated code
 ```
@@ -210,7 +210,7 @@ await page.fill('[data-testid="email"]', testUser.email);
 await page.click('[data-testid="submit-button"]');
 
 // ❌ Bad - Fragile selectors
-await page.click("text=Submit");
+await page.click('text=Submit');
 ```
 
 ### 4. Write Descriptive Test Names
@@ -227,9 +227,7 @@ test('test email validation', async ({ page }) => {
 
 ```typescript
 // ✅ Good - Specific assertions
-await expect(page.locator('[data-testid="error"]')).toContainText(
-  "Invalid email"
-);
+await expect(page.locator('[data-testid="error"]')).toContainText('Invalid email');
 
 // ❌ Bad - Generic assertions
 await expect(page.locator('[data-testid="error"]')).toBeVisible();
@@ -282,7 +280,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: "18"
+          node-version: '18'
       - run: npm ci
       - run: cd packages/backend && npm ci
       - run: cd packages/frontend && npm ci

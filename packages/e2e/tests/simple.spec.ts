@@ -1,31 +1,29 @@
-import {test, expect} from "@playwright/test";
-import {clearBrowserState} from "./utils/auth-helpers";
+import { test, expect } from '@playwright/test';
+import { clearBrowserState } from './utils/auth-helpers';
 
-test.describe("Simple Tests", () => {
-  test("should redirect to login when accessing protected route", async ({
-    page,
-  }) => {
+test.describe('Simple Tests', () => {
+  test('should redirect to login when accessing protected route', async ({ page }) => {
     await clearBrowserState(page);
-    await page.goto("/");
+    await page.goto('/');
 
     // Wait for authentication check to complete and redirect to happen
-    await page.waitForURL("/login", {timeout: 10000});
+    await page.waitForURL('/login', { timeout: 10000 });
 
     // Check that the page loads
     await expect(page).toHaveTitle(/Gazaconfirm/);
 
     // Check for login form heading
-    await expect(page.getByRole("heading", {name: "Sign In"})).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Sign In' })).toBeVisible();
   });
 
-  test("should navigate to register page from login", async ({page}) => {
-    await page.goto("/login");
+  test('should navigate to register page from login', async ({ page }) => {
+    await page.goto('/login');
 
     // Click register link
-    await page.getByRole("link", {name: "Create one"}).click();
+    await page.getByRole('link', { name: 'Create one' }).click();
 
     // Should navigate to register page
-    await expect(page).toHaveURL("/register");
+    await expect(page).toHaveURL('/register');
 
     // Check register form elements
     await expect(page.locator('[data-testid="email"]')).toBeVisible();
@@ -34,14 +32,14 @@ test.describe("Simple Tests", () => {
     await expect(page.locator('[data-testid="register-button"]')).toBeVisible();
   });
 
-  test("should navigate to login page from register", async ({page}) => {
-    await page.goto("/register");
+  test('should navigate to login page from register', async ({ page }) => {
+    await page.goto('/register');
 
     // Click login link
-    await page.getByRole("link", {name: "Sign in"}).click();
+    await page.getByRole('link', { name: 'Sign in' }).click();
 
     // Should navigate to login page
-    await expect(page).toHaveURL("/login");
+    await expect(page).toHaveURL('/login');
 
     // Check login form elements
     await expect(page.locator('[data-testid="email"]')).toBeVisible();

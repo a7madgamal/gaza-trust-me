@@ -9,6 +9,7 @@
   "scripts": {
     "prepare": "husky install",
     "lint": "npm run lint --workspaces",
+    "lint:check": "npm run lint:check --workspaces",
     "lint:sql": "npm run lint:sql --workspace=@gazaconfirm/backend",
     "type-check": "npm run type-check --workspaces",
     "check": "npm run lint --workspaces && npm run type-check --workspaces && npm run format:sql --workspace=@gazaconfirm/backend && npm run lint:sql --workspace=@gazaconfirm/backend && npm run test --workspaces",

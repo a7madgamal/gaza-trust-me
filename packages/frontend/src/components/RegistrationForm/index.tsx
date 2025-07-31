@@ -1,29 +1,19 @@
-import {
-  Box,
-  Paper,
-  Typography,
-  TextField,
-  Button,
-  Alert,
-  CircularProgress,
-  Link,
-} from "@mui/material";
-import {Link as RouterLink} from "react-router-dom";
-import {useRegistrationForm} from "@/hooks/useRegistrationForm";
+import { Box, Paper, Typography, TextField, Button, Alert, CircularProgress, Link } from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
+import { useRegistrationForm } from '@/hooks/useRegistrationForm';
 
 const RegistrationForm = () => {
-  const {formData, errors, loading, apiError, handleChange, handleSubmit} =
-    useRegistrationForm();
+  const { formData, errors, loading, apiError, handleChange, handleSubmit } = useRegistrationForm();
 
   return (
     <Box
       sx={{
-        display: "flex",
-        flexDirection: "column",
-        minHeight: "100vh",
-        justifyContent: "center",
-        alignItems: "center",
-        px: {xs: 2, sm: 4, md: 0},
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: '100vh',
+        justifyContent: 'center',
+        alignItems: 'center',
+        px: { xs: 2, sm: 4, md: 0 },
         py: 4,
       }}
     >
@@ -32,32 +22,27 @@ const RegistrationForm = () => {
         sx={{
           p: 4,
           maxWidth: 400,
-          width: "100%",
+          width: '100%',
         }}
       >
         <Typography variant="h4" component="h1" gutterBottom align="center">
           Create Account
         </Typography>
 
-        <Typography
-          variant="body2"
-          color="text.secondary"
-          align="center"
-          sx={{mb: 3}}
-        >
+        <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 3 }}>
           Join Gazaconfirm to submit and track help requests
         </Typography>
 
         {apiError && (
-          <Alert severity="error" sx={{mb: 3}} data-testid="error-message">
+          <Alert severity="error" sx={{ mb: 3 }} data-testid="error-message">
             {apiError}
           </Alert>
         )}
 
         {/* Success message will be shown here */}
-        <div data-testid="success-message" style={{display: "none"}}></div>
+        <div data-testid="success-message" style={{ display: 'none' }}></div>
 
-        <Box component="form" onSubmit={handleSubmit} sx={{mt: 2}} noValidate>
+        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }} noValidate>
           <TextField
             fullWidth
             label="Full Name"
@@ -67,10 +52,10 @@ const RegistrationForm = () => {
             error={!!errors.fullName}
             helperText={errors.fullName}
             value={formData.fullName}
-            onChange={handleChange("fullName")}
+            onChange={handleChange('fullName')}
             disabled={loading}
             autoComplete="name"
-            inputProps={{"data-testid": "fullName"}}
+            inputProps={{ 'data-testid': 'fullName' }}
           />
 
           <TextField
@@ -82,10 +67,10 @@ const RegistrationForm = () => {
             error={!!errors.email}
             helperText={errors.email}
             value={formData.email}
-            onChange={handleChange("email")}
+            onChange={handleChange('email')}
             disabled={loading}
             autoComplete="email"
-            inputProps={{"data-testid": "email"}}
+            inputProps={{ 'data-testid': 'email' }}
           />
 
           <TextField
@@ -97,10 +82,10 @@ const RegistrationForm = () => {
             error={!!errors.password}
             helperText={errors.password}
             value={formData.password}
-            onChange={handleChange("password")}
+            onChange={handleChange('password')}
             disabled={loading}
             autoComplete="new-password"
-            inputProps={{"data-testid": "password"}}
+            inputProps={{ 'data-testid': 'password' }}
           />
 
           <TextField
@@ -112,10 +97,10 @@ const RegistrationForm = () => {
             error={!!errors.confirmPassword}
             helperText={errors.confirmPassword}
             value={formData.confirmPassword}
-            onChange={handleChange("confirmPassword")}
+            onChange={handleChange('confirmPassword')}
             disabled={loading}
             autoComplete="new-password"
-            inputProps={{"data-testid": "confirmPassword"}}
+            inputProps={{ 'data-testid': 'confirmPassword' }}
           />
 
           <TextField
@@ -127,10 +112,10 @@ const RegistrationForm = () => {
             error={!!errors.phoneNumber}
             helperText={errors.phoneNumber}
             value={formData.phoneNumber}
-            onChange={handleChange("phoneNumber")}
+            onChange={handleChange('phoneNumber')}
             disabled={loading}
             autoComplete="tel"
-            inputProps={{"data-testid": "phoneNumber"}}
+            inputProps={{ 'data-testid': 'phoneNumber' }}
           />
 
           <TextField
@@ -141,14 +126,11 @@ const RegistrationForm = () => {
             margin="normal"
             required
             error={!!errors.description}
-            helperText={
-              errors.description ||
-              "Tell us about your situation and what kind of help you need"
-            }
+            helperText={errors.description || 'Tell us about your situation and what kind of help you need'}
             value={formData.description}
-            onChange={handleChange("description")}
+            onChange={handleChange('description')}
             disabled={loading}
-            inputProps={{"data-testid": "description"}}
+            inputProps={{ 'data-testid': 'description' }}
           />
 
           <Button
@@ -156,20 +138,16 @@ const RegistrationForm = () => {
             fullWidth
             variant="contained"
             size="large"
-            sx={{mt: 3, mb: 2}}
+            sx={{ mt: 3, mb: 2 }}
             disabled={loading}
             data-testid="register-button"
           >
-            {loading ? (
-              <CircularProgress size={24} color="inherit" />
-            ) : (
-              "Create Account"
-            )}
+            {loading ? <CircularProgress size={24} color="inherit" /> : 'Create Account'}
           </Button>
 
-          <Box sx={{textAlign: "center"}}>
+          <Box sx={{ textAlign: 'center' }}>
             <Typography variant="body2" color="text.secondary">
-              Already have an account?{" "}
+              Already have an account?{' '}
               <Link component={RouterLink} to="/login" variant="body2">
                 Sign in
               </Link>

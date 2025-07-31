@@ -1,7 +1,7 @@
-import {createTRPCReact} from "@trpc/react-query";
-import {createTRPCClient, httpBatchLink} from "@trpc/client";
-import type {AppRouter} from "@gazaconfirm/backend";
-import {config} from "./config";
+import { createTRPCReact } from '@trpc/react-query';
+import { createTRPCClient, httpBatchLink } from '@trpc/client';
+import type { AppRouter } from '@gazaconfirm/backend';
+import { config } from './config';
 
 export const trpc = createTRPCReact<AppRouter>();
 
@@ -11,7 +11,7 @@ export const trpcClient = createTRPCClient<AppRouter>({
     httpBatchLink({
       url: config.trpcUrl,
       headers: () => {
-        const session = localStorage.getItem("session");
+        const session = localStorage.getItem('session');
         const sessionData = session ? JSON.parse(session) : null;
 
         if (sessionData?.access_token) {

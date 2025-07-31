@@ -1,13 +1,13 @@
-import {RegistrationFormData, ValidationErrors} from "@/types/auth";
+import { RegistrationFormData, ValidationErrors } from '@/types/auth';
 
 export const validateEmail = (email: string): string | undefined => {
   if (!email) {
-    return "Email is required";
+    return 'Email is required';
   }
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
-    return "Please enter a valid email address";
+    return 'Please enter a valid email address';
   }
 
   return undefined;
@@ -15,15 +15,15 @@ export const validateEmail = (email: string): string | undefined => {
 
 export const validatePassword = (password: string): string | undefined => {
   if (!password) {
-    return "Password is required";
+    return 'Password is required';
   }
 
   if (password.length < 8) {
-    return "Password must be at least 8 characters long";
+    return 'Password must be at least 8 characters long';
   }
 
   if (!/(?=.*[a-zA-Z])(?=.*\d)/.test(password)) {
-    return "Password must contain at least one letter and one number";
+    return 'Password must contain at least one letter and one number';
   }
 
   return undefined;
@@ -31,68 +31,59 @@ export const validatePassword = (password: string): string | undefined => {
 
 export const validateFullName = (fullName: string): string | undefined => {
   if (!fullName) {
-    return "Full name is required";
+    return 'Full name is required';
   }
 
   if (fullName.trim().length < 2) {
-    return "Full name must be at least 2 characters long";
+    return 'Full name must be at least 2 characters long';
   }
 
   return undefined;
 };
 
-export const validatePhoneNumber = (
-  phoneNumber: string
-): string | undefined => {
+export const validatePhoneNumber = (phoneNumber: string): string | undefined => {
   if (!phoneNumber) {
-    return "Phone number is required";
+    return 'Phone number is required';
   }
 
   // Basic phone number validation - allows various formats
   const phoneRegex = /^[+]?[1-9][\d]{0,15}$/;
-  if (!phoneRegex.test(phoneNumber.replace(/[\s\-()]/g, ""))) {
-    return "Please enter a valid phone number";
+  if (!phoneRegex.test(phoneNumber.replace(/[\s\-()]/g, ''))) {
+    return 'Please enter a valid phone number';
   }
 
   return undefined;
 };
 
-export const validateDescription = (
-  description: string
-): string | undefined => {
+export const validateDescription = (description: string): string | undefined => {
   if (!description) {
-    return "Description is required";
+    return 'Description is required';
   }
 
   if (description.trim().length < 10) {
-    return "Description must be at least 10 characters long";
+    return 'Description must be at least 10 characters long';
   }
 
   if (description.trim().length > 2000) {
-    return "Description must be less than 2000 characters";
+    return 'Description must be less than 2000 characters';
   }
 
   return undefined;
 };
 
-export const validateConfirmPassword = (
-  password: string,
-  confirmPassword: string
-): string | undefined => {
+export const validateConfirmPassword = (password: string, confirmPassword: string): string | undefined => {
   if (!confirmPassword) {
-    return "Please confirm your password";
+    return 'Please confirm your password';
   }
 
   if (password !== confirmPassword) {
-    return "Passwords do not match";
+    return 'Passwords do not match';
   }
 
   return undefined;
 };
 
-export const validateRegistrationForm = (
-  formData: RegistrationFormData
-): ValidationErrors => {
+export const validateRegistrationForm = (formData: RegistrationFormData): ValidationErrors => {
   const errors: ValidationErrors = {};
 
   const fullNameError = validateFullName(formData.fullName);
@@ -110,10 +101,7 @@ export const validateRegistrationForm = (
     errors.password = passwordError;
   }
 
-  const confirmPasswordError = validateConfirmPassword(
-    formData.password,
-    formData.confirmPassword
-  );
+  const confirmPasswordError = validateConfirmPassword(formData.password, formData.confirmPassword);
   if (confirmPasswordError) {
     errors.confirmPassword = confirmPasswordError;
   }

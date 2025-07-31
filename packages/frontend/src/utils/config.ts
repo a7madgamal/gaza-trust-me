@@ -7,13 +7,13 @@ interface Config {
 const getConfig = (): Config => {
   const environment = import.meta.env.MODE;
   if (!environment) {
-    throw new Error("MODE environment variable is required");
+    throw new Error('MODE environment variable is required');
   }
 
   // In development, use the Vite proxy
-  if (environment === "development") {
+  if (environment === 'development') {
     return {
-      trpcUrl: "/trpc",
+      trpcUrl: '/trpc',
       environment,
     };
   }
@@ -21,13 +21,11 @@ const getConfig = (): Config => {
   // In production, use the full URL from environment variable
   const apiUrl = import.meta.env.VITE_API_URL;
   if (!apiUrl) {
-    throw new Error(
-      "VITE_API_URL environment variable is required for production"
-    );
+    throw new Error('VITE_API_URL environment variable is required for production');
   }
 
   // Construct tRPC URL properly
-  const baseUrl = apiUrl.endsWith("/") ? apiUrl.slice(0, -1) : apiUrl;
+  const baseUrl = apiUrl.endsWith('/') ? apiUrl.slice(0, -1) : apiUrl;
   const trpcUrl = `${baseUrl}/trpc`;
 
   return {

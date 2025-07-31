@@ -1,14 +1,14 @@
-import {Routes, Route} from "react-router-dom";
-import {ToastProvider} from "./components/Toast";
-import {AuthProvider} from "./contexts/AuthContext";
-import {TRPCProvider} from "./utils/trpc-provider";
-import HomePage from "./components/HomePage";
-import LoginForm from "./components/LoginForm";
-import RegistrationForm from "./components/RegistrationForm";
-import Dashboard from "./components/Dashboard";
-import Profile from "./components/Profile";
-import {ProtectedRoute} from "./components/ProtectedRoute";
-import {AuthCallback} from "./components/AuthCallback";
+import { Routes, Route } from 'react-router-dom';
+import { ToastProvider } from './components/Toast';
+import { AuthProvider } from './contexts/AuthContext';
+import { TRPCProvider } from './utils/trpc-provider';
+import HomePage from './components/HomePage';
+import LoginForm from './components/LoginForm';
+import RegistrationForm from './components/RegistrationForm';
+import Dashboard from './components/Dashboard';
+import Profile from './components/Profile';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import { AuthCallback } from './components/AuthCallback';
 
 function App() {
   return (

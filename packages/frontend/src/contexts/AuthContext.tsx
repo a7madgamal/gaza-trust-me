@@ -1,9 +1,9 @@
-import React, {useState, useEffect} from "react";
-import {useNavigate} from "react-router-dom";
-import {AuthContext, type User, type UserProfile} from "./AuthContextDef";
-import {trpc} from "../utils/trpc";
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { AuthContext, type User, type UserProfile } from './AuthContextDef';
+import { trpc } from '../utils/trpc';
 
-export const AuthProvider = ({children}: {children: React.ReactNode}) => {
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -28,16 +28,13 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
   // Handle authentication errors by logging out
   useEffect(() => {
     if (profileError) {
-      console.error("Profile fetch error:", profileError);
+      console.error('Profile fetch error:', profileError);
       // If it's an authentication error, logout the user
-      if (
-        profileError.data?.code === "UNAUTHORIZED" ||
-        profileError.message?.includes("Invalid token")
-      ) {
-        localStorage.removeItem("session");
+      if (profileError.data?.code === 'UNAUTHORIZED' || profileError.message?.includes('Invalid token')) {
+        localStorage.removeItem('session');
         setUser(null);
         setUserProfile(null);
-        navigate("/login");
+        navigate('/login');
       }
     }
   }, [profileError, navigate]);
@@ -48,10 +45,10 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
 
   const login = async (email: string, password: string) => {
     try {
-      const result = await loginMutation.mutateAsync({email, password});
+      const result = await loginMutation.mutateAsync({ email, password });
 
       if (!result.success || !result.data) {
-        throw new Error(result.error || "Login failed");
+        throw new Error(result.error || 'Login failed');
       }
 
       const sessionData = {
@@ -59,12 +56,12 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
         user: result.data.user,
       };
 
-      localStorage.setItem("session", JSON.stringify(sessionData));
+      localStorage.setItem('session', JSON.stringify(sessionData));
       setUser(result.data.user);
 
       // Profile will be fetched automatically by the tRPC hook when user is set
     } catch (error) {
-      console.error("Login error:", error);
+      console.error('Login error:', error);
       throw error;
     }
   };
@@ -75,16 +72,16 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
     try {
       await logoutMutation.mutateAsync();
     } catch (error) {
-      console.error("Logout error:", error);
+      console.error('Logout error:', error);
     } finally {
-      localStorage.removeItem("session");
+      localStorage.removeItem('session');
       setUser(null);
       setUserProfile(null);
     }
   };
 
   useEffect(() => {
-    const session = localStorage.getItem("session");
+    const session = localStorage.getItem('session');
     if (session) {
       try {
         const sessionData = JSON.parse(session);
@@ -94,11 +91,11 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
           // If the token is invalid, the profileError useEffect will handle logout
         } else {
           setUser(null);
-          localStorage.removeItem("session");
+          localStorage.removeItem('session');
         }
       } catch (error) {
-        console.error("Error parsing session:", error);
-        localStorage.removeItem("session");
+        console.error('Error parsing session:', error);
+        localStorage.removeItem('session');
         setUser(null);
       }
     } else {

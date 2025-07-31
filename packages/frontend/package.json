@@ -7,7 +7,8 @@
     "dev": "npx kill-port 3000 && vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "lint": "prettier --write \"**/*.{ts,tsx,json}\" && eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0 --fix",
+    "lint:check": "prettier --check \"**/*.{ts,tsx,json}\" && eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "type-check": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
     "clean": "rimraf dist"
@@ -34,6 +35,7 @@
     "eslint": "^8.45.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.0",
+    "prettier": "^3.1.0",
     "rimraf": "^5.0.5",
     "typescript": "^5.0.0",
     "vite": "^4.4.0",
