@@ -27,6 +27,7 @@ const envSchema = z.object({
   LOG_LEVEL: z.enum(['error', 'warn', 'info', 'debug']),
   SUPABASE_URL: z.string().url(),
   SUPABASE_SECRET_KEY: z.string().min(1),
+  SUPABASE_PUBLISHABLE_KEY: z.string().min(1),
   PORT: z
     .string()
     .transform(val => parseInt(val, 10))

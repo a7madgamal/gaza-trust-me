@@ -1,17 +1,22 @@
 import React, {useState, useEffect} from "react";
+import {useNavigate} from "react-router-dom";
 import {AuthContext, type User, type UserProfile} from "./AuthContextDef";
 import {trpc} from "../utils/trpc";
 
 export const AuthProvider = ({children}: {children: React.ReactNode}) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   // Use tRPC React hook for fetching user profile
-  const {data: profileData, isLoading: profileLoading} =
-    trpc.getProfile.useQuery(undefined, {
-      enabled: !!user, // Only fetch when user is logged in
-      retry: false,
-    });
+  const {
+    data: profileData,
+    isLoading: profileLoading,
+    error: profileError,
+  } = trpc.getProfile.useQuery(undefined, {
+    enabled: !!user, // Only fetch when user is logged in
+    retry: false,
+  });
 
   // Update userProfile when profileData changes
   useEffect(() => {
@@ -19,6 +24,23 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
       setUserProfile(profileData.data);
     }
   }, [profileData]);
+
+  // Handle authentication errors by logging out
+  useEffect(() => {
+    if (profileError) {
+      console.error("Profile fetch error:", profileError);
+      // If it's an authentication error, logout the user
+      if (
+        profileError.data?.code === "UNAUTHORIZED" ||
+        profileError.message?.includes("Invalid token")
+      ) {
+        localStorage.removeItem("session");
+        setUser(null);
+        setUserProfile(null);
+        navigate("/login");
+      }
+    }
+  }, [profileError, navigate]);
 
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
 
@@ -66,11 +88,13 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
     if (session) {
       try {
         const sessionData = JSON.parse(session);
-        if (sessionData.user) {
+        if (sessionData.user && sessionData.access_token) {
           setUser(sessionData.user);
           // Profile will be fetched automatically by the tRPC hook when user is set
+          // If the token is invalid, the profileError useEffect will handle logout
         } else {
           setUser(null);
+          localStorage.removeItem("session");
         }
       } catch (error) {
         console.error("Error parsing session:", error);

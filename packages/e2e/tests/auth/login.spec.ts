@@ -83,4 +83,48 @@ test.describe("User Login", () => {
     // Should navigate to register page
     await expect(page).toHaveURL("/register");
   });
+
+  test("should handle authentication errors gracefully", async ({page}) => {
+    // Set up a mock invalid token in localStorage
+    await page.goto("/");
+    await page.evaluate(() => {
+      localStorage.setItem(
+        "session",
+        JSON.stringify({
+          access_token: "invalid-token",
+          user: {id: "test", email: "test@example.com", role: "help_seeker"},
+        })
+      );
+    });
+
+    // Navigate to a protected page that will trigger authentication check
+    await page.goto("/profile");
+
+    // Should redirect to login page due to invalid token
+    await expect(page).toHaveURL("/login");
+  });
+
+  test("should clear session on authentication failure", async ({page}) => {
+    // Set up a mock invalid token in localStorage
+    await page.goto("/");
+    await page.evaluate(() => {
+      localStorage.setItem(
+        "session",
+        JSON.stringify({
+          access_token: "invalid-token",
+          user: {id: "test", email: "test@example.com", role: "help_seeker"},
+        })
+      );
+    });
+
+    // Navigate to a protected page
+    await page.goto("/profile");
+
+    // Should redirect to login
+    await expect(page).toHaveURL("/login");
+
+    // Session should be cleared from localStorage
+    const session = await page.evaluate(() => localStorage.getItem("session"));
+    expect(session).toBeNull();
+  });
 });

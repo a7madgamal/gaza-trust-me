@@ -8,7 +8,7 @@ import helmet from 'helmet';
 import compression from 'compression';
 import rateLimit from 'express-rate-limit';
 import { createExpressMiddleware } from '@trpc/server/adapters/express';
-import { initTRPC } from '@trpc/server';
+import { initTRPC, TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { ApiResponseSchema } from './schemas/api';
 import { UserRegistrationSchema, UserLoginSchema } from './schemas/user';
@@ -32,18 +32,37 @@ interface Context {
 // Initialize tRPC with context
 const t = initTRPC.context<Context>().create();
 
+// Middleware for protected routes
+const requireAuth = t.middleware(({ ctx, next }) => {
+  if (!ctx.user) {
+    throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Not authenticated' });
+  }
+  return next({
+    ctx: {
+      ...ctx,
+      user: ctx.user,
+    },
+  });
+});
+
+// Public and protected procedures
+const publicProcedure = t.procedure;
+const protectedProcedure = t.procedure.use(requireAuth);
+
 // Create context function
 const createContext = async (opts: { req: express.Request; res: express.Response }): Promise<Context> => {
   try {
     return await createAuthContext(supabase)(opts);
-  } catch {
+  } catch (error) {
+    // For public endpoints (register, login), return undefined user instead of throwing
+    // This allows these endpoints to work without authentication
     return { user: undefined };
   }
 };
 
 // Basic router with proper types
 const appRouter = t.router({
-  hello: t.procedure
+  hello: publicProcedure
     .input(z.object({ name: z.string().optional() }))
     .output(ApiResponseSchema(z.object({ greeting: z.string() })))
     .query(({ input }) => {
@@ -56,7 +75,7 @@ const appRouter = t.router({
     }),
 
   // Authentication procedures
-  register: t.procedure
+  register: publicProcedure
     .input(UserRegistrationSchema)
     .output(ApiResponseSchema(z.object({ userId: z.string() })))
     .mutation(async ({ input }) => {
@@ -131,7 +150,7 @@ const appRouter = t.router({
       }
     }),
 
-  login: t.procedure
+  login: publicProcedure
     .input(UserLoginSchema)
     .output(
       ApiResponseSchema(
@@ -195,12 +214,8 @@ const appRouter = t.router({
       }
     }),
 
-  logout: t.procedure.output(ApiResponseSchema(z.object({ success: z.boolean() }))).mutation(async ({ ctx }) => {
+  logout: protectedProcedure.output(ApiResponseSchema(z.object({ success: z.boolean() }))).mutation(async () => {
     try {
-      if (!ctx.user) {
-        throw new Error('Not authenticated');
-      }
-
       // Sign out user
       const { error } = await supabase.auth.signOut();
 
@@ -223,7 +238,7 @@ const appRouter = t.router({
     }
   }),
 
-  getProfile: t.procedure
+  getProfile: protectedProcedure
     .output(
       ApiResponseSchema(
         z.object({
@@ -241,10 +256,6 @@ const appRouter = t.router({
     )
     .query(async ({ ctx }) => {
       try {
-        if (!ctx.user) {
-          throw new Error('Not authenticated');
-        }
-
         // Get user profile from database
         const { data: userData, error } = await supabase
           .from('users')
@@ -281,7 +292,7 @@ const appRouter = t.router({
       }
     }),
 
-  updateProfile: t.procedure
+  updateProfile: protectedProcedure
     .input(
       z.object({
         fullName: z.string().min(1, 'Full name is required'),
@@ -297,10 +308,6 @@ const appRouter = t.router({
     )
     .mutation(async ({ input, ctx }) => {
       try {
-        if (!ctx.user) {
-          throw new Error('Not authenticated');
-        }
-
         // Update user profile in database
         const { error } = await supabase
           .from('users')

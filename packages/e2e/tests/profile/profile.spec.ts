@@ -56,4 +56,52 @@ test.describe("Profile Management", () => {
     // Should show error message
     await expect(page.getByText("Invalid credentials")).toBeVisible();
   });
+
+  test("should handle invalid token and redirect to login", async ({page}) => {
+    // Set up a mock invalid token in localStorage
+    await page.goto("/");
+    await page.evaluate(() => {
+      localStorage.setItem(
+        "session",
+        JSON.stringify({
+          access_token: "invalid-token",
+          user: {id: "test", email: "test@example.com", role: "help_seeker"},
+        })
+      );
+    });
+
+    // Navigate to profile page
+    await page.goto("/profile");
+
+    // Should redirect to login due to invalid token
+    await page.waitForURL("/login", {timeout: 10000});
+
+    // Session should be cleared
+    const session = await page.evaluate(() => localStorage.getItem("session"));
+    expect(session).toBeNull();
+  });
+
+  test("should handle authentication errors from backend", async ({page}) => {
+    // Set up a mock session with invalid token
+    await page.goto("/");
+    await page.evaluate(() => {
+      localStorage.setItem(
+        "session",
+        JSON.stringify({
+          access_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.invalid",
+          user: {id: "test", email: "test@example.com", role: "help_seeker"},
+        })
+      );
+    });
+
+    // Navigate to profile page which will trigger getProfile call
+    await page.goto("/profile");
+
+    // Should redirect to login due to authentication error
+    await page.waitForURL("/login", {timeout: 10000});
+
+    // Verify session is cleared
+    const session = await page.evaluate(() => localStorage.getItem("session"));
+    expect(session).toBeNull();
+  });
 });
