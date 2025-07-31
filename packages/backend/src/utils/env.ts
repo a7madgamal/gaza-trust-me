@@ -31,6 +31,12 @@ const envSchema = z.object({
     .string()
     .transform(val => parseInt(val, 10))
     .pipe(z.number().positive()),
+  // Email verification settings
+  ENABLE_EMAIL_VERIFICATION: z
+    .string()
+    .transform(val => val === 'true')
+    .default('false'),
+  FRONTEND_URL: z.string().url().optional(),
 });
 
 // Parse and validate environment variables

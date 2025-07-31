@@ -41,6 +41,14 @@ export const validateFullName = (fullName: string): string | undefined => {
   return undefined;
 };
 
+export const validatePhoneNumber = (
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _phoneNumber: string
+): string | undefined => {
+  // Phone number is optional, so no validation needed
+  return undefined;
+};
+
 export const validateConfirmPassword = (
   password: string,
   confirmPassword: string
@@ -82,6 +90,11 @@ export const validateRegistrationForm = (
   );
   if (confirmPasswordError) {
     errors.confirmPassword = confirmPasswordError;
+  }
+
+  const phoneNumberError = validatePhoneNumber(formData.phoneNumber);
+  if (phoneNumberError) {
+    errors.phoneNumber = phoneNumberError;
   }
 
   return errors;

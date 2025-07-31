@@ -2,6 +2,8 @@ import {Routes, Route} from "react-router-dom";
 import RegistrationForm from "./components/RegistrationForm";
 import LoginForm from "./components/LoginForm";
 import HomePage from "./components/HomePage";
+import Dashboard from "./components/Dashboard";
+import Profile from "./components/Profile";
 import {AuthCallback} from "./components/AuthCallback";
 import {ProtectedRoute} from "./components/ProtectedRoute";
 import {ToastProvider} from "./components/Toast";
@@ -15,6 +17,22 @@ function App() {
           element={
             <ProtectedRoute>
               <HomePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
             </ProtectedRoute>
           }
         />

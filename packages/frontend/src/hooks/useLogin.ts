@@ -62,13 +62,20 @@ export const useLogin = () => {
           role: "authenticated", // Default role for now
         };
         setAuthUser(authUser);
-        navigate("/");
+        navigate("/dashboard");
       } else {
-        showToast(data.error || "Login failed. Please try again.", "error");
+        const errorMessage = data.error || "Login failed. Please try again.";
+        showToast(errorMessage, "error");
+        throw new Error(errorMessage);
       }
     } catch (error) {
       console.error("Login error:", error);
-      showToast("Network error. Please check your connection.", "error");
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Network error. Please check your connection.";
+      showToast(errorMessage, "error");
+      throw error;
     } finally {
       setLoading(false);
     }

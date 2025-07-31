@@ -49,12 +49,15 @@ const RegistrationForm = () => {
         </Typography>
 
         {apiError && (
-          <Alert severity="error" sx={{mb: 3}}>
+          <Alert severity="error" sx={{mb: 3}} data-testid="error-message">
             {apiError}
           </Alert>
         )}
 
-        <Box component="form" onSubmit={handleSubmit} sx={{mt: 2}}>
+        {/* Success message will be shown here */}
+        <div data-testid="success-message" style={{display: "none"}}></div>
+
+        <Box component="form" onSubmit={handleSubmit} sx={{mt: 2}} noValidate>
           <TextField
             fullWidth
             label="Full Name"
@@ -67,6 +70,7 @@ const RegistrationForm = () => {
             onChange={handleChange("fullName")}
             disabled={loading}
             autoComplete="name"
+            inputProps={{"data-testid": "fullName"}}
           />
 
           <TextField
@@ -81,6 +85,7 @@ const RegistrationForm = () => {
             onChange={handleChange("email")}
             disabled={loading}
             autoComplete="email"
+            inputProps={{"data-testid": "email"}}
           />
 
           <TextField
@@ -95,6 +100,7 @@ const RegistrationForm = () => {
             onChange={handleChange("password")}
             disabled={loading}
             autoComplete="new-password"
+            inputProps={{"data-testid": "password"}}
           />
 
           <TextField
@@ -109,6 +115,21 @@ const RegistrationForm = () => {
             onChange={handleChange("confirmPassword")}
             disabled={loading}
             autoComplete="new-password"
+            inputProps={{"data-testid": "confirmPassword"}}
+          />
+
+          <TextField
+            fullWidth
+            label="Phone Number"
+            type="tel"
+            margin="normal"
+            error={!!errors.phoneNumber}
+            helperText={errors.phoneNumber}
+            value={formData.phoneNumber}
+            onChange={handleChange("phoneNumber")}
+            disabled={loading}
+            autoComplete="tel"
+            inputProps={{"data-testid": "phoneNumber"}}
           />
 
           <Button
@@ -118,6 +139,7 @@ const RegistrationForm = () => {
             size="large"
             sx={{mt: 3, mb: 2}}
             disabled={loading}
+            data-testid="register-button"
           >
             {loading ? (
               <CircularProgress size={24} color="inherit" />

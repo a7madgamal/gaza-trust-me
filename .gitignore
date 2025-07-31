@@ -172,3 +172,5 @@ storybook-static
 # Temporary files
 *.tmp
 *.temp 
+packages/e2e/test-results/
+packages/e2e/playwright-report/

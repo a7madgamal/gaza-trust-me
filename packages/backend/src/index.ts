@@ -61,11 +61,28 @@ const appRouter = t.router({
     .output(ApiResponseSchema(z.object({ userId: z.string() })))
     .mutation(async ({ input }) => {
       try {
-        // Create user in Supabase Auth
-        const { data: authData, error: authError } = await supabase.auth.signUp({
+        // Create user in Supabase Auth with email verification control
+        const signUpOptions: {
+          email: string;
+          password: string;
+          options?: {
+            emailRedirectTo?: string;
+          };
+        } = {
           email: input.email,
           password: input.password,
-        });
+        };
+
+        // If email verification is disabled, auto-confirm the user
+        if (!env.ENABLE_EMAIL_VERIFICATION) {
+          // Don't set options when email verification is disabled
+        } else if (env.FRONTEND_URL) {
+          signUpOptions.options = {
+            emailRedirectTo: `${env.FRONTEND_URL}/auth/callback`,
+          };
+        }
+
+        const { data: authData, error: authError } = await supabase.auth.signUp(signUpOptions);
 
         if (authError) {
           throw new Error(authError.message);
@@ -73,6 +90,13 @@ const appRouter = t.router({
 
         if (!authData.user) {
           throw new Error('Failed to create user');
+        }
+
+        // If email verification is disabled, auto-confirm the user
+        if (!env.ENABLE_EMAIL_VERIFICATION) {
+          await supabase.auth.admin.updateUserById(authData.user.id, {
+            email_confirm: true,
+          });
         }
 
         // Create user profile in database
@@ -241,6 +265,55 @@ const appRouter = t.router({
         };
       }
     }),
+
+  updateProfile: t.procedure
+    .input(
+      z.object({
+        fullName: z.string().min(1, 'Full name is required'),
+        phoneNumber: z.string().optional(),
+      })
+    )
+    .output(
+      ApiResponseSchema(
+        z.object({
+          success: z.boolean(),
+        })
+      )
+    )
+    .mutation(async ({ input, ctx }) => {
+      try {
+        if (!ctx.user) {
+          throw new Error('Not authenticated');
+        }
+
+        // Update user profile in database
+        const { error } = await supabase
+          .from('users')
+          .update({
+            full_name: input.fullName,
+            phone_number: input.phoneNumber,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', ctx.user.id);
+
+        if (error) {
+          throw new Error('Failed to update profile');
+        }
+
+        return {
+          success: true,
+          data: {
+            success: true,
+          },
+        };
+      } catch (error) {
+        logger.error('Update profile error:', error);
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Failed to update profile',
+        };
+      }
+    }),
 });
 
 export type AppRouter = typeof appRouter;
@@ -274,6 +347,15 @@ app.use('/api/', limiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
+// tRPC middleware
+app.use(
+  '/trpc',
+  createExpressMiddleware({
+    router: appRouter,
+    createContext,
+  })
+);
+
 // REST API endpoints
 app.post('/api/auth/register', async (req, res) => {
   try {
@@ -286,11 +368,28 @@ app.post('/api/auth/register', async (req, res) => {
       });
     }
 
-    // Create user in Supabase Auth
-    const { data: authData, error: authError } = await supabase.auth.signUp({
+    // Create user in Supabase Auth with email verification control
+    const signUpOptions: {
+      email: string;
+      password: string;
+      options?: {
+        emailRedirectTo?: string;
+      };
+    } = {
       email,
       password,
-    });
+    };
+
+    // If email verification is disabled, auto-confirm the user
+    if (!env.ENABLE_EMAIL_VERIFICATION) {
+      // Don't set options when email verification is disabled
+    } else if (env.FRONTEND_URL) {
+      signUpOptions.options = {
+        emailRedirectTo: `${env.FRONTEND_URL}/auth/callback`,
+      };
+    }
+
+    const { data: authData, error: authError } = await supabase.auth.signUp(signUpOptions);
 
     if (authError) {
       logger.error('Auth signup error:', authError);
@@ -302,6 +401,13 @@ app.post('/api/auth/register', async (req, res) => {
     if (!authData.user) {
       return res.status(400).json({
         error: 'Failed to create user',
+      });
+    }
+
+    // If email verification is disabled, auto-confirm the user
+    if (!env.ENABLE_EMAIL_VERIFICATION) {
+      await supabase.auth.admin.updateUserById(authData.user.id, {
+        email_confirm: true,
       });
     }
 
