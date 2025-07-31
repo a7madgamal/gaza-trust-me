@@ -1,7 +1,23 @@
 import {Box, Paper, Typography, TextField, Button, Link} from "@mui/material";
 import {Link as RouterLink} from "react-router-dom";
+import {useState} from "react";
+import {useLogin} from "../../hooks/useLogin";
 
 const LoginForm = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const {login, loading} = useLogin();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!email || !password) {
+      return;
+    }
+
+    await login({email, password});
+  };
+
   return (
     <Box
       sx={{
@@ -35,7 +51,7 @@ const LoginForm = () => {
           Welcome back to Gazaconfirm
         </Typography>
 
-        <Box component="form" sx={{mt: 2}}>
+        <Box component="form" onSubmit={handleSubmit} sx={{mt: 2}}>
           <TextField
             fullWidth
             label="Email"
@@ -43,6 +59,9 @@ const LoginForm = () => {
             margin="normal"
             required
             autoComplete="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={loading}
           />
 
           <TextField
@@ -52,6 +71,9 @@ const LoginForm = () => {
             margin="normal"
             required
             autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={loading}
           />
 
           <Button
@@ -60,8 +82,9 @@ const LoginForm = () => {
             variant="contained"
             size="large"
             sx={{mt: 3, mb: 2}}
+            disabled={loading}
           >
-            Sign In
+            {loading ? "Signing In..." : "Sign In"}
           </Button>
 
           <Box sx={{textAlign: "center"}}>
