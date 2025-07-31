@@ -49,6 +49,24 @@ export const validatePhoneNumber = (
   return undefined;
 };
 
+export const validateDescription = (
+  description: string
+): string | undefined => {
+  if (!description) {
+    return "Description is required";
+  }
+
+  if (description.trim().length < 10) {
+    return "Description must be at least 10 characters long";
+  }
+
+  if (description.trim().length > 2000) {
+    return "Description must be less than 2000 characters";
+  }
+
+  return undefined;
+};
+
 export const validateConfirmPassword = (
   password: string,
   confirmPassword: string
@@ -95,6 +113,11 @@ export const validateRegistrationForm = (
   const phoneNumberError = validatePhoneNumber(formData.phoneNumber);
   if (phoneNumberError) {
     errors.phoneNumber = phoneNumberError;
+  }
+
+  const descriptionError = validateDescription(formData.description);
+  if (descriptionError) {
+    errors.description = descriptionError;
   }
 
   return errors;

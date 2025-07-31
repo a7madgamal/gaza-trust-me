@@ -132,6 +132,24 @@ const RegistrationForm = () => {
             inputProps={{"data-testid": "phoneNumber"}}
           />
 
+          <TextField
+            fullWidth
+            label="Description"
+            multiline
+            rows={6}
+            margin="normal"
+            required
+            error={!!errors.description}
+            helperText={
+              errors.description ||
+              "Tell us about your situation and what kind of help you need"
+            }
+            value={formData.description}
+            onChange={handleChange("description")}
+            disabled={loading}
+            inputProps={{"data-testid": "description"}}
+          />
+
           <Button
             type="submit"
             fullWidth

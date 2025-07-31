@@ -20,6 +20,10 @@ export const UserRegistrationSchema = z.object({
   password: z.string().min(8, 'Password must be at least 8 characters'),
   fullName: z.string().min(2, 'Full name must be at least 2 characters'),
   phoneNumber: z.string().optional(),
+  description: z
+    .string()
+    .min(10, 'Description must be at least 10 characters')
+    .max(2000, 'Description must be less than 2000 characters'),
 });
 
 export const UserLoginSchema = z.object({

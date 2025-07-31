@@ -6,17 +6,20 @@ import {
   Button,
   Link,
   Alert,
+  CircularProgress,
 } from "@mui/material";
-import {Link as RouterLink} from "react-router-dom";
+import {Link as RouterLink, useNavigate} from "react-router-dom";
 import {useState} from "react";
-import {useLogin} from "../../hooks/useLogin";
+import {useAuth} from "../../hooks/useAuth";
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<{email?: string; password?: string}>({});
   const [apiError, setApiError] = useState("");
-  const {login, loading} = useLogin();
+  const [loading, setLoading] = useState(false);
+  const {login} = useAuth();
+  const navigate = useNavigate();
 
   const validateForm = () => {
     const newErrors: {email?: string; password?: string} = {};
@@ -38,15 +41,20 @@ const LoginForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setApiError("");
+    setLoading(true);
 
     if (!validateForm()) {
+      setLoading(false);
       return;
     }
 
     try {
-      await login({email, password});
+      await login(email, password);
+      navigate("/dashboard");
     } catch (error) {
       setApiError("Invalid credentials. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -149,7 +157,11 @@ const LoginForm = () => {
             disabled={loading}
             data-testid="login-button"
           >
-            {loading ? "Signing In..." : "Sign In"}
+            {loading ? (
+              <CircularProgress size={24} color="inherit" />
+            ) : (
+              "Sign In"
+            )}
           </Button>
 
           <Box sx={{textAlign: "center"}}>

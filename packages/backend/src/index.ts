@@ -227,6 +227,10 @@ const appRouter = t.router({
           fullName: z.string(),
           phoneNumber: z.string().optional(),
           role: z.string(),
+          description: z.string(),
+          status: z.string(),
+          verifiedAt: z.string().optional(),
+          verifiedBy: z.string().optional(),
         })
       )
     )
@@ -239,7 +243,7 @@ const appRouter = t.router({
         // Get user profile from database
         const { data: userData, error } = await supabase
           .from('users')
-          .select('id, email, full_name, phone_number, role')
+          .select('id, email, full_name, phone_number, role, description, status, verified_at, verified_by')
           .eq('id', ctx.user.id)
           .single();
 
@@ -255,6 +259,10 @@ const appRouter = t.router({
             fullName: userData.full_name,
             phoneNumber: userData.phone_number,
             role: userData.role,
+            description: userData.description,
+            status: userData.status,
+            verifiedAt: userData.verified_at,
+            verifiedBy: userData.verified_by,
           },
         };
       } catch (error) {
@@ -359,12 +367,12 @@ app.use(
 // REST API endpoints
 app.post('/api/auth/register', async (req, res) => {
   try {
-    const { email, password, fullName, phoneNumber } = req.body;
+    const { email, password, fullName, phoneNumber, description } = req.body;
 
     // Validate input
-    if (!email || !password || !fullName) {
+    if (!email || !password || !fullName || !description) {
       return res.status(400).json({
-        error: 'Email, password, and full name are required',
+        error: 'Email, password, full name, and description are required',
       });
     }
 
@@ -417,7 +425,9 @@ app.post('/api/auth/register', async (req, res) => {
       email,
       full_name: fullName,
       phone_number: phoneNumber,
+      description,
       role: 'help_seeker',
+      status: 'pending',
     });
 
     if (profileError) {

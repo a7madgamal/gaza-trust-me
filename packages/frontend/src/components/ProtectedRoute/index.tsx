@@ -12,7 +12,7 @@ export const ProtectedRoute = ({
   children,
   redirectTo = "/login",
 }: ProtectedRouteProps) => {
-  const {isAuthenticated, loading} = useAuth();
+  const {user, loading} = useAuth();
 
   if (loading) {
     return (
@@ -29,7 +29,7 @@ export const ProtectedRoute = ({
     );
   }
 
-  if (!isAuthenticated) {
+  if (!user) {
     return <Navigate to={redirectTo} replace />;
   }
 

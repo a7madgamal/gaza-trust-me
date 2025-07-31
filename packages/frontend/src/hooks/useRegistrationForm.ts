@@ -12,6 +12,7 @@ export const useRegistrationForm = () => {
     confirmPassword: "",
     fullName: "",
     phoneNumber: "",
+    description: "",
   });
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [loading, setLoading] = useState(false);
@@ -67,6 +68,7 @@ export const useRegistrationForm = () => {
             password: formData.password,
             fullName: formData.fullName,
             phoneNumber: formData.phoneNumber,
+            description: formData.description,
           }),
         });
 

@@ -10,4 +10,8 @@ elif [ -f ~/.profile ]; then
   . ~/.profile
 fi
 
-npm run check
+# Run checks but exclude e2e tests to avoid HTML report server
+npm run lint --workspaces
+npm run type-check --workspaces
+npm run lint:sql --workspace=@gazaconfirm/backend
+npm run test --workspace=@gazaconfirm/backend

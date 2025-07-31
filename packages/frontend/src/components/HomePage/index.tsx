@@ -15,7 +15,7 @@ import {useState} from "react";
 import {useAuth} from "../../hooks/useAuth";
 
 const HomePage = () => {
-  const {user, isAuthenticated, logout} = useAuth();
+  const {user, logout} = useAuth();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -39,7 +39,7 @@ const HomePage = () => {
             Gazaconfirm
           </Typography>
 
-          {isAuthenticated ? (
+          {user ? (
             <>
               <Button
                 color="inherit"
@@ -100,7 +100,7 @@ const HomePage = () => {
       </AppBar>
 
       <Container maxWidth="md" sx={{mt: 8, textAlign: "center"}}>
-        {isAuthenticated ? (
+        {user ? (
           <>
             <Typography
               variant="h2"

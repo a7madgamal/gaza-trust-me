@@ -8,6 +8,7 @@ describe('Authentication', () => {
       password: 'password123',
       fullName: 'Test User',
       phoneNumber: '+1234567890',
+      description: 'This is a detailed description of the help I need',
     };
 
     const result = UserRegistrationSchema.parse(validInput);
@@ -19,6 +20,7 @@ describe('Authentication', () => {
       email: 'invalid-email',
       password: 'password123',
       fullName: 'Test User',
+      description: 'This is a detailed description of the help I need',
     };
 
     expect(() => {

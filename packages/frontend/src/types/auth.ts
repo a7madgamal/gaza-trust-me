@@ -4,6 +4,7 @@ export interface RegistrationFormData {
   confirmPassword: string;
   fullName: string;
   phoneNumber: string;
+  description: string;
 }
 
 export interface LoginFormData {
@@ -26,4 +27,5 @@ export interface ValidationErrors {
   confirmPassword?: string;
   fullName?: string;
   phoneNumber?: string;
+  description?: string;
 }

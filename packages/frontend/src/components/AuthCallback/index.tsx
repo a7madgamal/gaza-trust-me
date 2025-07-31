@@ -16,7 +16,7 @@ interface AuthTokens {
 export const AuthCallback = () => {
   const navigate = useNavigate();
   const {showToast} = useToast();
-  const {login} = useAuth();
+  const {login, setUser} = useAuth();
 
   useEffect(() => {
     const handleAuthCallback = async () => {
@@ -55,7 +55,8 @@ export const AuthCallback = () => {
         const userInfo = decodeJWT(tokens.access_token);
         if (userInfo) {
           localStorage.setItem("user", JSON.stringify(userInfo));
-          login(userInfo);
+          // Set user directly instead of calling login
+          setUser(userInfo);
         }
 
         // Show success message
@@ -80,7 +81,7 @@ export const AuthCallback = () => {
     };
 
     handleAuthCallback();
-  }, [navigate, showToast, login]);
+  }, [navigate, showToast, login, setUser]);
 
   return (
     <Box
