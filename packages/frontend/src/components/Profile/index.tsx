@@ -4,151 +4,51 @@ import {
   Typography,
   Paper,
   TextField,
-  Button,
   Avatar,
   Grid,
   Divider,
   Alert,
   CircularProgress,
+  Chip,
 } from "@mui/material";
-import {useState, useEffect, useCallback} from "react";
-import {useToast} from "../../hooks/useToast";
-import {config} from "../../utils/config";
-
-interface ProfileData {
-  id: string;
-  email: string;
-  fullName: string;
-  phoneNumber?: string;
-  role: string;
-}
+import {useState, useEffect} from "react";
+import {useAuth} from "../../hooks/useAuth";
 
 const Profile = () => {
-  const {showToast} = useToast();
-  const [profile, setProfile] = useState<ProfileData | null>(null);
+  const {userProfile} = useAuth();
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [editMode, setEditMode] = useState(false);
-  const [errors, setErrors] = useState<{fullName?: string}>({});
-  const [formData, setFormData] = useState({
-    fullName: "",
-    phoneNumber: "",
-  });
-
-  const fetchProfile = useCallback(async () => {
-    try {
-      const session = localStorage.getItem("session");
-      const sessionData = session ? JSON.parse(session) : null;
-
-      if (!sessionData?.access_token) {
-        throw new Error("No access token found");
-      }
-
-      const response = await fetch(`${config.apiUrl}/trpc/getProfile`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${sessionData.access_token}`,
-        },
-        body: JSON.stringify({}),
-      });
-
-      const data = await response.json();
-
-      if (data.result?.data?.success) {
-        const profileData = data.result.data.data;
-        setProfile(profileData);
-        setFormData({
-          fullName: profileData.fullName,
-          phoneNumber: profileData.phoneNumber || "",
-        });
-      } else {
-        throw new Error(data.result?.data?.error || "Failed to fetch profile");
-      }
-    } catch (error) {
-      console.error("Profile fetch error:", error);
-      showToast("Failed to load profile data", "error");
-    } finally {
-      setLoading(false);
-    }
-  }, [showToast]);
 
   useEffect(() => {
-    fetchProfile();
-  }, [fetchProfile]);
+    // Profile data is now available through useAuth context
+    setLoading(false);
+  }, []);
 
-  const validateForm = () => {
-    const newErrors: {fullName?: string} = {};
-
-    if (!formData.fullName.trim()) {
-      newErrors.fullName = "Full name is required";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSave = async () => {
-    if (!validateForm()) {
-      return;
-    }
-
-    setSaving(true);
-    try {
-      const session = localStorage.getItem("session");
-      const sessionData = session ? JSON.parse(session) : null;
-
-      if (!sessionData?.access_token) {
-        throw new Error("No access token found");
-      }
-
-      const response = await fetch(`${config.apiUrl}/trpc/updateProfile`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${sessionData.access_token}`,
-        },
-        body: JSON.stringify({
-          fullName: formData.fullName,
-          phoneNumber: formData.phoneNumber,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (data.result?.data?.success) {
-        showToast("Profile updated successfully", "success");
-        setEditMode(false);
-        await fetchProfile(); // Refresh profile data
-      } else {
-        throw new Error(data.result?.data?.error || "Failed to update profile");
-      }
-    } catch (error) {
-      console.error("Profile update error:", error);
-      showToast("Failed to update profile", "error");
-    } finally {
-      setSaving(false);
+  const getStatusColor = (
+    status: string
+  ): "warning" | "success" | "error" | "default" => {
+    switch (status) {
+      case "pending":
+        return "warning";
+      case "verified":
+        return "success";
+      case "flagged":
+        return "error";
+      default:
+        return "default";
     }
   };
 
-  const handleCancel = () => {
-    setFormData({
-      fullName: profile?.fullName || "",
-      phoneNumber: profile?.phoneNumber || "",
-    });
-    setErrors({});
-    setEditMode(false);
-  };
-
-  const handleFullNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({...formData, fullName: e.target.value});
-    if (errors.fullName) {
-      setErrors((prev) => ({...prev, fullName: undefined}));
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case "pending":
+        return "Pending Verification";
+      case "verified":
+        return "Verified";
+      case "flagged":
+        return "Flagged";
+      default:
+        return status;
     }
-  };
-
-  const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({...formData, phoneNumber: e.target.value});
   };
 
   if (loading) {
@@ -166,7 +66,7 @@ const Profile = () => {
     );
   }
 
-  if (!profile) {
+  if (!userProfile) {
     return (
       <Container maxWidth="md" sx={{mt: 4}}>
         <Alert severity="error">Failed to load profile data</Alert>
@@ -194,22 +94,32 @@ const Profile = () => {
                 mb: 2,
               }}
             >
-              {profile.fullName.charAt(0).toUpperCase()}
+              {userProfile.fullName.charAt(0).toUpperCase()}
             </Avatar>
             <Typography
               variant="h6"
               gutterBottom
               data-testid="profile-fullName"
             >
-              {profile.fullName}
+              {userProfile.fullName}
             </Typography>
             <Typography
               variant="body2"
               color="text.secondary"
               data-testid="profile-role"
             >
-              {profile.role.replace("_", " ").toUpperCase()}
+              {userProfile.role.replace("_", " ").toUpperCase()}
             </Typography>
+
+            {/* Status Chip */}
+            <Box sx={{mt: 2}}>
+              <Chip
+                label={getStatusLabel(userProfile.status)}
+                color={getStatusColor(userProfile.status)}
+                size="medium"
+                data-testid="profile-status"
+              />
+            </Box>
           </Grid>
 
           {/* Profile Details */}
@@ -224,7 +134,7 @@ const Profile = () => {
                 <TextField
                   fullWidth
                   label="Email"
-                  value={profile.email}
+                  value={userProfile.email}
                   disabled
                   helperText="Email cannot be changed"
                   inputProps={{"data-testid": "profile-email"}}
@@ -234,7 +144,7 @@ const Profile = () => {
                 <TextField
                   fullWidth
                   label="Role"
-                  value={profile.role.replace("_", " ").toUpperCase()}
+                  value={userProfile.role.replace("_", " ").toUpperCase()}
                   disabled
                   helperText="Role is managed by administrators"
                   inputProps={{"data-testid": "profile-role-display"}}
@@ -244,11 +154,8 @@ const Profile = () => {
                 <TextField
                   fullWidth
                   label="Full Name"
-                  value={formData.fullName}
-                  onChange={handleFullNameChange}
-                  disabled={!editMode}
-                  error={!!errors.fullName}
-                  helperText={errors.fullName}
+                  value={userProfile.fullName}
+                  disabled
                   inputProps={{"data-testid": "profile-fullName-input"}}
                 />
               </Grid>
@@ -256,42 +163,43 @@ const Profile = () => {
                 <TextField
                   fullWidth
                   label="Phone Number"
-                  value={formData.phoneNumber}
-                  onChange={handlePhoneNumberChange}
-                  disabled={!editMode}
+                  value={userProfile.phoneNumber || ""}
+                  disabled
                   inputProps={{"data-testid": "profile-phoneNumber-input"}}
                 />
               </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  label="Description"
+                  value={userProfile.description}
+                  multiline
+                  rows={4}
+                  disabled
+                  inputProps={{"data-testid": "profile-description"}}
+                />
+              </Grid>
+              {userProfile.verifiedAt && (
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Verified At"
+                    value={new Date(
+                      userProfile.verifiedAt
+                    ).toLocaleDateString()}
+                    disabled
+                    inputProps={{"data-testid": "profile-verified-at"}}
+                  />
+                </Grid>
+              )}
             </Grid>
 
-            <Box sx={{mt: 4, display: "flex", gap: 2}}>
-              {editMode ? (
-                <>
-                  <Button
-                    variant="contained"
-                    onClick={handleSave}
-                    disabled={saving}
-                    data-testid="save-profile-button"
-                  >
-                    {saving ? "Saving..." : "Save Changes"}
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    onClick={handleCancel}
-                    data-testid="cancel-profile-button"
-                  >
-                    Cancel
-                  </Button>
-                </>
-              ) : (
-                <Button
-                  variant="contained"
-                  onClick={() => setEditMode(true)}
-                  data-testid="edit-profile-button"
-                >
-                  Edit Profile
-                </Button>
-              )}
+            <Box sx={{mt: 4}}>
+              <Alert severity="info">
+                Profile information is collected during registration and cannot
+                be edited. Contact support if you need to update your
+                information.
+              </Alert>
             </Box>
           </Grid>
         </Grid>

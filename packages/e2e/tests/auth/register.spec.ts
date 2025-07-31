@@ -21,6 +21,10 @@ test.describe("User Registration", () => {
       "aria-invalid",
       "true"
     );
+    await expect(page.locator('[data-testid="description"]')).toHaveAttribute(
+      "aria-invalid",
+      "true"
+    );
   });
 
   test("should validate email format", async ({page}) => {
@@ -32,6 +36,10 @@ test.describe("User Registration", () => {
     await page.fill('[data-testid="confirmPassword"]', "Password123!");
     await page.fill('[data-testid="fullName"]', "Test User");
     await page.fill('[data-testid="phoneNumber"]', "+1234567890");
+    await page.fill(
+      '[data-testid="description"]',
+      "Test description for validation"
+    );
 
     await page.click('[data-testid="register-button"]');
 
@@ -51,6 +59,10 @@ test.describe("User Registration", () => {
     await page.fill('[data-testid="confirmPassword"]', "weak");
     await page.fill('[data-testid="fullName"]', "Test User");
     await page.fill('[data-testid="phoneNumber"]', "+1234567890");
+    await page.fill(
+      '[data-testid="description"]',
+      "Test description for validation"
+    );
 
     await page.click('[data-testid="register-button"]');
 
@@ -70,6 +82,10 @@ test.describe("User Registration", () => {
     await page.fill('[data-testid="confirmPassword"]', "DifferentPassword123!");
     await page.fill('[data-testid="fullName"]', "Test User");
     await page.fill('[data-testid="phoneNumber"]', "+1234567890");
+    await page.fill(
+      '[data-testid="description"]',
+      "Test description for validation"
+    );
 
     await page.click('[data-testid="register-button"]');
 
@@ -90,6 +106,10 @@ test.describe("User Registration", () => {
     await page.fill('[data-testid="confirmPassword"]', testUser.password);
     await page.fill('[data-testid="fullName"]', testUser.fullName);
     await page.fill('[data-testid="phoneNumber"]', testUser.phoneNumber);
+    await page.fill(
+      '[data-testid="description"]',
+      `Test description for ${testUser.fullName}. This is a test user created for E2E testing.`
+    );
 
     // Verify all fields are filled correctly
     await expect(page.locator('[data-testid="email"]')).toHaveValue(
@@ -100,6 +120,9 @@ test.describe("User Registration", () => {
     );
     await expect(page.locator('[data-testid="phoneNumber"]')).toHaveValue(
       testUser.phoneNumber
+    );
+    await expect(page.locator('[data-testid="description"]')).toHaveValue(
+      `Test description for ${testUser.fullName}. This is a test user created for E2E testing.`
     );
 
     // Submit form (will fail due to backend config, but we can test the form behavior)

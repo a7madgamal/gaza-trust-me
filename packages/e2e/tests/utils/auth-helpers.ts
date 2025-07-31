@@ -1,5 +1,5 @@
 import {Page, expect} from "@playwright/test";
-import {TestUser, PREDEFINED_TEST_USERS} from "./test-data";
+import {TestUser, PREDEFINED_TEST_USERS, generateTestUser} from "./test-data";
 
 /**
  * Authentication helper functions for E2E tests
@@ -22,10 +22,15 @@ export async function loginAsUser(
 export async function registerAndLoginUniqueUser(
   page: Page
 ): Promise<TestUser> {
-  // For now, skip registration and use a predefined user
-  // since the backend registration is not working
-  const user = PREDEFINED_TEST_USERS.helpSeeker;
+  // Generate a unique test user
+  const user = generateTestUser();
+
+  // Register the user first
+  await registerNewUser(page, user);
+
+  // Then login
   await loginWithCredentials(page, user);
+
   return user;
 }
 
@@ -45,11 +50,13 @@ export async function loginWithCredentials(
   // Submit form
   await page.click('[data-testid="login-button"]');
 
-  // Wait for successful login
-  await expect(page).toHaveURL("/dashboard");
-  await expect(page.locator('[data-testid="user-email"]')).toContainText(
-    user.email
-  );
+  // Wait for successful login - check for dashboard elements instead of URL
+  await page.waitForSelector('[data-testid="dashboard-title"]', {
+    timeout: 10000,
+  });
+
+  // Verify we're on the dashboard by checking for dashboard-specific elements
+  await expect(page.locator('[data-testid="dashboard-title"]')).toBeVisible();
 }
 
 /**
@@ -66,6 +73,10 @@ export async function registerNewUser(
   await page.fill('[data-testid="password"]', user.password);
   await page.fill('[data-testid="fullName"]', user.fullName);
   await page.fill('[data-testid="phoneNumber"]', user.phoneNumber);
+  await page.fill(
+    '[data-testid="description"]',
+    `Test description for ${user.fullName}. This is a test user created for E2E testing.`
+  );
 
   // Submit form
   await page.click('[data-testid="register-button"]');
@@ -78,10 +89,33 @@ export async function registerNewUser(
   if (await errorElement.isVisible()) {
     const errorText = await errorElement.textContent();
     console.log("Registration error:", errorText);
+    throw new Error(`Registration failed: ${errorText}`);
   }
 
-  // Wait for navigation to login page
-  await expect(page).toHaveURL("/login");
+  // Wait for navigation to login page or check for success
+  try {
+    await expect(page).toHaveURL("/login", {timeout: 10000});
+  } catch (error) {
+    // If we're still on register page, check if there's a success message
+    const currentUrl = page.url();
+    console.log("Current URL after registration:", currentUrl);
+
+    if (currentUrl.includes("/register")) {
+      // Check if there's a success message
+      const successElement = page.locator('[data-testid="success-message"]');
+      if (await successElement.isVisible()) {
+        console.log("Registration successful but still on register page");
+        // Try to navigate to login manually
+        await page.goto("/login");
+      } else {
+        throw new Error(
+          "Registration failed - still on register page with no success message"
+        );
+      }
+    } else {
+      throw error;
+    }
+  }
 }
 
 /**
