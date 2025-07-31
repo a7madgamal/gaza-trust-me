@@ -42,10 +42,18 @@ export const validateFullName = (fullName: string): string | undefined => {
 };
 
 export const validatePhoneNumber = (
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  _phoneNumber: string
+  phoneNumber: string
 ): string | undefined => {
-  // Phone number is optional, so no validation needed
+  if (!phoneNumber) {
+    return "Phone number is required";
+  }
+
+  // Basic phone number validation - allows various formats
+  const phoneRegex = /^[+]?[1-9][\d]{0,15}$/;
+  if (!phoneRegex.test(phoneNumber.replace(/[\s\-()]/g, ""))) {
+    return "Please enter a valid phone number";
+  }
+
   return undefined;
 };
 

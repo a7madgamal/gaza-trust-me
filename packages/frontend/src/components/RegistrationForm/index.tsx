@@ -123,6 +123,7 @@ const RegistrationForm = () => {
             label="Phone Number"
             type="tel"
             margin="normal"
+            required
             error={!!errors.phoneNumber}
             helperText={errors.phoneNumber}
             value={formData.phoneNumber}

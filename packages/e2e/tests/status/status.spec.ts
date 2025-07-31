@@ -1,7 +1,9 @@
 import {test, expect} from "@playwright/test";
+import {clearBrowserState} from "../utils/auth-helpers";
 
 test.describe("User Status Display", () => {
   test.beforeEach(async ({page}) => {
+    await clearBrowserState(page);
     await page.goto("/");
   });
 
@@ -13,6 +15,7 @@ test.describe("User Status Display", () => {
     await page.fill('[data-testid="email"]', "test-status@example.com");
     await page.fill('[data-testid="password"]', "password123");
     await page.fill('[data-testid="confirmPassword"]', "password123");
+    await page.fill('[data-testid="phoneNumber"]', "+1234567890");
     await page.fill(
       '[data-testid="description"]',
       "This is a detailed description of the help I need for testing purposes"
@@ -46,6 +49,7 @@ test.describe("User Status Display", () => {
     await page.fill('[data-testid="email"]', "pending@example.com");
     await page.fill('[data-testid="password"]', "password123");
     await page.fill('[data-testid="confirmPassword"]', "password123");
+    await page.fill('[data-testid="phoneNumber"]', "+1234567890");
     await page.fill(
       '[data-testid="description"]',
       "This is a detailed description of the help I need for testing purposes"
@@ -77,8 +81,8 @@ test.describe("User Status Display", () => {
     // Navigate to dashboard without authentication - should redirect to login
     await page.goto("/dashboard");
 
-    // Should redirect to login page
-    await expect(page).toHaveURL(/.*login/);
+    // Wait for authentication check to complete and redirect to happen
+    await page.waitForURL(/.*login/, {timeout: 10000});
   });
 
   test("should show description field in registration form", async ({page}) => {
@@ -104,6 +108,7 @@ test.describe("User Status Display", () => {
     await page.fill('[data-testid="password"]', "Password123!");
     await page.fill('[data-testid="confirmPassword"]', "Password123!");
     await page.fill('[data-testid="fullName"]', "Test User");
+    await page.fill('[data-testid="phoneNumber"]', "+1234567890");
 
     // Try to submit with empty description
     await page.click('[data-testid="register-button"]');

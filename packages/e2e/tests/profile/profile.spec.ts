@@ -1,16 +1,19 @@
 import {test, expect} from "@playwright/test";
+import {clearBrowserState} from "../utils/auth-helpers";
 
 test.describe("Profile Management", () => {
   test("should redirect to login when not authenticated", async ({page}) => {
+    await clearBrowserState(page);
     await page.goto("/profile");
 
-    // Should redirect to login page when not authenticated
-    await expect(page).toHaveURL("/login");
+    // Wait for authentication check to complete and redirect to happen
+    await page.waitForURL("/login", {timeout: 10000});
   });
 
   test("should show login form when accessing profile without auth", async ({
     page,
   }) => {
+    await clearBrowserState(page);
     await page.goto("/profile");
 
     // Should show login form

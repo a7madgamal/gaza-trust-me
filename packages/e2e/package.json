@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "End-to-end tests for Gazaconfirm platform",
   "private": true,
+  "type": "module",
   "scripts": {
     "test": "playwright test",
     "test:headed": "playwright test --headed",

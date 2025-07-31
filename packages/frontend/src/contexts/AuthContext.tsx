@@ -1,95 +1,64 @@
 import React, {useState, useEffect} from "react";
-import {config} from "../utils/config";
-import {AuthContext} from "./AuthContextDef";
-
-interface User {
-  id: string;
-  email: string;
-  role: string;
-}
-
-interface UserProfile {
-  id: string;
-  email: string;
-  fullName: string;
-  phoneNumber?: string;
-  role: string;
-  description: string;
-  status: "pending" | "verified" | "flagged";
-  verifiedAt?: string;
-  verifiedBy?: string;
-}
+import {AuthContext, type User, type UserProfile} from "./AuthContextDef";
+import {trpc} from "../utils/trpc";
 
 export const AuthProvider = ({children}: {children: React.ReactNode}) => {
   const [user, setUser] = useState<User | null>(null);
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchUserProfile = async () => {
-    try {
-      const session = localStorage.getItem("session");
-      const sessionData = session ? JSON.parse(session) : null;
+  // Use tRPC React hook for fetching user profile
+  const {data: profileData, isLoading: profileLoading} =
+    trpc.getProfile.useQuery(undefined, {
+      enabled: !!user, // Only fetch when user is logged in
+      retry: false,
+    });
 
-      if (!sessionData?.access_token) {
-        return;
-      }
-
-      const response = await fetch(`${config.apiUrl}/trpc/getProfile`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${sessionData.access_token}`,
-        },
-        body: JSON.stringify({}),
-      });
-
-      const data = await response.json();
-
-      if (data.result?.data?.success) {
-        setUserProfile(data.result.data.data);
-      }
-    } catch (error) {
-      console.error("Failed to fetch user profile:", error);
+  // Update userProfile when profileData changes
+  useEffect(() => {
+    if (profileData?.success && profileData.data) {
+      setUserProfile(profileData.data);
     }
-  };
+  }, [profileData]);
+
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+
+  const loginMutation = trpc.login.useMutation();
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await fetch(`${config.apiUrl}/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({email, password}),
-      });
+      const result = await loginMutation.mutateAsync({email, password});
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Login failed");
+      if (!result.success || !result.data) {
+        throw new Error(result.error || "Login failed");
       }
 
       const sessionData = {
-        access_token: data.access_token,
-        refresh_token: data.refresh_token,
-        user: data.user,
+        access_token: result.data.token,
+        user: result.data.user,
       };
 
       localStorage.setItem("session", JSON.stringify(sessionData));
-      setUser(data.user);
+      setUser(result.data.user);
 
-      // Fetch user profile after login
-      await fetchUserProfile();
+      // Profile will be fetched automatically by the tRPC hook when user is set
     } catch (error) {
       console.error("Login error:", error);
       throw error;
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem("session");
-    setUser(null);
-    setUserProfile(null);
+  const logoutMutation = trpc.logout.useMutation();
+
+  const logout = async () => {
+    try {
+      await logoutMutation.mutateAsync();
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      localStorage.removeItem("session");
+      setUser(null);
+      setUserProfile(null);
+    }
   };
 
   useEffect(() => {
@@ -99,12 +68,17 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
         const sessionData = JSON.parse(session);
         if (sessionData.user) {
           setUser(sessionData.user);
-          fetchUserProfile();
+          // Profile will be fetched automatically by the tRPC hook when user is set
+        } else {
+          setUser(null);
         }
       } catch (error) {
         console.error("Error parsing session:", error);
         localStorage.removeItem("session");
+        setUser(null);
       }
+    } else {
+      setUser(null);
     }
     setLoading(false);
   }, []);
@@ -114,10 +88,10 @@ export const AuthProvider = ({children}: {children: React.ReactNode}) => {
       value={{
         user,
         userProfile,
-        loading,
+        loading: loading || (!!user && profileLoading),
         login,
         logout,
-        fetchUserProfile,
+        fetchUserProfile: async () => {}, // Keep for compatibility, but it's no longer needed
         setUser,
       }}
     >

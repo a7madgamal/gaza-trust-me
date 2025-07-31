@@ -223,16 +223,6 @@ const Dashboard = () => {
         </Typography>
         <Grid container spacing={2}>
           <Grid item>
-            <Button
-              variant="contained"
-              component={RouterLink}
-              to="/submit-case"
-              disabled={userProfile?.status !== "verified"}
-            >
-              Submit New Case
-            </Button>
-          </Grid>
-          <Grid item>
             <Button variant="outlined" component={RouterLink} to="/profile">
               Edit Profile
             </Button>

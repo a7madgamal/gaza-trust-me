@@ -67,10 +67,22 @@ const appRouter = t.router({
           password: string;
           options?: {
             emailRedirectTo?: string;
+            data?: {
+              full_name: string;
+              phone_number: string;
+              description: string;
+            };
           };
         } = {
           email: input.email,
           password: input.password,
+          options: {
+            data: {
+              full_name: input.fullName,
+              phone_number: input.phoneNumber,
+              description: input.description,
+            },
+          },
         };
 
         // If email verification is disabled, auto-confirm the user
@@ -82,9 +94,11 @@ const appRouter = t.router({
           };
         }
 
+        logger.info('SignUp options:', JSON.stringify(signUpOptions, null, 2));
         const { data: authData, error: authError } = await supabase.auth.signUp(signUpOptions);
 
         if (authError) {
+          logger.error('Auth signup error:', authError);
           throw new Error(authError.message);
         }
 
@@ -99,20 +113,8 @@ const appRouter = t.router({
           });
         }
 
-        // Create user profile in database
-        const { error: profileError } = await supabase.from('users').insert({
-          id: authData.user.id,
-          email: input.email,
-          full_name: input.fullName,
-          phone_number: input.phoneNumber,
-          role: 'help_seeker',
-        });
-
-        if (profileError) {
-          // Clean up auth user if profile creation fails
-          await supabase.auth.admin.deleteUser(authData.user.id);
-          throw new Error('Failed to create user profile');
-        }
+        // User profile is created automatically by database trigger
+        // No need to manually insert - the trigger handles it
 
         return {
           success: true,
@@ -160,6 +162,7 @@ const appRouter = t.router({
         }
 
         // Get user role from database
+        logger.info('Looking for user profile with ID:', data.user.id);
         const { data: userData, error: userError } = await supabase
           .from('users')
           .select('role')
@@ -167,7 +170,9 @@ const appRouter = t.router({
           .single();
 
         if (userError || !userData) {
-          throw new Error('User profile not found');
+          logger.error('User profile not found. Error:', userError);
+          logger.error('User data:', userData);
+          throw new Error(`User profile not found: ${userError?.message || 'Unknown error'}`);
         }
 
         return {
@@ -225,12 +230,12 @@ const appRouter = t.router({
           id: z.string(),
           email: z.string(),
           fullName: z.string(),
-          phoneNumber: z.string().optional(),
+          phoneNumber: z.string(),
           role: z.string(),
           description: z.string(),
           status: z.string(),
-          verifiedAt: z.string().optional(),
-          verifiedBy: z.string().optional(),
+          verifiedAt: z.string().nullable(),
+          verifiedBy: z.string().nullable(),
         })
       )
     )
@@ -248,7 +253,9 @@ const appRouter = t.router({
           .single();
 
         if (error || !userData) {
-          throw new Error('User profile not found');
+          logger.error('Get profile error:', error);
+          logger.error('User data:', userData);
+          throw new Error(`User profile not found: ${error?.message || 'Unknown error'}`);
         }
 
         return {
@@ -278,7 +285,7 @@ const appRouter = t.router({
     .input(
       z.object({
         fullName: z.string().min(1, 'Full name is required'),
-        phoneNumber: z.string().optional(),
+        phoneNumber: z.string().min(1, 'Phone number is required'),
       })
     )
     .output(
@@ -325,6 +332,7 @@ const appRouter = t.router({
 });
 
 export type AppRouter = typeof appRouter;
+export { appRouter };
 
 const app = express();
 const PORT = env.PORT;
@@ -363,137 +371,6 @@ app.use(
     createContext,
   })
 );
-
-// REST API endpoints
-app.post('/api/auth/register', async (req, res) => {
-  try {
-    const { email, password, fullName, phoneNumber, description } = req.body;
-
-    // Validate input
-    if (!email || !password || !fullName || !description) {
-      return res.status(400).json({
-        error: 'Email, password, full name, and description are required',
-      });
-    }
-
-    // Create user in Supabase Auth with email verification control
-    const signUpOptions: {
-      email: string;
-      password: string;
-      options?: {
-        emailRedirectTo?: string;
-      };
-    } = {
-      email,
-      password,
-    };
-
-    // If email verification is disabled, auto-confirm the user
-    if (!env.ENABLE_EMAIL_VERIFICATION) {
-      // Don't set options when email verification is disabled
-    } else if (env.FRONTEND_URL) {
-      signUpOptions.options = {
-        emailRedirectTo: `${env.FRONTEND_URL}/auth/callback`,
-      };
-    }
-
-    const { data: authData, error: authError } = await supabase.auth.signUp(signUpOptions);
-
-    if (authError) {
-      logger.error('Auth signup error:', authError);
-      return res.status(400).json({
-        error: authError.message || 'Registration failed',
-      });
-    }
-
-    if (!authData.user) {
-      return res.status(400).json({
-        error: 'Failed to create user',
-      });
-    }
-
-    // If email verification is disabled, auto-confirm the user
-    if (!env.ENABLE_EMAIL_VERIFICATION) {
-      await supabase.auth.admin.updateUserById(authData.user.id, {
-        email_confirm: true,
-      });
-    }
-
-    // Create user profile in database
-    const { error: profileError } = await supabase.from('users').insert({
-      id: authData.user.id,
-      email,
-      full_name: fullName,
-      phone_number: phoneNumber,
-      description,
-      role: 'help_seeker',
-      status: 'pending',
-    });
-
-    if (profileError) {
-      // Clean up auth user if profile creation fails
-      await supabase.auth.admin.deleteUser(authData.user.id);
-      logger.error('Profile creation error:', profileError);
-      return res.status(400).json({
-        error: 'Failed to create user profile',
-      });
-    }
-
-    return res.status(201).json({
-      success: true,
-      message: 'User registered successfully',
-    });
-  } catch (error) {
-    logger.error('Registration error:', error);
-    return res.status(500).json({
-      error: 'Internal server error',
-    });
-  }
-});
-
-app.post('/api/auth/login', async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
-      return res.status(400).json({
-        error: 'Email and password are required',
-      });
-    }
-
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      logger.error('Login error:', error);
-      return res.status(401).json({
-        error: error.message || 'Invalid credentials',
-      });
-    }
-
-    if (!data.user) {
-      return res.status(401).json({
-        error: 'Invalid credentials',
-      });
-    }
-
-    return res.json({
-      success: true,
-      user: {
-        id: data.user.id,
-        email: data.user.email,
-      },
-      session: data.session,
-    });
-  } catch (error) {
-    logger.error('Login error:', error);
-    return res.status(500).json({
-      error: 'Internal server error',
-    });
-  }
-});
 
 // tRPC middleware
 app.use(

@@ -1,6 +1,6 @@
 // Environment configuration for the frontend
 interface Config {
-  apiUrl: string;
+  trpcUrl: string;
   environment: string;
 }
 
@@ -13,7 +13,7 @@ const getConfig = (): Config => {
   // In development, use the Vite proxy
   if (environment === "development") {
     return {
-      apiUrl: "/api",
+      trpcUrl: "/trpc",
       environment,
     };
   }
@@ -26,8 +26,12 @@ const getConfig = (): Config => {
     );
   }
 
+  // Construct tRPC URL properly
+  const baseUrl = apiUrl.endsWith("/") ? apiUrl.slice(0, -1) : apiUrl;
+  const trpcUrl = `${baseUrl}/trpc`;
+
   return {
-    apiUrl,
+    trpcUrl,
     environment,
   };
 };

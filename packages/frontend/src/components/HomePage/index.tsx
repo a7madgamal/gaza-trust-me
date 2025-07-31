@@ -26,9 +26,9 @@ const HomePage = () => {
     setAnchorEl(null);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     handleMenuClose();
-    logout();
+    await logout();
   };
 
   return (

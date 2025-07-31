@@ -168,3 +168,22 @@ export async function waitForUserLogin(page: Page): Promise<void> {
 export async function waitForUserLogout(page: Page): Promise<void> {
   await expect(page).toHaveURL("/login");
 }
+
+/**
+ * Clear all browser storage and ensure clean state
+ */
+export async function clearBrowserState(page: Page): Promise<void> {
+  // Clear cookies
+  await page.context().clearCookies();
+
+  // Navigate to the app first to ensure we can access localStorage
+  await page.goto("http://localhost:3000");
+
+  // Clear localStorage and sessionStorage
+  await page.evaluate(() => {
+    // @ts-ignore - localStorage and sessionStorage are available in browser context
+    localStorage.clear();
+    // @ts-ignore - localStorage and sessionStorage are available in browser context
+    sessionStorage.clear();
+  });
+}

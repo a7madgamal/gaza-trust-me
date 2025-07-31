@@ -46,7 +46,7 @@ describe('Backend Setup', () => {
     expect(result).toBeNull();
   });
 
-  it('should handle missing optional fields', () => {
+  it('should reject registration without phone number', () => {
     const inputWithoutPhone = {
       email: 'test@example.com',
       password: 'password123',
@@ -54,8 +54,7 @@ describe('Backend Setup', () => {
       description: 'This is a detailed description of the help I need',
     };
 
-    const result = validateInput(UserRegistrationSchema, inputWithoutPhone);
-    expect(result.phoneNumber).toBeUndefined();
+    expect(() => validateInput(UserRegistrationSchema, inputWithoutPhone)).toThrow();
   });
 
   it('should reject registration without description', () => {

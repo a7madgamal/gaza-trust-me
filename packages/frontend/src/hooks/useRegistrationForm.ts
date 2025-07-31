@@ -2,10 +2,11 @@ import {useState, useCallback} from "react";
 import {useNavigate} from "react-router-dom";
 import {RegistrationFormData, ValidationErrors} from "@/types/auth";
 import {validateRegistrationForm, isFormValid} from "@/utils/validation";
-import {config} from "@/utils/config";
+import {trpc} from "@/utils/trpc";
 
 export const useRegistrationForm = () => {
   const navigate = useNavigate();
+  const registerMutation = trpc.register.useMutation();
   const [formData, setFormData] = useState<RegistrationFormData>({
     email: "",
     password: "",
@@ -57,29 +58,19 @@ export const useRegistrationForm = () => {
       setApiError("");
 
       try {
-        console.log("Making API request to:", `${config.apiUrl}/auth/register`);
-        const response = await fetch(`${config.apiUrl}/auth/register`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email: formData.email,
-            password: formData.password,
-            fullName: formData.fullName,
-            phoneNumber: formData.phoneNumber,
-            description: formData.description,
-          }),
+        console.log("Making tRPC registration request");
+        const result = await registerMutation.mutateAsync({
+          email: formData.email,
+          password: formData.password,
+          fullName: formData.fullName,
+          phoneNumber: formData.phoneNumber,
+          description: formData.description,
         });
 
-        console.log("API response status:", response.status);
-        const responseData = await response.json();
-        console.log("API response data:", responseData);
+        console.log("tRPC response:", result);
 
-        if (!response.ok) {
-          setApiError(
-            responseData.message || "Registration failed. Please try again."
-          );
+        if (!result.success) {
+          setApiError(result.error || "Registration failed. Please try again.");
           return;
         }
 
@@ -95,7 +86,7 @@ export const useRegistrationForm = () => {
         setLoading(false);
       }
     },
-    [formData, validateForm, navigate]
+    [formData, validateForm, navigate, registerMutation]
   );
 
   return {

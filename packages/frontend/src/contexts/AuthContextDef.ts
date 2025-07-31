@@ -1,21 +1,21 @@
 import {createContext} from "react";
 
-interface User {
+export interface User {
   id: string;
   email: string;
   role: string;
 }
 
-interface UserProfile {
+export interface UserProfile {
   id: string;
   email: string;
   fullName: string;
   phoneNumber?: string;
   role: string;
   description: string;
-  status: "pending" | "verified" | "flagged";
-  verifiedAt?: string;
-  verifiedBy?: string;
+  status: string; // Changed to string to match backend response
+  verifiedAt?: string | null;
+  verifiedBy?: string | null;
 }
 
 interface AuthContextType {
@@ -23,7 +23,7 @@ interface AuthContextType {
   userProfile: UserProfile | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   fetchUserProfile: () => Promise<void>;
   setUser: (user: User | null) => void;
 }

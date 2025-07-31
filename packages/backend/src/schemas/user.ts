@@ -4,7 +4,7 @@ export const UserSchema = z.object({
   id: z.string().uuid(),
   email: z.string().email(),
   fullName: z.string().min(2),
-  phoneNumber: z.string().optional(),
+  phoneNumber: z.string(),
   role: z.enum(['help_seeker', 'admin', 'super_admin']),
   // Help seeker specific fields
   description: z.string().optional(),
@@ -19,7 +19,7 @@ export const UserRegistrationSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
   fullName: z.string().min(2, 'Full name must be at least 2 characters'),
-  phoneNumber: z.string().optional(),
+  phoneNumber: z.string().min(1, 'Phone number is required'),
   description: z
     .string()
     .min(10, 'Description must be at least 10 characters')
@@ -33,7 +33,7 @@ export const UserLoginSchema = z.object({
 
 export const UserProfileUpdateSchema = z.object({
   fullName: z.string().min(2, 'Full name must be at least 2 characters').optional(),
-  phoneNumber: z.string().optional(),
+  phoneNumber: z.string().min(1, 'Phone number is required').optional(),
 });
 
 export const HelpSeekerSubmissionSchema = z.object({
