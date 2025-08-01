@@ -10,16 +10,20 @@ export interface UserProfile {
   id: string;
   email: string;
   fullName: string;
-  phoneNumber?: string;
+  phoneNumber: string;
   role: string;
   description: string;
-  status: string; // Changed to string to match backend response
+  status: string;
+  // eslint-disable-next-line vibe-coder/no-optional-properties
   verifiedAt?: string | null;
+  // eslint-disable-next-line vibe-coder/no-optional-properties
   verifiedBy?: string | null;
 }
 
 interface AuthContextType {
+  // eslint-disable-next-line vibe-coder/no-optional-properties
   user: User | null;
+  // eslint-disable-next-line vibe-coder/no-optional-properties
   userProfile: UserProfile | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;

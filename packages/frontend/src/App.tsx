@@ -7,6 +7,7 @@ import LoginForm from './components/LoginForm';
 import RegistrationForm from './components/RegistrationForm';
 import Dashboard from './components/Dashboard';
 import Profile from './components/Profile';
+import PublicPage from './components/PublicPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { AuthCallback } from './components/AuthCallback';
 
@@ -16,8 +17,9 @@ function App() {
       <AuthProvider>
         <ToastProvider>
           <Routes>
+            <Route path="/" element={<PublicPage />} />
             <Route
-              path="/"
+              path="/home"
               element={
                 <ProtectedRoute>
                   <HomePage />

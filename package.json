@@ -12,7 +12,7 @@
     "lint:check": "npm run lint:check --workspaces",
     "lint:sql": "npm run lint:sql --workspace=@gazaconfirm/backend",
     "type-check": "npm run type-check --workspaces",
-    "check": "npm run lint --workspaces && npm run type-check --workspaces && npm run test --workspaces",
+    "check": "npm run build --workspaces && npm run lint --workspaces && npm run type-check --workspaces && npm run test --workspaces",
     "test": "npm run test --workspaces",
     "build": "npm run build --workspaces",
     "dev": "npm run dev --workspaces",

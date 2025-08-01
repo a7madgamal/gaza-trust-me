@@ -96,7 +96,51 @@
 
 ---
 
-## MVP Feature 4: User Type Management System 🚧
+## MVP Feature 4: Public User Directory 🚧
+
+**Goal:** Anyone can browse verified users using a card stack interface
+
+**Backend:**
+
+- 🚧 Public user listing endpoint
+- 🚧 User details endpoint
+- 🚧 Card stack navigation (next/previous user)
+- 🚧 Search and filter functionality
+- 🚧 **Card ordering criteria** - Define how users are prioritized in the stack
+
+**Frontend:**
+
+- 🚧 **Public page with card stack interface** (top card focus)
+- 🚧 User card component with quick overview
+- 🚧 Accept/reject buttons (UI only for now)
+- 🚧 Card navigation controls
+- 🚧 Responsive card layout
+
+**Card Stack Design:**
+
+- Stack of user cards with top card fully visible
+- Show key details: name, description, status, role
+- Accept/reject buttons (actions disabled for now)
+- Next/previous navigation
+
+**Card Ordering Criteria (TO DEFINE):**
+
+- Priority based on verification status
+- Time-based ordering (newest first?)
+- User type priority (help_seeker vs admin?)
+- Location-based sorting?
+- Description completeness/quality?
+
+**Next Steps:**
+
+1. Define card ordering criteria and priority algorithm
+2. Create public user display APIs with ordering
+3. Build public page with card stack interface
+4. Implement card navigation
+
+---
+
+## MVP Feature 5: Admin and super admin Management System 🚧
 
 **Goal:** Different user types can manage their specific functionality
 
@@ -123,7 +167,7 @@
 
 ---
 
-## MVP Feature 5: Admin User Review System 🚧
+## MVP Feature 6: Admin User Review System 🚧
 
 **Goal:** Admins can review, approve, or reject user registrations
 
@@ -147,33 +191,6 @@
 2. Create admin user management APIs
 3. Build admin dashboard UI
 4. Add user review workflow
-
----
-
-## MVP Feature 6: Public User Directory 🚧
-
-**Goal:** Anyone can browse verified users
-
-**Backend:**
-
-- 🚧 Public user listing endpoint
-- 🚧 User details endpoint
-- 🚧 Image serving with signed URLs
-- 🚧 Search and filter functionality
-
-**Frontend:**
-
-- 🚧 Public user listings page
-- 🚧 User detail view with image gallery
-- 🚧 Search and filter components
-- 🚧 Responsive card layout
-
-**Next Steps:**
-
-1. Create public user display APIs
-2. Build user listing components
-3. Implement image gallery
-4. Add search functionality
 
 ---
 
@@ -256,21 +273,21 @@
 
 ---
 
-## Next Priority: User Type Management System
+## Next Priority: Public User Directory
 
 **Immediate Focus:**
 
-1. **User Type Roles:** Define different user types and their permissions
-2. **Backend APIs:** User type-specific endpoints and management
-3. **Image Upload:** Profile image handling with Supabase Storage
-4. **Frontend UI:** User type-specific dashboards and forms
+1. **Public User APIs:** Create endpoints for browsing verified users
+2. **User Display:** Build user listing and detail components
+3. **Image Handling:** Implement image serving with signed URLs
+4. **Search & Filter:** Add search and filtering functionality
 
 **Success Criteria:**
 
-- Different user types can access their specific functionality
-- Admins can review and approve/reject user registrations
-- Public can browse verified users
-- All operations are logged and secure
+- Anyone can browse verified users without authentication
+- User profiles display properly with images
+- Search and filtering work effectively
+- Responsive design works on all devices
 
 ---
 

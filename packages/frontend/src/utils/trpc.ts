@@ -1,12 +1,16 @@
 import { createTRPCReact } from '@trpc/react-query';
-import { createTRPCClient, httpBatchLink } from '@trpc/client';
+import { createTRPCProxyClient, httpBatchLink } from '@trpc/client';
+import type { inferRouterOutputs } from '@trpc/server';
 import type { AppRouter } from '@gazaconfirm/backend';
 import { config } from './config';
 
 export const trpc = createTRPCReact<AppRouter>();
 
+// Type helpers
+export type RouterOutputs = inferRouterOutputs<AppRouter>;
+
 // Direct client for use in non-React contexts
-export const trpcClient = createTRPCClient<AppRouter>({
+export const trpcClient = createTRPCProxyClient<AppRouter>({
   links: [
     httpBatchLink({
       url: config.trpcUrl,

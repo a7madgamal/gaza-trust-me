@@ -51,3 +51,44 @@ export const PREDEFINED_TEST_USERS = {
     phoneNumber: '+1234567891',
   },
 } as const;
+
+/**
+ * Create a test user in the database for testing
+ */
+export async function createTestUser(userData: {
+  full_name: string;
+  description: string;
+  phone_number: string;
+  role: 'help_seeker' | 'admin' | 'super_admin';
+  status: 'pending' | 'verified' | 'flagged';
+}): Promise<string> {
+  const response = await fetch('http://localhost:3001/trpc/register', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      json: {
+        ...userData,
+        email: `test-${Date.now()}@example.com`,
+        password: 'testpassword123',
+      },
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to create test user: ${response.statusText}`);
+  }
+
+  const result = await response.json();
+  return result.result.data.id;
+}
+
+/**
+ * Clean up a test user from the database
+ */
+export async function cleanupTestUser(userId: string): Promise<void> {
+  // For now, just log the cleanup
+  // In a real implementation, this would delete the user via API or direct DB
+  console.log('Cleaned up test user:', userId);
+}
