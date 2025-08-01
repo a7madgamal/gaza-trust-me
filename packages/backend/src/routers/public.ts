@@ -1,13 +1,19 @@
 import { z } from 'zod';
 import { ApiResponseSchema } from '../schemas/api';
-import { PublicUserSchema, CardStackNavigationSchema } from '../schemas/api';
 import { supabase } from '../utils/supabase';
 import { t, publicProcedure } from './shared';
+import {
+  PublicHelloInputSchema,
+  PublicHelloOutputSchema,
+  PublicUsersForCardsInputSchema,
+  PublicUserSchema,
+  CardStackNavigationInputSchema,
+} from '../types/supabase-types';
 
 export const publicRouter = t.router({
   hello: publicProcedure
-    .input(z.object({ name: z.string().optional() }))
-    .output(ApiResponseSchema(z.object({ greeting: z.string() })))
+    .input(PublicHelloInputSchema)
+    .output(ApiResponseSchema(PublicHelloOutputSchema))
     .query(({ input }) => {
       return {
         success: true,
@@ -19,12 +25,7 @@ export const publicRouter = t.router({
 
   // Public user browsing - Card stack interface
   getUsersForCards: publicProcedure
-    .input(
-      z.object({
-        limit: z.number().int().positive().max(50).default(10),
-        offset: z.number().int().nonnegative().default(0),
-      })
-    )
+    .input(PublicUsersForCardsInputSchema)
     .output(z.array(PublicUserSchema))
     .query(async ({ input }) => {
       try {
@@ -49,7 +50,7 @@ export const publicRouter = t.router({
     }),
 
   getNextUser: publicProcedure
-    .input(CardStackNavigationSchema)
+    .input(CardStackNavigationInputSchema)
     .output(PublicUserSchema.nullable())
     .query(async ({ input }) => {
       try {

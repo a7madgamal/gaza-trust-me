@@ -280,7 +280,7 @@
 **Tasks:**
 
 1. ✅ **Convert auth router endpoints to use Supabase types** - COMPLETED
-2. 🔄 Convert public router endpoints to use Supabase types
+2. ✅ **Convert public router endpoints to use Supabase types** - COMPLETED
 3. 🔄 Remove manual Zod schemas where Supabase types can be used
 4. 🔄 Ensure zero `any` types in all routers
 

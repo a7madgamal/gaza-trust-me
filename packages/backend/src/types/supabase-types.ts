@@ -54,9 +54,44 @@ export const AuthLogoutOutputSchema = z.object({
   success: z.boolean(),
 });
 
+// Public router schemas
+export const PublicHelloInputSchema = z.object({
+  name: z.string().optional(),
+});
+
+export const PublicHelloOutputSchema = z.object({
+  greeting: z.string(),
+});
+
+export const PublicUsersForCardsInputSchema = z.object({
+  limit: z.number().int().positive().max(50).default(10),
+  offset: z.number().int().nonnegative().default(0),
+});
+
+export const PublicUserSchema = z.object({
+  id: z.string().uuid(),
+  full_name: z.string(),
+  description: z.string(),
+  phone_number: z.string(),
+  status: z.enum(SEEKER_STATUSES),
+  role: z.enum(USER_ROLES),
+  created_at: z.string(),
+});
+
+export const CardStackNavigationInputSchema = z.object({
+  direction: z.enum(['next', 'previous']),
+  currentUserId: z.string().uuid().optional(),
+});
+
 // Type exports for tRPC
 export type AuthRegistrationInput = z.infer<typeof AuthRegistrationInputSchema>;
 export type AuthLoginInput = z.infer<typeof AuthLoginInputSchema>;
 export type AuthRegistrationOutput = z.infer<typeof AuthRegistrationOutputSchema>;
 export type AuthLoginOutput = z.infer<typeof AuthLoginOutputSchema>;
 export type AuthLogoutOutput = z.infer<typeof AuthLogoutOutputSchema>;
+
+export type PublicHelloInput = z.infer<typeof PublicHelloInputSchema>;
+export type PublicHelloOutput = z.infer<typeof PublicHelloOutputSchema>;
+export type PublicUsersForCardsInput = z.infer<typeof PublicUsersForCardsInputSchema>;
+export type PublicUser = z.infer<typeof PublicUserSchema>;
+export type CardStackNavigationInput = z.infer<typeof CardStackNavigationInputSchema>;
