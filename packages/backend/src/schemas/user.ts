@@ -32,8 +32,9 @@ export const UserLoginSchema = z.object({
 });
 
 export const UserProfileUpdateSchema = z.object({
-  fullName: z.string().min(2, 'Full name must be at least 2 characters').optional(),
-  phoneNumber: z.string().min(1, 'Phone number is required').optional(),
+  full_name: z.string().min(2, 'Full name must be at least 2 characters').optional(),
+  phone_number: z.string().min(1, 'Phone number is required').optional(),
+  description: z.string().min(10, 'Description must be at least 10 characters').optional(),
 });
 
 export const HelpSeekerSubmissionSchema = z.object({
@@ -59,5 +60,6 @@ export const UserImageSchema = z.object({
   createdAt: z.date(),
 });
 
-export const USER_ROLES = ['help_seeker', 'admin', 'super_admin'] as const;
-export const SEEKER_STATUSES = ['pending', 'verified', 'flagged'] as const;
+import { USER_ROLES, SEEKER_STATUSES } from '../types/supabase-types';
+
+export { USER_ROLES, SEEKER_STATUSES };

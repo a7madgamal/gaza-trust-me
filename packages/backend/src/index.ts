@@ -11,8 +11,9 @@ import { createExpressMiddleware } from '@trpc/server/adapters/express';
 import { initTRPC, TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { ApiResponseSchema } from './schemas/api';
-import { UserRegistrationSchema, UserLoginSchema } from './schemas/user';
+import { UserRegistrationSchema, UserLoginSchema, UserProfileUpdateSchema } from './schemas/user';
 import { PublicUserSchema, CardStackNavigationSchema } from './schemas/api';
+import type { Database } from './types/database.types';
 
 // Import logger and supabase after environment variables are loaded
 import logger from './utils/logger';
@@ -295,39 +296,58 @@ const appRouter = t.router({
     }),
 
   updateProfile: protectedProcedure
-    .input(
-      z.object({
-        fullName: z.string().min(1, 'Full name is required'),
-        phoneNumber: z.string().min(1, 'Phone number is required'),
-      })
-    )
+    .input(UserProfileUpdateSchema)
     .output(
       ApiResponseSchema(
         z.object({
-          success: z.boolean(),
+          user: z.object({
+            id: z.string(),
+            full_name: z.string(),
+            phone_number: z.string(),
+            description: z.string(),
+            updated_at: z.string().nullable(),
+          }),
         })
       )
     )
     .mutation(async ({ input, ctx }) => {
       try {
+        // Only update fields that are provided
+        const updateData: Database['public']['Tables']['users']['Update'] = {
+          updated_at: new Date().toISOString(),
+        };
+
+        if (input.full_name !== undefined) {
+          updateData.full_name = input.full_name;
+        }
+        if (input.phone_number !== undefined) {
+          updateData.phone_number = input.phone_number;
+        }
+        if (input.description !== undefined) {
+          updateData.description = input.description;
+        }
+
         // Update user profile in database
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('users')
-          .update({
-            full_name: input.fullName,
-            phone_number: input.phoneNumber,
-            updated_at: new Date().toISOString(),
-          })
-          .eq('id', ctx.user.id);
+          .update(updateData)
+          .eq('id', ctx.user.id)
+          .select('id, full_name, phone_number, description, updated_at')
+          .single();
 
         if (error) {
-          throw new Error('Failed to update profile');
+          logger.error('Supabase update error:', error);
+          throw new Error(`Failed to update profile: ${error.message}`);
+        }
+
+        if (!data) {
+          throw new Error('User not found');
         }
 
         return {
           success: true,
           data: {
-            success: true,
+            user: data,
           },
         };
       } catch (error) {
