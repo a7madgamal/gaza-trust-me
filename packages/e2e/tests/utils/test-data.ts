@@ -68,11 +68,14 @@ export async function createTestUser(userData: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      json: {
-        ...userData,
-        email: `test-${Date.now()}@example.com`,
-        password: 'testpassword123',
-      },
+      email: `test-${Date.now()}@example.com`,
+      password: 'testpassword123',
+      fullName: userData.full_name,
+      phoneNumber: userData.phone_number,
+      description:
+        userData.description.length >= 10
+          ? userData.description
+          : `${userData.description} - This is a test user created for automated testing purposes.`,
     }),
   });
 
@@ -81,7 +84,7 @@ export async function createTestUser(userData: {
   }
 
   const result = await response.json();
-  return result.result.data.id;
+  return result.result.data.userId;
 }
 
 /**

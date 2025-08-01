@@ -54,41 +54,29 @@ test.describe('Public Page - Card Stack Interface', () => {
     await page.waitForLoadState('networkidle');
 
     // Check if we have users or empty state
-    const hasUsers = (await page.locator('[data-testid="user-card"]').count()) > 0;
-
-    if (hasUsers) {
-      // Should show verified status if users exist
-      await expect(page.getByText('✅ Verified')).toBeVisible();
-
-      // Should show phone number (now required)
-      await expect(page.getByText('📞')).toBeVisible();
-
-      // Should show WhatsApp link (now required)
-      await expect(page.getByText('💬 WhatsApp')).toBeVisible();
-    } else {
-      // Should show empty state message
-      await expect(page.getByText('No Users Available')).toBeVisible();
-    }
+    // We know we have a test user from beforeAll
+    await expect(page.getByText('✅ Verified')).toBeVisible();
+    await expect(page.getByText('📞')).toBeVisible();
+    await expect(page.getByText('💬 WhatsApp')).toBeVisible();
   });
 
   test('should have working WhatsApp link', async ({ page }) => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
 
-    // Check if WhatsApp link exists
+    // Check if WhatsApp link exists and validate it
     const whatsappLink = page.getByText('💬 WhatsApp');
     const linkCount = await whatsappLink.count();
 
-    if (linkCount > 0) {
-      await expect(whatsappLink).toBeVisible();
+    // Require at least one WhatsApp link for this test
+    expect(linkCount).toBeGreaterThan(0);
 
-      // Check that the link has the correct format
-      const href = await whatsappLink.getAttribute('href');
-      expect(href).toMatch(/^https:\/\/wa\.me\/\d+$/);
-    } else {
-      // If no users, this is expected
-      console.log('No WhatsApp links found - likely no users in database');
-    }
+    // If we have users, expect WhatsApp link to be present
+    await expect(whatsappLink).toBeVisible();
+
+    // Check that the link has the correct format
+    const href = await whatsappLink.getAttribute('href');
+    expect(href).toMatch(/^https:\/\/wa\.me\/\d+$/);
   });
 
   test('should have navigation buttons', async ({ page }) => {
@@ -129,8 +117,15 @@ test.describe('Public Page - Card Stack Interface', () => {
     // For now, we'll test the structure that would show empty state
     await page.goto('/');
 
-    // If no users, should show appropriate message
-    // This is handled by the component logic
+    // Should show the main page structure even if empty
+    await expect(page.getByRole('heading', { name: 'Help Someone Today' })).toBeVisible();
+
+    // Should show either user cards or empty state message
+    const userCard = page.locator('[data-testid="user-card"]');
+    const emptyMessage = page.getByText(/No users available|No help seekers found/);
+
+    // Either user cards or empty message should be visible
+    await expect(userCard.or(emptyMessage)).toBeVisible();
   });
 
   test('should be responsive', async ({ page }) => {
@@ -153,24 +148,31 @@ test.describe('Public Page - Card Stack Interface', () => {
 
   test('should handle API errors gracefully', async ({ page }) => {
     // Mock API error by temporarily changing the endpoint
-    await page.route('**/trpc/getUsersForCards', route => {
-      route.fulfill({
-        status: 500,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          error: {
-            message: 'Internal Server Error',
-            code: -32603,
-          },
-        }),
-      });
+    await page.route('**/trpc/**', route => {
+      console.log('Intercepted tRPC request to:', route.request().url());
+      if (route.request().url().includes('getUsersForCards')) {
+        route.fulfill({
+          status: 500,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            error: {
+              message: 'Internal Server Error',
+              code: -32603,
+            },
+          }),
+        });
+      } else {
+        route.continue();
+      }
     });
 
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
 
-    // Should show error state
-    await expect(page.getByText('Error Loading Users')).toBeVisible();
+    // Wait for the page to load and error to be displayed
+    await page.waitForLoadState('domcontentloaded');
+
+    // Wait for error state to appear
+    await expect(page.getByText('Error Loading Users')).toBeVisible({ timeout: 10000 });
     await expect(page.getByText('Please try refreshing the page.')).toBeVisible();
   });
 

@@ -8,6 +8,9 @@ test.describe('Profile Management', () => {
 
     // Wait for authentication check to complete and redirect to happen
     await page.waitForURL('/login', { timeout: 10000 });
+
+    // Assert we're on the login page
+    await expect(page).toHaveURL(/.*login/);
   });
 
   test('should show login form when accessing profile without auth', async ({ page }) => {

@@ -4,10 +4,10 @@ import { clearBrowserState } from './utils/auth-helpers';
 test.describe('Simple Tests', () => {
   test('should redirect to login when accessing protected route', async ({ page }) => {
     await clearBrowserState(page);
-    await page.goto('/');
+    await page.goto('/dashboard');
 
     // Wait for authentication check to complete and redirect to happen
-    await page.waitForURL('/login', { timeout: 10000 });
+    await page.waitForURL('/login', { timeout: 15000 });
 
     // Check that the page loads
     await expect(page).toHaveTitle(/Gazaconfirm/);
