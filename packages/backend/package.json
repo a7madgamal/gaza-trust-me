@@ -20,7 +20,8 @@
     "db:migrate": "supabase db push --db-url \"postgresql://postgres.sivaovkdxiluefuhlqoj:kQiJZS7OFUXE4S4I@aws-0-eu-central-1.pooler.supabase.com:6543/postgres\" --debug",
     "db:migrate:reset": "supabase db reset",
     "db:migrate:status": "supabase migration list",
-    "db:create-migration": "supabase migration new"
+    "db:create-migration": "supabase migration new",
+    "types:generate": "supabase gen types typescript --project-id sivaovkdxiluefuhlqoj --schema public > src/types/database.types.ts"
   },
   "dependencies": {
     "@gazaconfirm/shared": "file:../shared",
