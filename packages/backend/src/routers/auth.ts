@@ -110,7 +110,7 @@ export const authRouter = t.router({
         logger.info('Looking for user profile with ID:', data.user.id);
         const { data: userData, error: userError } = await supabase
           .from('users')
-          .select('role')
+          .select('role, status')
           .eq('id', data.user.id)
           .single();
 
@@ -128,6 +128,7 @@ export const authRouter = t.router({
               id: data.user.id,
               email: data.user.email ?? '',
               role: userData.role,
+              status: userData.status,
             },
           },
         };

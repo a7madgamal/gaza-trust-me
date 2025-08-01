@@ -97,74 +97,91 @@
 
 ---
 
-## MVP Feature 4: Public User Directory 🚧
+## MVP Feature 4: Public User Directory ✅
 
 **Goal:** Anyone can browse verified users using a card stack interface
 
 **Backend:**
 
-- 🚧 Public user listing endpoint
-- 🚧 User details endpoint
-- 🚧 Card stack navigation (next/previous user)
-- 🚧 Search and filter functionality
-- 🚧 **Card ordering criteria** - Define how users are prioritized in the stack
+- ✅ Public user listing endpoint (`getUsersForCards`)
+- ✅ User details endpoint (included in listing)
+- ✅ Card stack navigation (`getNextUser`)
+- ✅ User count endpoint (`getVerifiedUserCount`)
+- ✅ Card ordering criteria - Newest verified help seekers first
+- ✅ Search and filter functionality (basic filtering by role and status)
 
 **Frontend:**
 
-- 🚧 **Public page with card stack interface** (top card focus)
-- 🚧 User card component with quick overview
-- 🚧 Accept/reject buttons (UI only for now)
-- 🚧 Card navigation controls
-- 🚧 Responsive card layout
+- ✅ **Public page with card stack interface** (top card focus)
+- ✅ User card component with quick overview
+- ✅ Accept/reject buttons (UI implemented, actions disabled for now)
+- ✅ Card navigation controls (previous/next)
+- ✅ Responsive card layout with Material UI
+- ✅ WhatsApp integration for contact
+- ✅ Progress indicator and user count display
+- ✅ Loading states and error handling
 
 **Card Stack Design:**
 
-- Stack of user cards with top card fully visible
-- Show key details: name, description, status, role
-- Accept/reject buttons (actions disabled for now)
-- Next/previous navigation
+- ✅ Stack of user cards with top card fully visible
+- ✅ Show key details: name, description, status, role, phone number
+- ✅ Accept/reject buttons (UI ready, actions need backend implementation)
+- ✅ Next/previous navigation
+- ✅ WhatsApp contact integration
+- ✅ Beautiful gradient card design
 
-**Card Ordering Criteria (TO DEFINE):**
+**Card Ordering Criteria:**
 
-- Priority based on verification status
-- Time-based ordering (newest first?)
-- User type priority (help_seeker vs admin?)
-- Location-based sorting?
-- Description completeness/quality?
+- ✅ Priority based on verification status (verified users only)
+- ✅ Time-based ordering (newest first)
+- ✅ User type priority (help_seeker only)
+- ✅ Pagination support (limit/offset)
+
+**Success:** Users can browse verified help seekers with a beautiful card stack interface
 
 **Next Steps:**
-
-1. Define card ordering criteria and priority algorithm
-2. Create public user display APIs with ordering
-3. Build public page with card stack interface
-4. Implement card navigation
 
 ---
 
-## MVP Feature 5: Admin and super admin Management System 🚧
+## MVP Feature 5: Admin Management System 🚧
 
-**Goal:** Different user types can manage their specific functionality
+**Goal:** Admins can log in and manage user verification status
 
 **Backend:**
 
-- 🚧 User type-specific endpoints needed
-- 🚧 Role-based access control
-- 🚧 User status management (pending/verified/flagged)
-- 🚧 Profile image storage with Supabase Storage
+- 🚧 Admin login endpoint (separate from user login)
+- 🚧 Admin authentication middleware
+- 🚧 User listing endpoint (all users with status)
+- 🚧 User verification/flagging endpoints
+- 🚧 Admin role validation
 
 **Frontend:**
 
-- 🚧 User type-specific dashboard components
-- 🚧 Profile image upload component with drag & drop
-- 🚧 Form validation for user details
-- 🚧 Progress indicators for uploads
+- 🚧 Admin login page
+- 🚧 Admin dashboard with user list
+- 🚧 User cards with verify/flag actions
+- 🚧 Basic admin state management
+- 🚧 Simple remarks input for actions
+
+**MVP Scope:**
+
+- ✅ Admin login and authentication
+- ✅ User listing with status filtering
+- ✅ Verify/flag actions with immediate UI updates
+- ✅ Basic error handling and loading states
+- ❌ No super admin features
+- ❌ No audit logging
+- ❌ No complex role management
+- ❌ No bulk operations
+
+**Success:** Admin can log in, view users, and verify/flag them with immediate feedback
 
 **Next Steps:**
 
-1. Define user type roles and permissions
-2. Implement user type-specific APIs
-3. Build image upload system
-4. Create user type-specific UI
+1. Create admin login endpoint and middleware
+2. Build admin dashboard with user list
+3. Implement verify/flag actions
+4. Add admin authentication to frontend
 
 ---
 
@@ -276,20 +293,22 @@
 
 ---
 
-## Next Priority: Public User Directory
+## Next Priority: Admin and Super Admin Management System
 
 **Tasks:**
 
-1. Define card ordering criteria and priority algorithm
-2. Create public user display APIs with ordering
-3. Build public page with card stack interface
-4. Implement card navigation
+1. Implement admin authentication and role-based access control
+2. Create admin dashboard for user review and management
+3. Build user verification/flagging workflow
+4. Add admin action logging and audit trails
+5. Implement super admin user role management
 
 **Success:**
 
-- Public user browsing with card stack interface
-- Proper user ordering and navigation
-- Responsive design for all devices
+- Admins can review and verify user profiles
+- Super admins can manage user roles and system settings
+- Complete audit trail for all admin actions
+- Secure role-based access control
 
 ---
 

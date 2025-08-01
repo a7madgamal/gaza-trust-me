@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { AuthRegistrationInputSchema, AuthLoginInputSchema } from '../types/supabase-types';
+import { AuthRegistrationInputSchema, AuthLoginInputSchema, AuthLoginOutputSchema } from '../types/supabase-types';
 
 describe('Authentication', () => {
   it('should validate registration input correctly', () => {
@@ -48,5 +48,35 @@ describe('Authentication', () => {
     expect(() => {
       AuthLoginInputSchema.parse(invalidInput);
     }).toThrow();
+  });
+
+  it('should validate login output schema with status', () => {
+    const validOutput = {
+      token: 'jwt-token-here',
+      user: {
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        email: 'test@example.com',
+        role: 'help_seeker',
+        status: 'pending',
+      },
+    };
+
+    const result = AuthLoginOutputSchema.parse(validOutput);
+    expect(result).toEqual(validOutput);
+  });
+
+  it('should validate login output schema with null status', () => {
+    const validOutput = {
+      token: 'jwt-token-here',
+      user: {
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        email: 'test@example.com',
+        role: 'admin',
+        status: null,
+      },
+    };
+
+    const result = AuthLoginOutputSchema.parse(validOutput);
+    expect(result).toEqual(validOutput);
   });
 });

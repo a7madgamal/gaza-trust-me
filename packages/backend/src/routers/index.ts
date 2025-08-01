@@ -2,6 +2,7 @@ import { t } from './shared';
 import { authRouter } from './auth';
 import { profileRouter } from './profile';
 import { publicRouter } from './public';
+import { adminRouter } from './admin';
 
 export const appRouter = t.router({
   // Auth routes
@@ -18,6 +19,10 @@ export const appRouter = t.router({
   getUsersForCards: publicRouter.getUsersForCards,
   getNextUser: publicRouter.getNextUser,
   getVerifiedUserCount: publicRouter.getVerifiedUserCount,
+
+  // Admin routes
+  adminGetUsers: adminRouter.getUsers,
+  adminUpdateUserStatus: adminRouter.updateUserStatus,
 });
 
 export type AppRouter = typeof appRouter;

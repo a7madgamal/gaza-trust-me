@@ -47,11 +47,52 @@ export const AuthLoginOutputSchema = z.object({
     id: z.string(),
     email: z.string(),
     role: z.enum(USER_ROLES),
+    status: z.enum(SEEKER_STATUSES).nullable(),
   }),
 });
 
 export const AuthLogoutOutputSchema = z.object({
   success: z.boolean(),
+});
+
+// Admin router schemas
+export const AdminUserListInputSchema = z.object({
+  status: z.enum(SEEKER_STATUSES).optional(),
+  limit: z.number().int().positive().max(100).default(20),
+  offset: z.number().int().nonnegative().default(0),
+});
+
+export const AdminUserListOutputSchema = z.object({
+  users: z.array(
+    z.object({
+      id: z.string(),
+      email: z.string(),
+      full_name: z.string(),
+      description: z.string(),
+      phone_number: z.string(),
+      status: z.enum(SEEKER_STATUSES),
+      role: z.enum(USER_ROLES),
+      created_at: z.string(),
+    })
+  ),
+  total: z.number(),
+});
+
+export const AdminUserActionInputSchema = z.object({
+  userId: z.string().min(1, 'User ID is required'),
+  action: z.enum(['verify', 'flag']),
+  remarks: z.string().optional(),
+});
+
+export const AdminUserActionOutputSchema = z.object({
+  user: z.object({
+    id: z.string(),
+    status: z.enum(SEEKER_STATUSES),
+    verified_at: z.string().nullable(),
+    verified_by: z.string().nullable(),
+  }),
+  action: z.enum(['verify', 'flag']),
+  remarks: z.string().optional(),
 });
 
 // Profile router schemas
@@ -118,6 +159,11 @@ export type AuthLoginInput = z.infer<typeof AuthLoginInputSchema>;
 export type AuthRegistrationOutput = z.infer<typeof AuthRegistrationOutputSchema>;
 export type AuthLoginOutput = z.infer<typeof AuthLoginOutputSchema>;
 export type AuthLogoutOutput = z.infer<typeof AuthLogoutOutputSchema>;
+
+export type AdminUserListInput = z.infer<typeof AdminUserListInputSchema>;
+export type AdminUserListOutput = z.infer<typeof AdminUserListOutputSchema>;
+export type AdminUserActionInput = z.infer<typeof AdminUserActionInputSchema>;
+export type AdminUserActionOutput = z.infer<typeof AdminUserActionOutputSchema>;
 
 export type UserProfileUpdateInput = z.infer<typeof UserProfileUpdateSchema>;
 export type UserProfileOutput = z.infer<typeof UserProfileOutputSchema>;
