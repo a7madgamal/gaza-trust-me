@@ -3,6 +3,7 @@ import { createTRPCProxyClient, httpBatchLink } from '@trpc/client';
 import type { inferRouterOutputs } from '@trpc/server';
 import type { AppRouter } from '@gazaconfirm/backend';
 import { config } from './config';
+import { parseSessionData } from './validation';
 
 export const trpc = createTRPCReact<AppRouter>();
 
@@ -16,8 +17,9 @@ export const trpcClient = createTRPCProxyClient<AppRouter>({
       url: config.trpcUrl,
       headers: () => {
         const session = localStorage.getItem('session');
-        const sessionData = session ? JSON.parse(session) : null;
+        if (!session) return {};
 
+        const sessionData = parseSessionData(session);
         if (sessionData?.access_token) {
           return {
             Authorization: `Bearer ${sessionData.access_token}`,

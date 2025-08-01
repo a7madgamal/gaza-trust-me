@@ -9,9 +9,9 @@ export interface User {
 export interface UserProfile {
   id: string;
   email: string;
-  fullName: string;
-  phoneNumber: string;
-  role: string;
+  full_name: string;
+  phone_number: string;
+  role: 'help_seeker' | 'admin' | 'super_admin';
   description: string;
   status: string;
   // eslint-disable-next-line vibe-coder/no-optional-properties

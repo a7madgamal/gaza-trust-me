@@ -248,6 +248,8 @@
 
 - ✅ **Fixed authentication flow and error handling**
 - ✅ **Implemented proper tRPC middleware**
+- ✅ **Supabase types tightly integrated with tRPC** - Single endpoint converted as proof of concept
+- 🔄 **Complete tRPC type integration** - Profile endpoints migrated, auth and public endpoints still need Supabase types
 - 🔄 Replace REST endpoints with tRPC for consistency
 - 🔄 Add comprehensive error handling
 - 🔄 Implement rate limiting on all endpoints
@@ -273,21 +275,29 @@
 
 ---
 
-## Next Priority: Public User Directory
+## Next Priority: Complete tRPC Type Integration
 
-**Immediate Focus:**
+**Tasks:**
 
-1. **Public User APIs:** Create endpoints for browsing verified users
-2. **User Display:** Build user listing and detail components
-3. **Image Handling:** Implement image serving with signed URLs
-4. **Search & Filter:** Add search and filtering functionality
+1. Convert auth router endpoints to use Supabase types
+2. Convert public router endpoints to use Supabase types
+3. Remove manual Zod schemas where Supabase types can be used
+4. Ensure zero `any` types in all routers
 
-**Success Criteria:**
+**Then:** Public User Directory
 
-- Anyone can browse verified users without authentication
-- User profiles display properly with images
-- Search and filtering work effectively
-- Responsive design works on all devices
+**Tasks:**
+
+1. Define card ordering criteria and priority algorithm
+2. Create public user display APIs with ordering
+3. Build public page with card stack interface
+4. Implement card navigation
+
+**Success:**
+
+- Public user browsing with card stack interface
+- Proper user ordering and navigation
+- Responsive design for all devices
 
 ---
 
@@ -316,6 +326,16 @@
 ---
 
 ## Recent Fixes & Improvements ✅
+
+### Type System Integration
+
+- **Created Supabase type utilities** - `supabase-types.ts` for tRPC integration
+- **Converted profile endpoints** - Profile router uses Supabase types
+- **Auth and public endpoints pending** - Still using manual Zod schemas
+- **Modular router architecture** - Split monolithic index.ts into focused modules
+- **Aligned Zod schemas** - Updated field names to match database schema
+- **Established type architecture** - Generated types → utilities → tRPC routers
+- **Fixed export issues** - Proper AppRouter and appRouter exports after refactoring
 
 ### Authentication System
 

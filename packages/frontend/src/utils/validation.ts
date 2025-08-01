@@ -1,4 +1,5 @@
 import { RegistrationFormData, ValidationErrors } from '@/types/auth';
+import { z } from 'zod';
 
 export const validateEmail = (email: string): string | undefined => {
   if (!email) {
@@ -121,4 +122,65 @@ export const validateRegistrationForm = (formData: RegistrationFormData): Valida
 
 export const isFormValid = (errors: ValidationErrors): boolean => {
   return Object.keys(errors).length === 0;
+};
+
+// Session data schema
+export const SessionDataSchema = z.object({
+  user: z.object({
+    id: z.string(),
+    email: z.string(),
+    role: z.string(),
+  }),
+  access_token: z.string(),
+});
+
+export type SessionData = z.infer<typeof SessionDataSchema>;
+
+// User schema for JWT payload
+export const UserSchema = z.object({
+  id: z.string(),
+  email: z.string(),
+  role: z.enum(['help_seeker', 'admin', 'super_admin']),
+});
+
+export type ValidatedUser = z.infer<typeof UserSchema>;
+
+// Auth tokens schema
+export const AuthTokensSchema = z.object({
+  access_token: z.string(),
+  refresh_token: z.string(),
+  expires_in: z.number(),
+  expires_at: z.number(),
+  token_type: z.string(),
+  type: z.string(),
+});
+
+export type AuthTokens = z.infer<typeof AuthTokensSchema>;
+
+// Utility functions for safe JSON parsing
+export const parseSessionData = (json: string): SessionData | null => {
+  try {
+    const parsed = JSON.parse(json) as unknown;
+    return SessionDataSchema.parse(parsed);
+  } catch {
+    return null;
+  }
+};
+
+export const parseUser = (json: string): ValidatedUser | null => {
+  try {
+    const parsed = JSON.parse(json) as unknown;
+    return UserSchema.parse(parsed);
+  } catch {
+    return null;
+  }
+};
+
+export const parseAuthTokens = (json: string): AuthTokens | null => {
+  try {
+    const parsed = JSON.parse(json) as unknown;
+    return AuthTokensSchema.parse(parsed);
+  } catch {
+    return null;
+  }
 };

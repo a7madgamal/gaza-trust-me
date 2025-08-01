@@ -92,10 +92,10 @@ const Profile = () => {
                 mb: 2,
               }}
             >
-              {userProfile.fullName.charAt(0).toUpperCase()}
+              {userProfile.full_name.charAt(0).toUpperCase()}
             </Avatar>
             <Typography variant="h6" gutterBottom data-testid="profile-fullName">
-              {userProfile.fullName}
+              {userProfile.full_name}
             </Typography>
             <Typography variant="body2" color="text.secondary" data-testid="profile-role">
               {userProfile.role.replace('_', ' ').toUpperCase()}
@@ -144,7 +144,7 @@ const Profile = () => {
                 <TextField
                   fullWidth
                   label="Full Name"
-                  value={userProfile.fullName}
+                  value={userProfile.full_name}
                   disabled
                   inputProps={{ 'data-testid': 'profile-fullName-input' }}
                 />
@@ -153,7 +153,7 @@ const Profile = () => {
                 <TextField
                   fullWidth
                   label="Phone Number"
-                  value={userProfile.phoneNumber || ''}
+                  value={userProfile.phone_number || ''}
                   disabled
                   inputProps={{ 'data-testid': 'profile-phoneNumber-input' }}
                 />

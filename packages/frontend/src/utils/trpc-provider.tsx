@@ -3,6 +3,7 @@ import { httpBatchLink } from '@trpc/client';
 import { useState } from 'react';
 import { trpc } from './trpc';
 import { config } from './config';
+import { parseSessionData } from './validation';
 
 export function TRPCProvider({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
@@ -13,8 +14,9 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
           url: config.trpcUrl,
           headers: () => {
             const session = localStorage.getItem('session');
-            const sessionData = session ? JSON.parse(session) : null;
+            if (!session) return {};
 
+            const sessionData = parseSessionData(session);
             if (sessionData?.access_token) {
               return {
                 Authorization: `Bearer ${sessionData.access_token}`,

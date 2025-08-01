@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext, type User, type UserProfile } from './AuthContextDef';
+import { parseSessionData } from '../utils/validation';
 import { trpc } from '../utils/trpc';
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -21,7 +22,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // Update userProfile when profileData changes
   useEffect(() => {
     if (profileData?.success && profileData.data) {
-      setUserProfile(profileData.data);
+      const transformedProfile: UserProfile = {
+        id: profileData.data.id,
+        email: profileData.data.email,
+        full_name: profileData.data.full_name,
+        phone_number: profileData.data.phone_number,
+        role: profileData.data.role as 'help_seeker' | 'admin' | 'super_admin',
+        description: profileData.data.description,
+        status: profileData.data.status || 'pending',
+        verifiedAt: profileData.data.verified_at,
+        verifiedBy: profileData.data.verified_by,
+      };
+      setUserProfile(transformedProfile);
     }
   }, [profileData]);
 
@@ -83,18 +95,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const session = localStorage.getItem('session');
     if (session) {
-      try {
-        const sessionData = JSON.parse(session);
-        if (sessionData.user && sessionData.access_token) {
-          setUser(sessionData.user);
-          // Profile will be fetched automatically by the tRPC hook when user is set
-          // If the token is invalid, the profileError useEffect will handle logout
-        } else {
-          setUser(null);
-          localStorage.removeItem('session');
-        }
-      } catch (error) {
-        console.error('Error parsing session:', error);
+      const sessionData = parseSessionData(session);
+      if (sessionData) {
+        setUser(sessionData.user);
+      } else {
         localStorage.removeItem('session');
         setUser(null);
       }

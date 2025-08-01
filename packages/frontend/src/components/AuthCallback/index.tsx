@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useToast } from '../../hooks/useToast';
 import { useAuth } from '../../hooks/useAuth';
 import { Box, CircularProgress, Typography } from '@mui/material';
+import type { User } from '../../contexts/AuthContextDef';
+import { parseUser } from '../../utils/validation';
 
 interface AuthTokens {
   access_token: string;
@@ -55,7 +57,6 @@ export const AuthCallback = () => {
         const userInfo = decodeJWT(tokens.access_token);
         if (userInfo) {
           localStorage.setItem('user', JSON.stringify(userInfo));
-          // Set user directly instead of calling login
           setUser(userInfo);
         }
 
@@ -100,7 +101,7 @@ export const AuthCallback = () => {
 };
 
 // Helper function to decode JWT token
-const decodeJWT = (token: string) => {
+const decodeJWT = (token: string): User | null => {
   try {
     const base64Url = token.split('.')[1];
     const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -110,7 +111,7 @@ const decodeJWT = (token: string) => {
         .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
         .join('')
     );
-    return JSON.parse(jsonPayload);
+    return parseUser(jsonPayload);
   } catch (error) {
     console.error('Failed to decode JWT:', error);
     return null;
