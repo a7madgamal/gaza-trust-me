@@ -1,15 +1,20 @@
-import { z } from 'zod';
 import { ApiResponseSchema } from '../schemas/api';
-import { UserRegistrationSchema, UserLoginSchema } from '../schemas/user';
 import { env } from '../utils/env';
 import logger from '../utils/logger';
 import { supabase } from '../utils/supabase';
 import { t, publicProcedure, protectedProcedure } from './shared';
+import {
+  AuthRegistrationInputSchema,
+  AuthLoginInputSchema,
+  AuthRegistrationOutputSchema,
+  AuthLoginOutputSchema,
+  AuthLogoutOutputSchema,
+} from '../types/supabase-types';
 
 export const authRouter = t.router({
   register: publicProcedure
-    .input(UserRegistrationSchema)
-    .output(ApiResponseSchema(z.object({ userId: z.string() })))
+    .input(AuthRegistrationInputSchema)
+    .output(ApiResponseSchema(AuthRegistrationOutputSchema))
     .mutation(async ({ input }) => {
       try {
         // Create user in Supabase Auth with email verification control
@@ -83,19 +88,8 @@ export const authRouter = t.router({
     }),
 
   login: publicProcedure
-    .input(UserLoginSchema)
-    .output(
-      ApiResponseSchema(
-        z.object({
-          token: z.string(),
-          user: z.object({
-            id: z.string(),
-            email: z.string(),
-            role: z.string(),
-          }),
-        })
-      )
-    )
+    .input(AuthLoginInputSchema)
+    .output(ApiResponseSchema(AuthLoginOutputSchema))
     .mutation(async ({ input }) => {
       try {
         // Sign in user
@@ -146,7 +140,7 @@ export const authRouter = t.router({
       }
     }),
 
-  logout: protectedProcedure.output(ApiResponseSchema(z.object({ success: z.boolean() }))).mutation(async () => {
+  logout: protectedProcedure.output(ApiResponseSchema(AuthLogoutOutputSchema)).mutation(async () => {
     try {
       // Sign out user
       const { error } = await supabase.auth.signOut();

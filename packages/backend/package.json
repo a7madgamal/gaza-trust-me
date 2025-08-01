@@ -6,7 +6,7 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "npx kill-port 3001 && tsx watch src/index.ts",
-    "build": "tsc",
+    "build": "npm run types:generate && tsc",
     "start": "node dist/index.js",
     "lint": "prettier --write \"src/**/*.{ts,tsx,json}\" \"supabase/**/*.sql\" && eslint \"src/**/*.ts\" --fix",
     "lint:check": "prettier --check \"src/**/*.{ts,tsx,json}\" \"supabase/**/*.sql\" && eslint \"src/**/*.ts\"",
@@ -21,7 +21,7 @@
     "db:migrate:reset": "supabase db reset",
     "db:migrate:status": "supabase migration list",
     "db:create-migration": "supabase migration new",
-    "types:generate": "supabase gen types typescript --project-id sivaovkdxiluefuhlqoj --schema public > src/types/database.types.ts"
+    "types:generate": "supabase gen types typescript --project-id sivaovkdxiluefuhlqoj --schema public > src/types/GENERATED_database.types.ts && prettier --write src/types/GENERATED_database.types.ts"
   },
   "dependencies": {
     "@gazaconfirm/shared": "file:../shared",

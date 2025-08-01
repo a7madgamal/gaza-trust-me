@@ -3,7 +3,7 @@ import { ApiResponseSchema } from '../schemas/api';
 import { UserProfileUpdateSchema } from '../schemas/user';
 import logger from '../utils/logger';
 import { supabase } from '../utils/supabase';
-import type { Database } from '../types/database.types';
+import type { Database } from '../types/GENERATED_database.types';
 import { t, protectedProcedure } from './shared';
 
 export const profileRouter = t.router({
