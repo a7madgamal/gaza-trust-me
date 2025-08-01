@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { UserRegistrationSchema, UserLoginSchema } from '../schemas/user';
+import { AuthRegistrationInputSchema, AuthLoginInputSchema } from '../types/supabase-types';
 
 describe('Authentication', () => {
   it('should validate registration input correctly', () => {
@@ -11,7 +11,7 @@ describe('Authentication', () => {
       description: 'This is a detailed description of the help I need',
     };
 
-    const result = UserRegistrationSchema.parse(validInput);
+    const result = AuthRegistrationInputSchema.parse(validInput);
     expect(result).toEqual(validInput);
   });
 
@@ -20,11 +20,12 @@ describe('Authentication', () => {
       email: 'invalid-email',
       password: 'password123',
       fullName: 'Test User',
+      phoneNumber: '+1234567890',
       description: 'This is a detailed description of the help I need',
     };
 
     expect(() => {
-      UserRegistrationSchema.parse(invalidInput);
+      AuthRegistrationInputSchema.parse(invalidInput);
     }).toThrow();
   });
 
@@ -34,7 +35,7 @@ describe('Authentication', () => {
       password: 'password123',
     };
 
-    const result = UserLoginSchema.parse(validInput);
+    const result = AuthLoginInputSchema.parse(validInput);
     expect(result).toEqual(validInput);
   });
 
@@ -45,7 +46,7 @@ describe('Authentication', () => {
     };
 
     expect(() => {
-      UserLoginSchema.parse(invalidInput);
+      AuthLoginInputSchema.parse(invalidInput);
     }).toThrow();
   });
 });

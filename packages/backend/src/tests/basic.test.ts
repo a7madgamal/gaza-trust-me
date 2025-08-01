@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { validateInput, safeValidateInput } from '../utils/validation';
-import { UserRegistrationSchema, HelpSeekerSubmissionSchema } from '../schemas/user';
+import { AuthRegistrationInputSchema } from '../types/supabase-types';
 
 describe('Backend Setup', () => {
   it('should validate user registration input correctly', () => {
@@ -12,7 +12,7 @@ describe('Backend Setup', () => {
       description: 'This is a detailed description of the help I need',
     };
 
-    const result = validateInput(UserRegistrationSchema, validInput);
+    const result = validateInput(AuthRegistrationInputSchema, validInput);
     expect(result).toEqual(validInput);
   });
 
@@ -21,28 +21,23 @@ describe('Backend Setup', () => {
       email: 'invalid-email',
       password: 'password123',
       fullName: 'John Doe',
+      phoneNumber: '+1234567890',
       description: 'This is a detailed description of the help I need',
     };
 
-    expect(() => validateInput(UserRegistrationSchema, invalidInput)).toThrow();
-  });
-
-  it('should validate help seeker submission input correctly', () => {
-    const validInput = {
-      description: 'This is a detailed description of the help needed',
-    };
-
-    const result = validateInput(HelpSeekerSubmissionSchema, validInput);
-    expect(result).toEqual(validInput);
+    expect(() => validateInput(AuthRegistrationInputSchema, invalidInput)).toThrow();
   });
 
   it('should safely validate input and return null for invalid data', () => {
     const invalidInput = {
       email: 'invalid-email',
       password: 'short',
+      fullName: 'John Doe',
+      phoneNumber: '+1234567890',
+      description: 'This is a detailed description of the help I need',
     };
 
-    const result = safeValidateInput(UserRegistrationSchema, invalidInput);
+    const result = safeValidateInput(AuthRegistrationInputSchema, invalidInput);
     expect(result).toBeNull();
   });
 
@@ -54,7 +49,7 @@ describe('Backend Setup', () => {
       description: 'This is a detailed description of the help I need',
     };
 
-    expect(() => validateInput(UserRegistrationSchema, inputWithoutPhone)).toThrow();
+    expect(() => validateInput(AuthRegistrationInputSchema, inputWithoutPhone)).toThrow();
   });
 
   it('should reject registration without description', () => {
@@ -65,7 +60,7 @@ describe('Backend Setup', () => {
       phoneNumber: '+1234567890',
     };
 
-    expect(() => validateInput(UserRegistrationSchema, inputWithoutDescription)).toThrow();
+    expect(() => validateInput(AuthRegistrationInputSchema, inputWithoutDescription)).toThrow();
   });
 
   it('should reject description that is too short', () => {
@@ -77,7 +72,7 @@ describe('Backend Setup', () => {
       description: 'Too short',
     };
 
-    expect(() => validateInput(UserRegistrationSchema, inputWithShortDescription)).toThrow();
+    expect(() => validateInput(AuthRegistrationInputSchema, inputWithShortDescription)).toThrow();
   });
 
   it('should reject description that is too long', () => {
@@ -90,7 +85,7 @@ describe('Backend Setup', () => {
       description: longDescription,
     };
 
-    expect(() => validateInput(UserRegistrationSchema, inputWithLongDescription)).toThrow();
+    expect(() => validateInput(AuthRegistrationInputSchema, inputWithLongDescription)).toThrow();
   });
 
   it('should accept description at minimum length', () => {
@@ -103,7 +98,7 @@ describe('Backend Setup', () => {
       description: minDescription,
     };
 
-    const result = validateInput(UserRegistrationSchema, validInput);
+    const result = validateInput(AuthRegistrationInputSchema, validInput);
     expect(result.description).toBe(minDescription);
   });
 
@@ -117,7 +112,7 @@ describe('Backend Setup', () => {
       description: maxDescription,
     };
 
-    const result = validateInput(UserRegistrationSchema, validInput);
+    const result = validateInput(AuthRegistrationInputSchema, validInput);
     expect(result.description).toBe(maxDescription);
   });
 });

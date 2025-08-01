@@ -1,15 +1,13 @@
 import { z } from 'zod';
 
-// Re-export schemas from local schemas for consistency
+// Re-export schemas from generated types for consistency
 export {
-  UserRegistrationSchema,
-  UserLoginSchema,
+  AuthRegistrationInputSchema,
+  AuthLoginInputSchema,
   UserProfileUpdateSchema,
-  HelpSeekerSubmissionSchema,
-  HelpSeekerUpdateSchema,
-  HelpSeekerVerificationSchema,
-  UserImageSchema,
-} from '../schemas/user';
+  PublicUsersForCardsInputSchema,
+  CardStackNavigationInputSchema,
+} from '../types/supabase-types';
 
 export { UserFilterSchema } from '../schemas/api';
 

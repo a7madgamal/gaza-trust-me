@@ -54,6 +54,35 @@ export const AuthLogoutOutputSchema = z.object({
   success: z.boolean(),
 });
 
+// Profile router schemas
+export const UserProfileUpdateSchema = z.object({
+  full_name: z.string().min(2, 'Full name must be at least 2 characters').optional(),
+  phone_number: z.string().min(1, 'Phone number is required').optional(),
+  description: z.string().min(10, 'Description must be at least 10 characters').optional(),
+});
+
+export const UserProfileOutputSchema = z.object({
+  id: z.string(),
+  email: z.string(),
+  full_name: z.string(),
+  phone_number: z.string(),
+  role: z.enum(USER_ROLES),
+  description: z.string(),
+  status: z.enum(SEEKER_STATUSES).nullable(),
+  verified_at: z.string().nullable(),
+  verified_by: z.string().nullable(),
+});
+
+export const UserProfileUpdateOutputSchema = z.object({
+  user: z.object({
+    id: z.string(),
+    full_name: z.string(),
+    phone_number: z.string(),
+    description: z.string(),
+    updated_at: z.string().nullable(),
+  }),
+});
+
 // Public router schemas
 export const PublicHelloInputSchema = z.object({
   name: z.string().optional(),
@@ -89,6 +118,10 @@ export type AuthLoginInput = z.infer<typeof AuthLoginInputSchema>;
 export type AuthRegistrationOutput = z.infer<typeof AuthRegistrationOutputSchema>;
 export type AuthLoginOutput = z.infer<typeof AuthLoginOutputSchema>;
 export type AuthLogoutOutput = z.infer<typeof AuthLogoutOutputSchema>;
+
+export type UserProfileUpdateInput = z.infer<typeof UserProfileUpdateSchema>;
+export type UserProfileOutput = z.infer<typeof UserProfileOutputSchema>;
+export type UserProfileUpdateOutput = z.infer<typeof UserProfileUpdateOutputSchema>;
 
 export type PublicHelloInput = z.infer<typeof PublicHelloInputSchema>;
 export type PublicHelloOutput = z.infer<typeof PublicHelloOutputSchema>;

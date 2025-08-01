@@ -1,30 +1,43 @@
-// TypeScript types derived from Zod schemas for airtight type safety
+// TypeScript types derived from generated Supabase types for airtight type safety
 import { z } from 'zod';
+import type { Database } from './types/GENERATED_database.types';
 import {
-  UserSchema,
-  UserRegistrationSchema,
-  UserLoginSchema,
+  AuthRegistrationInputSchema,
+  AuthLoginInputSchema,
   UserProfileUpdateSchema,
-  UserImageSchema,
-  HelpSeekerSubmissionSchema,
-  HelpSeekerUpdateSchema,
-  HelpSeekerVerificationSchema,
-} from './schemas/user';
+  PublicUsersForCardsInputSchema,
+  CardStackNavigationInputSchema,
+  PublicUserSchema,
+  UserProfileOutputSchema,
+  UserProfileUpdateOutputSchema,
+} from './types/supabase-types';
 
-import { AdminActionSchema, AdminActionInputSchema, AuditLogSchema } from './schemas/admin';
+import { AdminActionInputSchema } from './schemas/admin';
 
 import { PaginationSchema, UserFilterSchema } from './schemas/api';
 
-// Core entity types
-export type User = z.infer<typeof UserSchema>;
-export type UserImage = z.infer<typeof UserImageSchema>;
-export type AdminAction = z.infer<typeof AdminActionSchema>;
-export type AuditLog = z.infer<typeof AuditLogSchema>;
+// Legacy schemas (to be removed when fully migrated)
+import { HelpSeekerSubmissionSchema, HelpSeekerUpdateSchema, HelpSeekerVerificationSchema } from './schemas/user';
 
-// Input/Output types
-export type UserRegistration = z.infer<typeof UserRegistrationSchema>;
-export type UserLogin = z.infer<typeof UserLoginSchema>;
-export type UserProfileUpdate = z.infer<typeof UserProfileUpdateSchema>;
+// Core entity types from generated database types
+export type User = Database['public']['Tables']['users']['Row'];
+export type UserInsert = Database['public']['Tables']['users']['Insert'];
+export type UserUpdate = Database['public']['Tables']['users']['Update'];
+export type UserImage = Database['public']['Tables']['user_images']['Row'];
+export type AdminAction = Database['public']['Tables']['admin_actions']['Row'];
+export type AuditLog = Database['public']['Tables']['audit_logs']['Row'];
+
+// Input/Output types from generated schemas
+export type AuthRegistrationInput = z.infer<typeof AuthRegistrationInputSchema>;
+export type AuthLoginInput = z.infer<typeof AuthLoginInputSchema>;
+export type UserProfileUpdateInput = z.infer<typeof UserProfileUpdateSchema>;
+export type PublicUsersForCardsInput = z.infer<typeof PublicUsersForCardsInputSchema>;
+export type CardStackNavigationInput = z.infer<typeof CardStackNavigationInputSchema>;
+export type PublicUser = z.infer<typeof PublicUserSchema>;
+export type UserProfileOutput = z.infer<typeof UserProfileOutputSchema>;
+export type UserProfileUpdateOutput = z.infer<typeof UserProfileUpdateOutputSchema>;
+
+// Legacy types from old schemas (to be removed when fully migrated)
 export type HelpSeekerSubmission = z.infer<typeof HelpSeekerSubmissionSchema>;
 export type HelpSeekerUpdate = z.infer<typeof HelpSeekerUpdateSchema>;
 export type HelpSeekerVerification = z.infer<typeof HelpSeekerVerificationSchema>;
@@ -50,12 +63,14 @@ export interface PaginatedResponse<T> {
   };
 }
 
-// Utility types
-export type UserRole = User['role'];
-export type SeekerStatus = User['status'];
-export type AdminActionType = AdminAction['action'];
+// Utility types from generated enums
+export type UserRole = Database['public']['Enums']['user_role'];
+export type SeekerStatus = Database['public']['Enums']['seeker_status'];
+export type AdminActionType = AdminAction['action_type'];
 
-// Re-export schemas for runtime validation
-export * from './schemas/user';
+// Re-export generated schemas for runtime validation
+export * from './types/supabase-types';
+
+// Legacy schema exports (to be removed when fully migrated)
 export * from './schemas/admin';
 export * from './schemas/api';

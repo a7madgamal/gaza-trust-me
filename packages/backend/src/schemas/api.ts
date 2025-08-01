@@ -28,18 +28,3 @@ export const UserFilterSchema = z.object({
   status: z.enum(['pending', 'verified', 'flagged']).optional(),
   search: z.string().optional(),
 });
-
-export const PublicUserSchema = z.object({
-  id: z.string().uuid(),
-  full_name: z.string(),
-  description: z.string(),
-  phone_number: z.string(),
-  status: z.enum(['pending', 'verified', 'flagged']),
-  role: z.enum(['help_seeker', 'admin', 'super_admin']),
-  created_at: z.string(), // More flexible for different date formats
-});
-
-export const CardStackNavigationSchema = z.object({
-  direction: z.enum(['next', 'previous']),
-  currentUserId: z.string().uuid().optional(),
-});
