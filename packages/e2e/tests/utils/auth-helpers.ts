@@ -43,12 +43,20 @@ export async function loginWithCredentials(page: Page, user: TestUser): Promise<
   await page.click('[data-testid="login-button"]');
 
   // Wait for successful login - check for dashboard elements instead of URL
-  await page.waitForSelector('[data-testid="dashboard-title"]', {
-    timeout: 10000,
-  });
-
-  // Verify we're on the dashboard by checking for dashboard-specific elements
-  await expect(page.locator('[data-testid="dashboard-title"]')).toBeVisible();
+  // Admin users go to admin dashboard, regular users go to regular dashboard
+  try {
+    // First try to wait for admin dashboard
+    await page.waitForSelector('[data-testid="admin-dashboard-title"]', {
+      timeout: 5000,
+    });
+    await expect(page.locator('[data-testid="admin-dashboard-title"]')).toBeVisible();
+  } catch {
+    // If admin dashboard not found, wait for regular dashboard
+    await page.waitForSelector('[data-testid="dashboard-title"]', {
+      timeout: 5000,
+    });
+    await expect(page.locator('[data-testid="dashboard-title"]')).toBeVisible();
+  }
 }
 
 /**
@@ -60,6 +68,7 @@ export async function registerNewUser(page: Page, user: TestUser): Promise<void>
   // Fill registration form
   await page.fill('[data-testid="email"]', user.email);
   await page.fill('[data-testid="password"]', user.password);
+  await page.fill('[data-testid="confirmPassword"]', user.password);
   await page.fill('[data-testid="fullName"]', user.fullName);
   await page.fill('[data-testid="phoneNumber"]', user.phoneNumber);
   await page.fill(

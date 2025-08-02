@@ -26,6 +26,7 @@ export default [
       'playwright/no-focused-test': 'error',
       'playwright/expect-expect': 'error',
       'playwright/no-wait-for-timeout': 'warn',
+      'playwright/no-wait-for-selector': 'off',
       'playwright/no-networkidle': 'warn',
       'playwright/no-conditional-in-test': 'warn',
       'playwright/no-conditional-expect': 'error',

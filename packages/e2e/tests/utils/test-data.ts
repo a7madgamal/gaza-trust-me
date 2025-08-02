@@ -36,20 +36,28 @@ export function generateTestUser(): TestUser {
 
 /**
  * Predefined test users for consistent testing
+ * These users should NEVER be deleted or edited by tests
  */
 export const PREDEFINED_TEST_USERS = {
   helpSeeker: {
-    email: 'test-user@example.com',
-    password: 'password123',
-    fullName: 'Test User',
+    email: 'seeker@seeker.com',
+    password: 'seekerseeker1',
+    fullName: 'Help Seeker',
     phoneNumber: '+1234567890',
   },
   admin: {
-    email: 'admin@example.com',
-    password: 'admin123',
-    fullName: 'Admin User',
-    phoneNumber: '+1234567891',
+    email: 'admin@admin.com',
+    password: 'adminadmin1',
+    fullName: 'admin',
+    phoneNumber: '9999999',
   },
+  // Add a third fixed user if needed
+  // thirdUser: {
+  //   email: 'third@third.com',
+  //   password: 'thirdthird1',
+  //   fullName: 'Third User',
+  //   phoneNumber: '+1234567891',
+  // },
 } as const;
 
 /**

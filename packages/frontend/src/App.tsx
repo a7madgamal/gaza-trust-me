@@ -8,7 +8,9 @@ import RegistrationForm from './components/RegistrationForm';
 import Dashboard from './components/Dashboard';
 import Profile from './components/Profile';
 import PublicPage from './components/PublicPage';
+import AdminDashboard from './components/AdminDashboard';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { AdminRoute } from './components/AdminRoute';
 import { AuthCallback } from './components/AuthCallback';
 
 function App() {
@@ -40,6 +42,14 @@ function App() {
                 <ProtectedRoute>
                   <Profile />
                 </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/dashboard"
+              element={
+                <AdminRoute>
+                  <AdminDashboard />
+                </AdminRoute>
               }
             />
             <Route path="/register" element={<RegistrationForm />} />

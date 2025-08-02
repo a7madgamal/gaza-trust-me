@@ -42,8 +42,13 @@ const LoginForm = () => {
     }
 
     try {
-      await login(email, password);
-      navigate('/dashboard');
+      const result = await login(email, password);
+      // Redirect based on user role
+      if (result?.user?.role === 'admin' || result?.user?.role === 'super_admin') {
+        navigate('/admin/dashboard');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (error) {
       console.error('Error logging in:', error);
       setApiError('Invalid credentials. Please try again.');

@@ -26,7 +26,7 @@ interface AuthContextType {
   // eslint-disable-next-line vibe-coder/no-optional-properties
   userProfile: UserProfile | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<{ user: User } | null>;
   logout: () => Promise<void>;
   fetchUserProfile: () => Promise<void>;
   setUser: (user: User | null) => void;

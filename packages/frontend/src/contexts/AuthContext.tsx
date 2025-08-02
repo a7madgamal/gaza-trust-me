@@ -72,6 +72,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(result.data.user);
 
       // Profile will be fetched automatically by the tRPC hook when user is set
+      return { user: result.data.user };
     } catch (error) {
       console.error('Login error:', error);
       throw error;
