@@ -3,6 +3,7 @@ import { TRPCError } from '@trpc/server';
 import type winston from 'winston';
 
 import type { User } from '../types';
+import logger from '../utils/logger';
 
 export interface AuthenticatedRequest extends Request {
   user?: Pick<User, 'id' | 'email' | 'role'>;
@@ -103,8 +104,16 @@ export const createAuthContext = (supabase: typeof import('../utils/supabase').s
     // Get user role from database
     const { data: userData, error: userError } = await supabase.from('users').select('role').eq('id', user.id).single();
 
-    if (userError || !userData) {
-      throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User not found' });
+    if (userError) {
+      logger.error('User role lookup error:', userError);
+      throw new TRPCError({
+        code: 'UNAUTHORIZED',
+        message: `User role lookup failed: ${userError.message}`,
+      });
+    }
+
+    if (!userData) {
+      throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User not found in database' });
     }
 
     if (!user.email) {

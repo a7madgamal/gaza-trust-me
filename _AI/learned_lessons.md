@@ -48,3 +48,24 @@
 - **Problem:** Skipped tests when stuck instead of asking user
 - **Rule:** Always ask before skipping tests - user may have preferences
 - **Lesson:** When stuck, ask user how to proceed rather than skipping tests
+
+### 🚨 **NEVER Run Destructive Commands Without Explicit Permission**
+
+- **Problem:** Ran `npm run db:migrate:reset` without asking user first
+- **Rule:** ALWAYS ask before running ANY destructive commands, especially database operations
+- **Critical:** Supabase commands like `db reset`, `db push`, `migration reset` can destroy data
+- **Lesson:** When user can't login, ask what they want to do - don't assume database reset is needed
+
+### 🔍 **Debug RLS Issues with Detailed Error Messages**
+
+- **Problem:** Generic error messages made debugging RLS policies difficult
+- **Rule:** Always improve error handling to show actual error messages for debugging
+- **Lesson:** The error "Failed to update user status" was actually "new row violates row-level security policy for table 'audit_logs'"
+- **Fix:** Enhanced error logging in auth middleware and admin router to show specific Supabase errors
+
+### 🛠️ **Use Playwright for Real-Time Debugging**
+
+- **Problem:** Backend logs weren't accessible for debugging authentication issues
+- **Rule:** Use browser automation tools to debug frontend-backend interactions
+- **Lesson:** Playwright can simulate real user actions and show network requests/errors
+- **Fix:** Used Playwright to login as admin and test verification process step-by-step

@@ -12,14 +12,25 @@ import {
 
 // Admin middleware - checks if user has admin role
 const adminProcedure = protectedProcedure.use(async ({ ctx, next }) => {
+  logger.info('Admin middleware called for user:', ctx.user.id);
+
   // Check if user has admin role
   const { data: userData, error } = await supabase.from('users').select('role').eq('id', ctx.user.id).single();
 
-  if (error || !userData) {
-    throw new Error('User not found');
+  logger.info('Admin middleware query result:', { userData, error });
+
+  if (error) {
+    logger.error('Admin middleware query error:', error);
+    throw new Error(`Admin role check failed: ${error.message}`);
   }
 
-  if (userData.role !== 'admin') {
+  if (!userData) {
+    logger.error('Admin middleware: User not found');
+    throw new Error('User not found in database');
+  }
+
+  if (userData.role !== 'admin' && userData.role !== 'super_admin') {
+    logger.error('User does not have admin role:', userData.role);
     throw new Error('Admin access required');
   }
 
@@ -52,7 +63,8 @@ export const adminRouter = t.router({
         const { data, error } = await query.range(input.offset, input.offset + input.limit - 1);
 
         if (error) {
-          throw new Error('Failed to fetch users');
+          logger.error('Get users query error:', error);
+          throw new Error(`Failed to fetch users: ${error.message}`);
         }
 
         return {
@@ -77,12 +89,17 @@ export const adminRouter = t.router({
     .output(ApiResponseSchema(AdminUserActionOutputSchema))
     .mutation(async ({ input, ctx }) => {
       try {
+        logger.info('Admin updateUserStatus called with input:', input);
+        logger.info('Admin context user:', ctx.user);
+
         // Create update data using generated types
         const updateData: Database['public']['Tables']['users']['Update'] = {
           status: input.action === 'verify' ? 'verified' : 'flagged',
           verified_at: new Date().toISOString(),
           verified_by: ctx.user.id,
         };
+
+        logger.info('Update data:', updateData);
 
         // Update user status
         const { data, error } = await supabase
@@ -93,7 +110,8 @@ export const adminRouter = t.router({
           .single();
 
         if (error) {
-          throw new Error('Failed to update user status');
+          logger.error('Supabase update error details:', error);
+          throw new Error(`Failed to update user status: ${error.message}`);
         }
 
         if (!data) {
