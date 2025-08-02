@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import { ToastProvider } from './components/Toast';
 import { AuthProvider } from './contexts/AuthContext';
 import { TRPCProvider } from './utils/trpc-provider';
+import { Header } from './components/Header';
 import HomePage from './components/HomePage';
 import LoginForm from './components/LoginForm';
 import RegistrationForm from './components/RegistrationForm';
@@ -18,6 +19,7 @@ function App() {
     <TRPCProvider>
       <AuthProvider>
         <ToastProvider>
+          <Header />
           <Routes>
             <Route path="/" element={<PublicPage />} />
             <Route

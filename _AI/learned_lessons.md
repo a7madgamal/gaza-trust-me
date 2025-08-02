@@ -69,3 +69,19 @@
 - **Rule:** Use browser automation tools to debug frontend-backend interactions
 - **Lesson:** Playwright can simulate real user actions and show network requests/errors
 - **Fix:** Used Playwright to login as admin and test verification process step-by-step
+
+### 🧪 **Test Strategy Preferences**
+
+- **User Preference:** "always prefer playwright tests for ui and interaction. and unit tests for backend and non-react important functions"
+- **Rule:**
+  - **Playwright E2E** for UI components, user interactions, and full user flows
+  - **Unit tests** for backend API endpoints, utility functions, and non-React business logic
+- **Lesson:** Don't waste time on React component unit tests when Playwright covers real user behavior better
+- **Focus:** Backend validation, auth logic, database operations, and critical utility functions
+
+### ⚡ **Run Failed Tests Only When Fixing**
+
+- **Problem:** Running all tests repeatedly when only fixing specific failures
+- **Rule:** When fixing or writing new tests, run only failed tests to save time
+- **Command:** `npm test -- --grep "failing test name"` or `npm test -- specific-file.spec.ts`
+- **Lesson:** Don't waste time running 15 passing tests when you only need to fix 1 failing test

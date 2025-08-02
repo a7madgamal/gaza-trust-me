@@ -10,7 +10,7 @@ const RegistrationForm = () => {
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        minHeight: '100vh',
+        minHeight: 'calc(100vh - 64px)',
         justifyContent: 'center',
         alignItems: 'center',
         px: { xs: 2, sm: 4, md: 0 },

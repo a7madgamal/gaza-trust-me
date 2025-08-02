@@ -10,7 +10,7 @@
     "lint": "prettier --write \"**/*.{ts,tsx,json}\" && eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0 --fix",
     "lint:check": "prettier --check \"**/*.{ts,tsx,json}\" && eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "type-check": "tsc --noEmit",
-    "test": "vitest run --passWithNoTests",
+    "test": "echo \"Frontend tests are run via Playwright E2E tests\" && exit 0",
     "clean": "rimraf dist"
   },
   "dependencies": {
@@ -39,7 +39,6 @@
     "prettier": "^3.1.0",
     "rimraf": "^5.0.5",
     "typescript": "5.3.3",
-    "vite": "^4.4.0",
-    "vitest": "^0.34.0"
+    "vite": "^4.4.0"
   }
 }

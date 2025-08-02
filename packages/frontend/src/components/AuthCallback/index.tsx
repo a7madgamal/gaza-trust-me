@@ -86,10 +86,11 @@ export const AuthCallback = () => {
       sx={{
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center',
+        minHeight: 'calc(100vh - 64px)',
         justifyContent: 'center',
-        minHeight: '100vh',
-        gap: 2,
+        alignItems: 'center',
+        px: { xs: 2, sm: 4, md: 0 },
+        py: 4,
       }}
     >
       <CircularProgress size={60} />

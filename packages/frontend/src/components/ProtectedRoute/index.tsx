@@ -17,9 +17,11 @@ export const ProtectedRoute = ({ children, redirectTo = '/login' }: ProtectedRou
       <Box
         sx={{
           display: 'flex',
+          flexDirection: 'column',
+          minHeight: 'calc(100vh - 64px)',
           justifyContent: 'center',
           alignItems: 'center',
-          minHeight: '100vh',
+          gap: 2,
         }}
       >
         <CircularProgress size={60} />
