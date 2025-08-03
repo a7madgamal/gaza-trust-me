@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, Card, CardContent, Button, Stack, Chip, CircularProgress, Link } from '@mui/material';
-import { Link as RouterLink } from 'react-router-dom';
 import { trpc } from '../../utils/trpc';
 import { useToast } from '../../hooks/useToast';
 import type { RouterOutputs } from '../../utils/trpc';
@@ -132,23 +131,6 @@ const PublicPage: React.FC = () => {
             {totalCount} verified users available
           </Typography>
         )}
-
-        {/* Login Button */}
-        <Box mt={3}>
-          <Button
-            variant="contained"
-            component={RouterLink}
-            to="/login"
-            sx={{
-              backgroundColor: '#667eea',
-              '&:hover': {
-                backgroundColor: '#5a6fd8',
-              },
-            }}
-          >
-            Login to Help
-          </Button>
-        </Box>
       </Box>
 
       {/* Card Stack */}

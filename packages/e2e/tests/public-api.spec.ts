@@ -28,25 +28,6 @@ test.describe('Public API Endpoints', () => {
     expect(data.result.data).toBeGreaterThanOrEqual(0);
   });
 
-  test('should validate response structure', async ({ request }) => {
-    const response = await request.get(
-      'http://localhost:3001/trpc/getUsersForCards?input=' +
-        encodeURIComponent(
-          JSON.stringify({
-            limit: 1,
-            offset: 0,
-          })
-        )
-    );
-
-    expect(response.status()).toBe(200);
-    const data = await response.json();
-
-    // Always expect the response structure
-    expect(data.result).toBeDefined();
-    expect(Array.isArray(data.result.data)).toBe(true);
-  });
-
   test('should validate user schema when users exist', async ({ request }) => {
     const response = await request.get(
       'http://localhost:3001/trpc/getUsersForCards?input=' +

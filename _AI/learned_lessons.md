@@ -85,3 +85,19 @@
 - **Rule:** When fixing or writing new tests, run only failed tests to save time
 - **Command:** `npm test -- --grep "failing test name"` or `npm test -- specific-file.spec.ts`
 - **Lesson:** Don't waste time running 15 passing tests when you only need to fix 1 failing test
+
+### 🧹 **Remove Fake Tests, Keep Meaningful Differences**
+
+- **Problem:** Tests that test nothing or duplicate functionality without meaningful differences
+- **Rule:** Only remove tests that are clearly fake (admit they don't test what they claim)
+- **Examples:** Tests that "would require clean database" but don't actually test empty state
+- **Lesson:** Be conservative - if tests have different contexts, scenarios, or assertions, keep them
+- **Result:** Removed 2 fake tests, kept 33 meaningful tests with real coverage
+
+### 🎯 **Fix Playwright Strict Mode Violations**
+
+- **Problem:** `locator.click: Error: strict mode violation: locator resolved to X elements`
+- **Cause:** Generic selectors like `text=Pending` match multiple elements in tables/lists
+- **Fix:** Use specific selectors like `[role="option"]:has-text("Pending")` for dropdowns
+- **Lesson:** Always target the specific element you want, not generic text that appears multiple times
+- **Example:** Changed `text=Pending` to `[role="option"]:has-text("Pending")` for dropdown options

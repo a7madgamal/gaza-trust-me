@@ -60,7 +60,9 @@ test.describe('Admin Dashboard', () => {
 
     // Test filtering by pending status
     await statusFilter.click();
-    await page.locator('text=Pending').click();
+
+    // Click on the dropdown option specifically, not any "Pending" text in the table
+    await page.locator('[role="option"]:has-text("Pending")').click();
 
     // Wait for the filter to be applied
     await page.waitForLoadState('networkidle');
