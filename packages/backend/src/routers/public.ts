@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { ApiResponseSchema } from '../schemas/api';
 import { supabase } from '../utils/supabase';
+import logger from '../utils/logger';
 import { t, publicProcedure } from './shared';
 import {
   PublicHelloInputSchema,
@@ -31,20 +32,20 @@ export const publicRouter = t.router({
       try {
         const { data, error } = await supabase
           .from('users')
-          .select('id, full_name, description, phone_number, status, role, created_at')
+          .select('id, full_name, description, phone_number, status, role, created_at, linkedin_url, campaign_url')
           .eq('role', 'help_seeker') // Only show help seekers
           .eq('status', 'verified') // Only verified users
           .order('created_at', { ascending: false }) // Newest first
           .range(input.offset, input.offset + input.limit - 1);
 
         if (error) {
-          console.error('Error fetching users for cards:', error);
+          logger.error('Error fetching users for cards:', error);
           throw new Error('Failed to fetch users');
         }
 
         return data || [];
       } catch (error) {
-        console.error('Error in getUsersForCards:', error);
+        logger.error('Error in getUsersForCards:', error);
         throw new Error('Failed to fetch users');
       }
     }),
@@ -56,7 +57,7 @@ export const publicRouter = t.router({
       try {
         let query = supabase
           .from('users')
-          .select('id, full_name, description, phone_number, status, role, created_at')
+          .select('id, full_name, description, phone_number, status, role, created_at, linkedin_url, campaign_url')
           .eq('role', 'help_seeker')
           .eq('status', 'verified');
 
@@ -77,13 +78,13 @@ export const publicRouter = t.router({
 
         if (error && error.code !== 'PGRST116') {
           // PGRST116 = no rows returned
-          console.error('Error fetching next user:', error);
+          logger.error('Error fetching next user:', error);
           throw new Error('Failed to fetch next user');
         }
 
         return data;
       } catch (error) {
-        console.error('Error in getNextUser:', error);
+        logger.error('Error in getNextUser:', error);
         throw new Error('Failed to fetch next user');
       }
     }),
@@ -97,13 +98,13 @@ export const publicRouter = t.router({
         .eq('status', 'verified');
 
       if (error) {
-        console.error('Error fetching user count:', error);
+        logger.error('Error fetching user count:', error);
         throw new Error('Failed to fetch user count');
       }
 
       return count || 0;
     } catch (error) {
-      console.error('Error in getVerifiedUserCount:', error);
+      logger.error('Error in getVerifiedUserCount:', error);
       throw new Error('Failed to fetch user count');
     }
   }),

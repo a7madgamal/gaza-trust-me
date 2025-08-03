@@ -2,12 +2,11 @@ import React, { useState } from 'react';
 import { AppBar, Toolbar, Typography, Button, Menu, MenuItem, Box, IconButton } from '@mui/material';
 import { AccountCircle, Logout, Person } from '@mui/icons-material';
 import { useAuth } from '../../hooks/useAuth';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export const Header: React.FC = () => {
   const { user, userProfile, logout } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -118,16 +117,12 @@ export const Header: React.FC = () => {
           </Box>
         ) : (
           <Box sx={{ display: 'flex', gap: 1 }}>
-            {location.pathname !== '/login' && (
-              <Button color="inherit" onClick={() => navigate('/login')}>
-                Login
-              </Button>
-            )}
-            {location.pathname !== '/register' && (
-              <Button color="inherit" onClick={() => navigate('/register')}>
-                Register
-              </Button>
-            )}
+            <Button color="inherit" onClick={() => navigate('/login')}>
+              Login
+            </Button>
+            <Button color="inherit" onClick={() => navigate('/register')}>
+              Register
+            </Button>
           </Box>
         )}
       </Toolbar>

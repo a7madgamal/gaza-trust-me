@@ -30,6 +30,8 @@ export const AuthRegistrationInputSchema = z.object({
     .string()
     .min(10, 'Description must be at least 10 characters')
     .max(2000, 'Description must be less than 2000 characters'),
+  linkedinUrl: z.string().url('Invalid LinkedIn URL').optional(),
+  campaignUrl: z.string().url('Invalid campaign URL').optional(),
 });
 
 export const AuthLoginInputSchema = z.object({
@@ -146,6 +148,8 @@ export const PublicUserSchema = z.object({
   status: z.enum(SEEKER_STATUSES),
   role: z.enum(USER_ROLES),
   created_at: z.string(),
+  linkedin_url: z.string().nullable(),
+  campaign_url: z.string().nullable(),
 });
 
 export const CardStackNavigationInputSchema = z.object({

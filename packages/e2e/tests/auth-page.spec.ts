@@ -33,7 +33,7 @@ test.describe('Auth Pages', () => {
     await page.click('[data-testid="login-button"]');
 
     // Wait for network activity to complete
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Since backend is not configured, button will remain enabled
     // but we can verify the form submission was attempted
@@ -247,6 +247,8 @@ test.describe('Auth Pages', () => {
       '[data-testid="description"]',
       `Test description for ${testUser.fullName}. This is a test user created for E2E testing.`
     );
+    await page.fill('[data-testid="linkedinUrl"]', testUser.linkedinUrl || '');
+    await page.fill('[data-testid="campaignUrl"]', testUser.campaignUrl || '');
 
     // Verify all fields are filled correctly
     await expect(page.locator('[data-testid="email"]')).toHaveValue(testUser.email);
@@ -255,6 +257,8 @@ test.describe('Auth Pages', () => {
     await expect(page.locator('[data-testid="description"]')).toHaveValue(
       `Test description for ${testUser.fullName}. This is a test user created for E2E testing.`
     );
+    await expect(page.locator('[data-testid="linkedinUrl"]')).toHaveValue(testUser.linkedinUrl || '');
+    await expect(page.locator('[data-testid="campaignUrl"]')).toHaveValue(testUser.campaignUrl || '');
 
     // Submit form and wait for loading state
     await page.click('[data-testid="register-button"]');

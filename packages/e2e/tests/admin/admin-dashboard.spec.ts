@@ -65,7 +65,7 @@ test.describe('Admin Dashboard', () => {
     await page.locator('[role="option"]:has-text("Pending")').click();
 
     // Wait for the filter to be applied
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Verify filter is applied by checking if the select shows "Pending"
     await expect(page.locator('[data-testid="status-filter"]')).toContainText('Pending');

@@ -133,6 +133,34 @@ const RegistrationForm = () => {
             inputProps={{ 'data-testid': 'description' }}
           />
 
+          <TextField
+            fullWidth
+            label="LinkedIn Profile URL (Optional)"
+            type="url"
+            margin="normal"
+            error={!!errors.linkedinUrl}
+            helperText={errors.linkedinUrl || 'Share your LinkedIn profile to help build trust'}
+            value={formData.linkedinUrl}
+            onChange={handleChange('linkedinUrl')}
+            disabled={loading}
+            autoComplete="url"
+            inputProps={{ 'data-testid': 'linkedinUrl' }}
+          />
+
+          <TextField
+            fullWidth
+            label="Campaign/Fundraising URL (Optional)"
+            type="url"
+            margin="normal"
+            error={!!errors.campaignUrl}
+            helperText={errors.campaignUrl || 'Link to your fundraising campaign or project'}
+            value={formData.campaignUrl}
+            onChange={handleChange('campaignUrl')}
+            disabled={loading}
+            autoComplete="url"
+            inputProps={{ 'data-testid': 'campaignUrl' }}
+          />
+
           <Button
             type="submit"
             fullWidth

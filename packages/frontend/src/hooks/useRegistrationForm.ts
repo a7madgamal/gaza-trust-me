@@ -14,6 +14,8 @@ export const useRegistrationForm = () => {
     fullName: '',
     phoneNumber: '',
     description: '',
+    linkedinUrl: '',
+    campaignUrl: '',
   });
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [loading, setLoading] = useState(false);
@@ -64,6 +66,8 @@ export const useRegistrationForm = () => {
           fullName: formData.fullName,
           phoneNumber: formData.phoneNumber,
           description: formData.description,
+          linkedinUrl: formData.linkedinUrl,
+          campaignUrl: formData.campaignUrl,
         });
 
         console.log('tRPC response:', result);

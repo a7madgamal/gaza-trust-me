@@ -13,6 +13,8 @@ test.describe('Home Page', () => {
       phone_number: '+1234567890',
       role: 'help_seeker',
       status: 'verified',
+      linkedin_url: 'https://linkedin.com/in/test-help-seeker',
+      campaign_url: 'https://gofundme.com/test-campaign',
     });
   });
 
@@ -40,7 +42,7 @@ test.describe('Home Page', () => {
     await expect(page.locator('[data-testid="user-card"]')).toBeVisible();
 
     // Wait for the page to load and show either user data or empty state
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     // Check if we have users or empty state
     // We know we have a test user from beforeAll

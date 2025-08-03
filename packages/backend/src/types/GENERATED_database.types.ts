@@ -164,11 +164,13 @@ export type Database = {
       };
       users: {
         Row: {
+          campaign_url: string | null;
           created_at: string | null;
           description: string;
           email: string;
           full_name: string;
           id: string;
+          linkedin_url: string | null;
           phone_number: string;
           role: Database['public']['Enums']['user_role'];
           status: Database['public']['Enums']['seeker_status'] | null;
@@ -177,11 +179,13 @@ export type Database = {
           verified_by: string | null;
         };
         Insert: {
+          campaign_url?: string | null;
           created_at?: string | null;
           description: string;
           email: string;
           full_name: string;
           id: string;
+          linkedin_url?: string | null;
           phone_number: string;
           role?: Database['public']['Enums']['user_role'];
           status?: Database['public']['Enums']['seeker_status'] | null;
@@ -190,11 +194,13 @@ export type Database = {
           verified_by?: string | null;
         };
         Update: {
+          campaign_url?: string | null;
           created_at?: string | null;
           description?: string;
           email?: string;
           full_name?: string;
           id?: string;
+          linkedin_url?: string | null;
           phone_number?: string;
           role?: Database['public']['Enums']['user_role'];
           status?: Database['public']['Enums']['seeker_status'] | null;

@@ -8,6 +8,8 @@ export interface TestUser {
   readonly password: string;
   readonly fullName: string;
   readonly phoneNumber: string;
+  readonly linkedinUrl?: string;
+  readonly campaignUrl?: string;
 }
 
 /**
@@ -31,6 +33,8 @@ export function generateTestUser(): TestUser {
     password: 'TestPassword123!',
     fullName: `Test User ${timestamp}`,
     phoneNumber: `+1${Math.floor(Math.random() * 9000000000) + 1000000000}`,
+    linkedinUrl: 'https://linkedin.com/in/test-user',
+    campaignUrl: 'https://gofundme.com/test-campaign',
   };
 }
 
@@ -44,6 +48,8 @@ export const PREDEFINED_TEST_USERS = {
     password: 'seekerseeker1',
     fullName: 'Help Seeker',
     phoneNumber: '+1234567890',
+    linkedinUrl: 'https://linkedin.com/in/help-seeker',
+    campaignUrl: 'https://gofundme.com/help-seeker-campaign',
   },
   admin: {
     email: 'admin@admin.com',
@@ -69,6 +75,8 @@ export async function createTestUser(userData: {
   phone_number: string;
   role: 'help_seeker' | 'admin' | 'super_admin';
   status: 'pending' | 'verified' | 'flagged';
+  linkedin_url?: string;
+  campaign_url?: string;
 }): Promise<string> {
   const response = await fetch('http://localhost:3001/trpc/register', {
     method: 'POST',
@@ -84,6 +92,8 @@ export async function createTestUser(userData: {
         userData.description.length >= 10
           ? userData.description
           : `${userData.description} - This is a test user created for automated testing purposes.`,
+      linkedinUrl: userData.linkedin_url,
+      campaignUrl: userData.campaign_url,
     }),
   });
 

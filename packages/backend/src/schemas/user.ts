@@ -8,6 +8,8 @@ export const UserSchema = z.object({
   role: z.enum(['help_seeker', 'admin', 'super_admin']),
   // Help seeker specific fields
   description: z.string().optional(),
+  linkedinUrl: z.string().url().optional(),
+  campaignUrl: z.string().url().optional(),
   status: z.enum(['pending', 'verified', 'flagged']).optional(),
   verifiedBy: z.string().uuid().optional(),
   verifiedAt: z.date().optional(),
@@ -24,6 +26,8 @@ export const UserRegistrationSchema = z.object({
     .string()
     .min(10, 'Description must be at least 10 characters')
     .max(2000, 'Description must be less than 2000 characters'),
+  linkedinUrl: z.string().url('Invalid LinkedIn URL').optional(),
+  campaignUrl: z.string().url('Invalid campaign URL').optional(),
 });
 
 export const UserLoginSchema = z.object({
@@ -35,6 +39,8 @@ export const UserProfileUpdateSchema = z.object({
   full_name: z.string().min(2, 'Full name must be at least 2 characters').optional(),
   phone_number: z.string().min(1, 'Phone number is required').optional(),
   description: z.string().min(10, 'Description must be at least 10 characters').optional(),
+  linkedin_url: z.string().url('Invalid LinkedIn URL').optional(),
+  campaign_url: z.string().url('Invalid campaign URL').optional(),
 });
 
 export const HelpSeekerSubmissionSchema = z.object({

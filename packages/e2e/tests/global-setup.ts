@@ -24,7 +24,7 @@ async function globalSetup(config: FullConfig): Promise<void> {
 
     // Test frontend
     await page.goto(baseURL);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
 
     console.log('✅ Global setup completed - services are running');
   } catch (error) {

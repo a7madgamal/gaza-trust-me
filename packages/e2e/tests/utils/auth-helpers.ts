@@ -76,11 +76,19 @@ export async function registerNewUser(page: Page, user: TestUser): Promise<void>
     `Test description for ${user.fullName}. This is a test user created for E2E testing.`
   );
 
+  // Fill optional LinkedIn and campaign URLs if provided
+  if (user.linkedinUrl) {
+    await page.fill('[data-testid="linkedinUrl"]', user.linkedinUrl);
+  }
+  if (user.campaignUrl) {
+    await page.fill('[data-testid="campaignUrl"]', user.campaignUrl);
+  }
+
   // Submit form
   await page.click('[data-testid="register-button"]');
 
   // Wait for the form submission to complete
-  await page.waitForLoadState('networkidle');
+  await page.waitForLoadState('domcontentloaded');
 
   // Check if there are any error messages
   const errorElement = page.locator('[data-testid="error-message"]');
@@ -92,7 +100,7 @@ export async function registerNewUser(page: Page, user: TestUser): Promise<void>
 
   // Wait for navigation to login page or check for success
   try {
-    await expect(page).toHaveURL('/login', { timeout: 10000 });
+    await expect(page).toHaveURL(/\/login/, { timeout: 10000 });
   } catch (error) {
     // If we're still on register page, check if there's a success message
     const currentUrl = page.url();
@@ -179,4 +187,38 @@ export async function clearBrowserState(page: Page): Promise<void> {
     // @ts-ignore - localStorage and sessionStorage are available in browser context
     sessionStorage.clear();
   });
+}
+
+/**
+ * Create a test user and verify them as admin so they appear in public cards
+ */
+export async function createTestUser(page: Page, user: TestUser): Promise<void> {
+  // First register the user
+  await registerNewUser(page, user);
+
+  // Then login as admin to verify the user
+  await loginAsUser(page, 'admin');
+
+  // Navigate to admin dashboard
+  await page.goto('/admin/dashboard');
+
+  // Find and verify the user
+  // This is a simplified version - in a real implementation you'd need to find the specific user
+  // For now, we'll just verify the first pending user we find
+  const verifyButtons = page.locator('button:has-text("Verify")');
+  if ((await verifyButtons.count()) > 0) {
+    await verifyButtons.first().click();
+
+    // Handle the verification dialog
+    const remarksInput = page.locator('input[placeholder*="remarks"], textarea[placeholder*="remarks"]');
+    if (await remarksInput.isVisible()) {
+      await remarksInput.fill('Verified for testing');
+    }
+
+    const confirmButton = page.locator('button:has-text("Confirm"), button:has-text("Verify")');
+    await confirmButton.click();
+  }
+
+  // Logout admin
+  await logoutUser(page);
 }

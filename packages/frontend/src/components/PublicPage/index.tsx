@@ -218,6 +218,58 @@ const PublicPage: React.FC = () => {
                   </Link>
                 </Box>
               )}
+
+              {/* LinkedIn Profile */}
+              {currentUser.linkedin_url && (
+                <Box display="flex" alignItems="center" gap={1} mt={1}>
+                  <Link
+                    href={currentUser.linkedin_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    sx={{
+                      color: 'rgba(255,255,255,0.9)',
+                      textDecoration: 'none',
+                      backgroundColor: 'rgba(255,255,255,0.1)',
+                      px: 1,
+                      py: 0.5,
+                      borderRadius: 1,
+                      fontSize: '0.75rem',
+                      '&:hover': {
+                        backgroundColor: 'rgba(255,255,255,0.2)',
+                        textDecoration: 'none',
+                      },
+                    }}
+                  >
+                    💼 LinkedIn Profile
+                  </Link>
+                </Box>
+              )}
+
+              {/* Campaign/Fundraising Link */}
+              {currentUser.campaign_url && (
+                <Box display="flex" alignItems="center" gap={1} mt={1}>
+                  <Link
+                    href={currentUser.campaign_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    sx={{
+                      color: 'rgba(255,255,255,0.9)',
+                      textDecoration: 'none',
+                      backgroundColor: 'rgba(255,255,255,0.1)',
+                      px: 1,
+                      py: 0.5,
+                      borderRadius: 1,
+                      fontSize: '0.75rem',
+                      '&:hover': {
+                        backgroundColor: 'rgba(255,255,255,0.2)',
+                        textDecoration: 'none',
+                      },
+                    }}
+                  >
+                    🎯 Campaign/Fundraising
+                  </Link>
+                </Box>
+              )}
             </Box>
           </CardContent>
         </Card>

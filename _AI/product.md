@@ -37,6 +37,8 @@
 1.8. Full name
 1.9. Phone number
 1.10. Profile description
+1.11. LinkedIn profile URL (optional)
+1.12. Campaign/fundraising URL (optional)
 
 ### 2. Help Providers (Optional Registration)
 
@@ -127,6 +129,8 @@
 5.9.2. Responsive card layout
 5.9.3. Image gallery with lazy loading
 5.9.4. Contact information display
+5.9.5. LinkedIn profile links (when provided)
+5.9.6. Campaign/fundraising links (when provided)
 5.9.5. Search and filter functionality
 
 ### Image Management

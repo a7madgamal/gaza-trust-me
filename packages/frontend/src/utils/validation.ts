@@ -72,6 +72,20 @@ export const validateDescription = (description: string): string | undefined => 
   return undefined;
 };
 
+export const validateUrl = (url: string, fieldName: string): string | undefined => {
+  if (!url) {
+    return undefined; // Optional field
+  }
+
+  try {
+    new URL(url);
+  } catch {
+    return `Please enter a valid ${fieldName} URL`;
+  }
+
+  return undefined;
+};
+
 export const validateConfirmPassword = (password: string, confirmPassword: string): string | undefined => {
   if (!confirmPassword) {
     return 'Please confirm your password';
@@ -115,6 +129,16 @@ export const validateRegistrationForm = (formData: RegistrationFormData): Valida
   const descriptionError = validateDescription(formData.description);
   if (descriptionError) {
     errors.description = descriptionError;
+  }
+
+  const linkedinUrlError = validateUrl(formData.linkedinUrl, 'LinkedIn');
+  if (linkedinUrlError) {
+    errors.linkedinUrl = linkedinUrlError;
+  }
+
+  const campaignUrlError = validateUrl(formData.campaignUrl, 'campaign');
+  if (campaignUrlError) {
+    errors.campaignUrl = campaignUrlError;
   }
 
   return errors;

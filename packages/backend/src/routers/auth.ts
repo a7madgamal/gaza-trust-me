@@ -27,6 +27,8 @@ export const authRouter = t.router({
               full_name: string;
               phone_number: string;
               description: string;
+              linkedin_url?: string;
+              campaign_url?: string;
             };
           };
         } = {
@@ -37,6 +39,8 @@ export const authRouter = t.router({
               full_name: input.fullName,
               phone_number: input.phoneNumber,
               description: input.description,
+              ...(input.linkedinUrl && { linkedin_url: input.linkedinUrl }),
+              ...(input.campaignUrl && { campaign_url: input.campaignUrl }),
             },
           },
         };

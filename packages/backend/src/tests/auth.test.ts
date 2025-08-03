@@ -15,6 +15,85 @@ describe('Authentication', () => {
     expect(result).toEqual(validInput);
   });
 
+  it('should validate registration input with LinkedIn and campaign URLs', () => {
+    const validInput = {
+      email: 'test@example.com',
+      password: 'password123',
+      fullName: 'Test User',
+      phoneNumber: '+1234567890',
+      description: 'This is a detailed description of the help I need',
+      linkedinUrl: 'https://linkedin.com/in/test-user',
+      campaignUrl: 'https://gofundme.com/test-campaign',
+    };
+
+    const result = AuthRegistrationInputSchema.parse(validInput);
+    expect(result).toEqual(validInput);
+    expect(result.linkedinUrl).toBe('https://linkedin.com/in/test-user');
+    expect(result.campaignUrl).toBe('https://gofundme.com/test-campaign');
+  });
+
+  it('should validate registration input with only LinkedIn URL', () => {
+    const validInput = {
+      email: 'test@example.com',
+      password: 'password123',
+      fullName: 'Test User',
+      phoneNumber: '+1234567890',
+      description: 'This is a detailed description of the help I need',
+      linkedinUrl: 'https://linkedin.com/in/test-user',
+    };
+
+    const result = AuthRegistrationInputSchema.parse(validInput);
+    expect(result).toEqual(validInput);
+    expect(result.linkedinUrl).toBe('https://linkedin.com/in/test-user');
+    expect(result.campaignUrl).toBeUndefined();
+  });
+
+  it('should validate registration input with only campaign URL', () => {
+    const validInput = {
+      email: 'test@example.com',
+      password: 'password123',
+      fullName: 'Test User',
+      phoneNumber: '+1234567890',
+      description: 'This is a detailed description of the help I need',
+      campaignUrl: 'https://gofundme.com/test-campaign',
+    };
+
+    const result = AuthRegistrationInputSchema.parse(validInput);
+    expect(result).toEqual(validInput);
+    expect(result.linkedinUrl).toBeUndefined();
+    expect(result.campaignUrl).toBe('https://gofundme.com/test-campaign');
+  });
+
+  it('should reject invalid LinkedIn URL in registration', () => {
+    const invalidInput = {
+      email: 'test@example.com',
+      password: 'password123',
+      fullName: 'Test User',
+      phoneNumber: '+1234567890',
+      description: 'This is a detailed description of the help I need',
+      linkedinUrl: 'not-a-valid-url',
+    };
+
+    expect(() => {
+      AuthRegistrationInputSchema.parse(invalidInput);
+    }).toThrow();
+  });
+
+  it('should reject invalid campaign URL in registration', () => {
+    const invalidInput = {
+      email: 'test@example.com',
+      password: 'password123',
+      fullName: 'Test User',
+      phoneNumber: '+1234567890',
+      description: 'This is a detailed description of the help I need',
+      campaignUrl: 'invalid-url-format',
+    };
+
+    expect(() => {
+      AuthRegistrationInputSchema.parse(invalidInput);
+    }).toThrow();
+  });
+
   it('should reject invalid email in registration', () => {
     const invalidInput = {
       email: 'invalid-email',

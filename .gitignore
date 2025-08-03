@@ -174,3 +174,4 @@ storybook-static
 *.temp 
 packages/e2e/test-results/
 packages/e2e/playwright-report/
+packages/backend/test-results/

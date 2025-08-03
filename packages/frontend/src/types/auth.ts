@@ -5,6 +5,8 @@ export interface RegistrationFormData {
   fullName: string;
   phoneNumber: string;
   description: string;
+  linkedinUrl: string;
+  campaignUrl: string;
 }
 
 export interface LoginFormData {
@@ -34,4 +36,8 @@ export interface ValidationErrors {
   phoneNumber?: string;
   // eslint-disable-next-line vibe-coder/no-optional-properties
   description?: string;
+  // eslint-disable-next-line vibe-coder/no-optional-properties
+  linkedinUrl?: string;
+  // eslint-disable-next-line vibe-coder/no-optional-properties
+  campaignUrl?: string;
 }
