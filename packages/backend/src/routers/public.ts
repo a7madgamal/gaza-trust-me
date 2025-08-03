@@ -9,6 +9,7 @@ import {
   PublicUsersForCardsInputSchema,
   PublicUserSchema,
   CardStackNavigationInputSchema,
+  GetUserByUrlIdInputSchema,
 } from '../types/supabase-types';
 
 export const publicRouter = t.router({
@@ -32,7 +33,9 @@ export const publicRouter = t.router({
       try {
         const { data, error } = await supabase
           .from('users')
-          .select('id, full_name, description, phone_number, status, role, created_at, linkedin_url, campaign_url')
+          .select(
+            'id, url_id, full_name, description, phone_number, status, role, created_at, linkedin_url, campaign_url'
+          )
           .eq('role', 'help_seeker') // Only show help seekers
           .eq('status', 'verified') // Only verified users
           .order('created_at', { ascending: false }) // Newest first
@@ -57,7 +60,9 @@ export const publicRouter = t.router({
       try {
         let query = supabase
           .from('users')
-          .select('id, full_name, description, phone_number, status, role, created_at, linkedin_url, campaign_url')
+          .select(
+            'id, url_id, full_name, description, phone_number, status, role, created_at, linkedin_url, campaign_url'
+          )
           .eq('role', 'help_seeker')
           .eq('status', 'verified');
 
@@ -108,6 +113,38 @@ export const publicRouter = t.router({
       throw new Error('Failed to fetch user count');
     }
   }),
+
+  // Get user by URL ID for direct access
+  getUserByUrlId: publicProcedure
+    .input(GetUserByUrlIdInputSchema)
+    .output(PublicUserSchema.nullable())
+    .query(async ({ input }) => {
+      try {
+        const { data, error } = await supabase
+          .from('users')
+          .select(
+            'id, url_id, full_name, description, phone_number, status, role, created_at, linkedin_url, campaign_url'
+          )
+          .eq('url_id', input.urlId)
+          .eq('role', 'help_seeker')
+          .eq('status', 'verified')
+          .single();
+
+        if (error) {
+          if (error.code === 'PGRST116') {
+            // No user found with this URL ID
+            return null;
+          }
+          logger.error('Error fetching user by URL ID:', error);
+          throw new Error('Failed to fetch user');
+        }
+
+        return data;
+      } catch (error) {
+        logger.error('Error in getUserByUrlId:', error);
+        throw new Error('Failed to fetch user');
+      }
+    }),
 });
 
 export type PublicRouter = typeof publicRouter;

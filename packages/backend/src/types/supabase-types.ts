@@ -68,6 +68,7 @@ export const AdminUserListOutputSchema = z.object({
   users: z.array(
     z.object({
       id: z.string(),
+      url_id: z.number(),
       email: z.string(),
       full_name: z.string(),
       description: z.string(),
@@ -106,6 +107,7 @@ export const UserProfileUpdateSchema = z.object({
 
 export const UserProfileOutputSchema = z.object({
   id: z.string(),
+  url_id: z.number(),
   email: z.string(),
   full_name: z.string(),
   phone_number: z.string(),
@@ -142,6 +144,7 @@ export const PublicUsersForCardsInputSchema = z.object({
 
 export const PublicUserSchema = z.object({
   id: z.string().uuid(),
+  url_id: z.number(),
   full_name: z.string(),
   description: z.string(),
   phone_number: z.string(),
@@ -155,6 +158,10 @@ export const PublicUserSchema = z.object({
 export const CardStackNavigationInputSchema = z.object({
   direction: z.enum(['next', 'previous']),
   currentUserId: z.string().uuid().optional(),
+});
+
+export const GetUserByUrlIdInputSchema = z.object({
+  urlId: z.number().int().positive('URL ID must be a positive integer'),
 });
 
 // Type exports for tRPC
@@ -178,3 +185,4 @@ export type PublicHelloOutput = z.infer<typeof PublicHelloOutputSchema>;
 export type PublicUsersForCardsInput = z.infer<typeof PublicUsersForCardsInputSchema>;
 export type PublicUser = z.infer<typeof PublicUserSchema>;
 export type CardStackNavigationInput = z.infer<typeof CardStackNavigationInputSchema>;
+export type GetUserByUrlIdInput = z.infer<typeof GetUserByUrlIdInputSchema>;

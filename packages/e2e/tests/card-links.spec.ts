@@ -20,7 +20,7 @@ test.describe('Card Links', () => {
     });
 
     // Navigate to the public page to see the cards
-    await page.goto('http://localhost:3000');
+    await page.goto(`${process.env['FRONTEND_URL']}`);
 
     // Wait for the card to load
     await expect(page.locator('[data-testid="user-card"]')).toBeVisible();
@@ -42,7 +42,7 @@ test.describe('Card Links', () => {
 
   test('should handle card navigation and display user information', async ({ page }) => {
     // Navigate to the public page
-    await page.goto('http://localhost:3000');
+    await page.goto(`${process.env['FRONTEND_URL']}`);
 
     // Wait for the card to load
     await expect(page.locator('[data-testid="user-card"]')).toBeVisible();
@@ -77,7 +77,7 @@ test.describe('Card Links', () => {
     });
 
     // Navigate to the public page
-    await page.goto('http://localhost:3000');
+    await page.goto(`${process.env['FRONTEND_URL']}`);
 
     // Wait for the card to load
     await expect(page.locator('[data-testid="user-card"]')).toBeVisible();

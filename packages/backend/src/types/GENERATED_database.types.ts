@@ -175,6 +175,7 @@ export type Database = {
           role: Database['public']['Enums']['user_role'];
           status: Database['public']['Enums']['seeker_status'] | null;
           updated_at: string | null;
+          url_id: number;
           verified_at: string | null;
           verified_by: string | null;
         };
@@ -190,6 +191,7 @@ export type Database = {
           role?: Database['public']['Enums']['user_role'];
           status?: Database['public']['Enums']['seeker_status'] | null;
           updated_at?: string | null;
+          url_id?: number;
           verified_at?: string | null;
           verified_by?: string | null;
         };
@@ -205,6 +207,7 @@ export type Database = {
           role?: Database['public']['Enums']['user_role'];
           status?: Database['public']['Enums']['seeker_status'] | null;
           updated_at?: string | null;
+          url_id?: number;
           verified_at?: string | null;
           verified_by?: string | null;
         };

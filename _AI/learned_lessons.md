@@ -37,6 +37,13 @@
 - **Setup:** `npm run types:generate` generates and formats the file automatically
 - **Lesson:** Only modify files you create, never touch generated files - they'll be overwritten
 
+### 🔄 **Always Regenerate Types After Migrations**
+
+- **Problem:** Database schema changes not reflected in TypeScript types
+- **Rule:** Always run `npm run types:generate` after running migrations
+- **Command:** `npm run types:generate` in backend package
+- **Lesson:** Database changes require type regeneration to maintain type safety
+
 ### ❌ **Don't Run Dev Servers**
 
 - **Problem:** Tried to run dev servers automatically
@@ -101,3 +108,20 @@
 - **Fix:** Use specific selectors like `[role="option"]:has-text("Pending")` for dropdowns
 - **Lesson:** Always target the specific element you want, not generic text that appears multiple times
 - **Example:** Changed `text=Pending` to `[role="option"]:has-text("Pending")` for dropdown options
+
+### 🚨 **NEVER Use Static URLs When Environment Variables Exist**
+
+- **Problem:** Hardcoded URLs like `http://localhost:3000` in tests and code
+- **Rule:** Always use environment variables for URLs, ports, and endpoints
+- **Examples:**
+  - ❌ `http://localhost:3000` → ✅ `process.env['FRONTEND_URL']`
+  - ❌ `http://localhost:3001` → ✅ `process.env['BACKEND_URL']`
+- **Lesson:** Static URLs break across environments and make testing unreliable
+- **Fix:** Use config files or environment variables for all URL references
+
+### 🚨 **NEVER Try to Read/Create .env Files - They're Protected**
+
+- **Problem:** Attempted to read or create `.env` files which are gitignored
+- **Rule:** `.env` files are protected by globalIgnore and cannot be accessed
+- **Lesson:** When user says "environment variables are already there", don't try to create/read `.env` files
+- **Fix:** Trust that environment variables exist and focus on using them correctly

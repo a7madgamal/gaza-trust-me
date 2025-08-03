@@ -78,7 +78,7 @@ export async function createTestUser(userData: {
   linkedin_url?: string;
   campaign_url?: string;
 }): Promise<string> {
-  const response = await fetch('http://localhost:3001/trpc/register', {
+  const response = await fetch(`${process.env['BACKEND_URL']}/trpc/register`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

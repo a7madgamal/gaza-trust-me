@@ -15,7 +15,7 @@ export const profileRouter = t.router({
       // Get user profile from database using strict Supabase types
       const { data: userData, error } = await supabase
         .from('users')
-        .select('id, email, full_name, phone_number, role, description, status, verified_at, verified_by')
+        .select('id, url_id, email, full_name, phone_number, role, description, status, verified_at, verified_by')
         .eq('id', ctx.user.id)
         .single();
 
@@ -29,6 +29,7 @@ export const profileRouter = t.router({
         success: true,
         data: {
           id: userData.id,
+          url_id: userData.url_id,
           email: userData.email,
           full_name: userData.full_name,
           phone_number: userData.phone_number,

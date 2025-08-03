@@ -178,7 +178,7 @@ export async function clearBrowserState(page: Page): Promise<void> {
   await page.context().clearCookies();
 
   // Navigate to the app first to ensure we can access localStorage
-  await page.goto('http://localhost:3000');
+  await page.goto(`${process.env['FRONTEND_URL']}`);
 
   // Clear localStorage and sessionStorage
   await page.evaluate(() => {

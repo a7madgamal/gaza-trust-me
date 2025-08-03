@@ -134,7 +134,7 @@ test.describe('Home Page', () => {
   });
 
   test('should display header and handle navigation when not logged in', async ({ page }) => {
-    await page.goto('http://localhost:3000');
+    await page.goto(`${process.env['FRONTEND_URL']}`);
 
     // Check title is visible and clickable
     const title = page.getByText('Help-Seeking Platform');
@@ -148,25 +148,25 @@ test.describe('Home Page', () => {
     await expect(page.getByRole('button', { name: 'account of current user' })).toBeHidden();
 
     // Navigate to a different page first
-    await page.goto('http://localhost:3000/login');
+    await page.goto(`${process.env['FRONTEND_URL']}/login`);
 
     // Click the title
     await page.getByText('Help-Seeking Platform').click();
 
     // Should navigate back to home
-    await expect(page).toHaveURL('http://localhost:3000/');
+    await expect(page).toHaveURL(`${process.env['FRONTEND_URL']}/`);
 
     // Test navigation buttons
     await page.getByRole('button', { name: 'Login' }).click();
-    await expect(page).toHaveURL('http://localhost:3000/login');
+    await expect(page).toHaveURL(`${process.env['FRONTEND_URL']}/login`);
 
-    await page.goto('http://localhost:3000/');
+    await page.goto(`${process.env['FRONTEND_URL']}/`);
     await page.getByRole('button', { name: 'Register' }).click();
-    await expect(page).toHaveURL('http://localhost:3000/register');
+    await expect(page).toHaveURL(`${process.env['FRONTEND_URL']}/register`);
   });
 
   test('should handle header navigation for logged in users', async ({ page }) => {
-    await page.goto('http://localhost:3000');
+    await page.goto(`${process.env['FRONTEND_URL']}`);
 
     // Test help seeker login
     await loginAsUser(page, 'helpSeeker');
@@ -192,21 +192,21 @@ test.describe('Home Page', () => {
 
     // Test navigation to profile
     await page.getByRole('menuitem', { name: 'Profile' }).click();
-    await expect(page).toHaveURL('http://localhost:3000/profile');
+    await expect(page).toHaveURL(`${process.env['FRONTEND_URL']}/profile`);
 
     // Go back and test dashboard navigation
-    await page.goto('http://localhost:3000/');
+    await page.goto(`${process.env['FRONTEND_URL']}/`);
     await page.getByRole('button', { name: 'account of current user' }).click();
     await page.getByRole('menuitem', { name: 'Dashboard' }).click();
-    await expect(page).toHaveURL('http://localhost:3000/dashboard');
+    await expect(page).toHaveURL(`${process.env['FRONTEND_URL']}/dashboard`);
 
     // Test logout
-    await page.goto('http://localhost:3000/');
+    await page.goto(`${process.env['FRONTEND_URL']}/`);
     await page.getByRole('button', { name: 'account of current user' }).click();
     await page.getByRole('menuitem', { name: 'Logout' }).click();
 
     // Should redirect to home
-    await expect(page).toHaveURL('http://localhost:3000/');
+    await expect(page).toHaveURL(`${process.env['FRONTEND_URL']}/`);
 
     // Should show login/register buttons again
     await expect(page.getByRole('button', { name: 'Login' })).toBeVisible();
@@ -217,7 +217,7 @@ test.describe('Home Page', () => {
   });
 
   test('should handle admin user header and responsive behavior', async ({ page }) => {
-    await page.goto('http://localhost:3000');
+    await page.goto(`${process.env['FRONTEND_URL']}`);
 
     // Test admin login
     await loginAsUser(page, 'admin');
@@ -234,10 +234,10 @@ test.describe('Home Page', () => {
     await page.getByRole('menuitem', { name: 'Dashboard' }).click();
 
     // Should navigate to admin dashboard
-    await expect(page).toHaveURL('http://localhost:3000/admin/dashboard');
+    await expect(page).toHaveURL(`${process.env['FRONTEND_URL']}/admin/dashboard`);
 
     // Test responsive behavior - go back to home page
-    await page.goto('http://localhost:3000/');
+    await page.goto(`${process.env['FRONTEND_URL']}/`);
     await page.setViewportSize({ width: 375, height: 667 });
 
     // Check title is still visible
@@ -259,7 +259,7 @@ test.describe('Home Page', () => {
   });
 
   test('should handle menu interactions and basic navigation', async ({ page }) => {
-    await page.goto('http://localhost:3000');
+    await page.goto(`${process.env['FRONTEND_URL']}`);
 
     // Test menu close behavior
     await loginAsUser(page, 'helpSeeker');
