@@ -1,0 +1,41 @@
+# Frontend Development Dockerfile for Gazaconfirm Platform
+# Note: This should be built from the project root with: docker build -f packages/frontend/Dockerfile.dev .
+
+FROM node:20-alpine AS base
+
+# Development image with hot reload
+FROM base AS development
+WORKDIR /app
+
+# Copy frontend package.json first for better caching
+COPY packages/frontend/package.json ./packages/frontend/
+WORKDIR /app/packages/frontend
+
+# Install only frontend dependencies
+RUN HUSKY=0 npm install
+
+# Create non-root user
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 frontend
+
+# Copy backend source (for types only, no dependencies needed)
+COPY --chown=frontend:nodejs packages/backend /app/packages/backend/
+
+# Copy frontend source with proper ownership
+COPY --chown=frontend:nodejs packages/frontend ./
+
+USER frontend
+
+WORKDIR /app/packages/frontend
+
+EXPOSE 3000
+
+ENV NODE_ENV=development
+ENV VITE_API_URL=http://localhost:3001
+
+# Health check for dev server
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000 || exit 1
+
+# Use npm run dev for hot reload
+CMD ["npm", "run", "dev"]

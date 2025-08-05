@@ -3,8 +3,8 @@
 
 FROM node:20-alpine AS base
 
-# Build backend types first
-FROM base AS backend-builder
+# Generate backend types only (no full build)
+FROM base AS types-generator
 WORKDIR /app/packages/backend
 
 # Install Supabase CLI for type generation
@@ -15,13 +15,15 @@ RUN apk add --no-cache curl && \
 
 # Copy backend source and install dependencies
 COPY packages/backend/package.json ./
-RUN npm install --ignore-scripts
+RUN HUSKY=0 npm install --ignore-scripts
 
 COPY packages/backend ./
-# Build backend with type generation
-ARG SUPABASE_ACCESS_TOKEN
-ENV SUPABASE_ACCESS_TOKEN=$SUPABASE_ACCESS_TOKEN
-RUN npm run build
+# Copy env file and generate types
+COPY packages/backend/.env-prod .env-prod
+RUN set -a && . ./.env-prod && set +a && \
+    echo "Checking SUPABASE_ACCESS_TOKEN: ${SUPABASE_ACCESS_TOKEN:0:10}..." && \
+    test -n "$SUPABASE_ACCESS_TOKEN" || (echo "SUPABASE_ACCESS_TOKEN not set!" && exit 1) && \
+    npm run types:generate
 
 # Build frontend
 FROM base AS builder
@@ -33,11 +35,11 @@ COPY package.json ./
 # Copy frontend source
 COPY packages/frontend ./packages/frontend/
 
-# Copy built backend for type imports
-COPY --from=backend-builder /app/packages/backend ./packages/backend/
+# Copy backend with generated types
+COPY --from=types-generator /app/packages/backend ./packages/backend/
 
 # Install workspace dependencies from root
-RUN npm install --workspaces --ignore-scripts
+RUN HUSKY=0 npm install --workspaces --ignore-scripts
 
 # Build frontend
 WORKDIR /app/packages/frontend

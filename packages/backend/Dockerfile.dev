@@ -1,0 +1,51 @@
+# Backend Development Dockerfile for Gazaconfirm Platform
+# Note: This should be built from the project root with: docker build -f packages/backend/Dockerfile.dev .
+
+FROM node:20-alpine AS base
+
+# Development image with hot reload
+FROM base AS development
+WORKDIR /app
+
+# Install development tools and Supabase CLI
+RUN apk add --no-cache curl tini && \
+    curl -fsSL https://github.com/supabase/cli/releases/latest/download/supabase_linux_amd64.tar.gz | tar -xz && \
+    mv supabase /usr/local/bin/supabase && \
+    chmod +x /usr/local/bin/supabase
+
+# Copy package.json first for better caching
+COPY packages/backend/package.json ./packages/backend/
+WORKDIR /app/packages/backend
+
+# Install dependencies (skip Husky in Docker)
+RUN HUSKY=0 npm install
+
+# Install nodemon globally for hot reload
+RUN npm install -g nodemon tsx
+
+# Create non-root user
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 backend
+
+# Create logs directory with proper permissions
+RUN mkdir -p /app/logs && \
+    chown backend:nodejs /app/logs
+
+# Copy source code with proper ownership (will be overridden by volume mount)
+COPY --chown=backend:nodejs packages/backend ./
+
+USER backend
+
+EXPOSE 3001
+
+ENV NODE_ENV=development
+ENV PORT=3001
+ENV DOCKER=true
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3001/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
+
+ENTRYPOINT ["/sbin/tini", "--"]
+# Use npm run dev for hot reload
+CMD ["npm", "run", "dev"]

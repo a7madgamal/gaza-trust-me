@@ -3,66 +3,67 @@
 
 FROM node:20-alpine AS base
 
-# Install dependencies
+# Install dependencies only
 FROM base AS deps
-WORKDIR /app
-
-# Copy only backend package files
-COPY packages/backend/package.json ./packages/backend/
-
-# Install only backend dependencies
 WORKDIR /app/packages/backend
+
+# Copy package.json first for better layer caching
+COPY packages/backend/package.json ./
 RUN npm install --only=production --ignore-scripts && npm cache clean --force
 
 # Build backend
 FROM base AS builder
 WORKDIR /app
 
-# Install Supabase CLI for type generation
+# Install build tools and Supabase CLI (ONLY HERE)
 RUN apk add --no-cache curl && \
     curl -fsSL https://github.com/supabase/cli/releases/latest/download/supabase_linux_amd64.tar.gz | tar -xz && \
     mv supabase /usr/local/bin/supabase && \
     chmod +x /usr/local/bin/supabase
 
-# Copy backend source and env file
-COPY packages/backend ./packages/backend/
-
-# Install all dependencies (including dev for build, skip scripts)
+# Copy package.json first for better caching
+COPY packages/backend/package.json ./packages/backend/
 WORKDIR /app/packages/backend
 RUN npm install --ignore-scripts
 
-# Build backend with type generation
-ARG SUPABASE_ACCESS_TOKEN
-ENV SUPABASE_ACCESS_TOKEN=$SUPABASE_ACCESS_TOKEN
-RUN npm run clean && npm run build
+# Copy source code
+COPY packages/backend ./
+WORKDIR /app/packages/backend
+
+# Copy env file and build backend
+COPY packages/backend/.env-prod .env-prod
+RUN set -a && . ./.env-prod && set +a && \
+    echo "Checking SUPABASE_ACCESS_TOKEN: ${SUPABASE_ACCESS_TOKEN:0:10}..." && \
+    test -n "$SUPABASE_ACCESS_TOKEN" || (echo "SUPABASE_ACCESS_TOKEN not set!" && exit 1) && \
+    npm run clean && npm run build
 
 # Production image
 FROM base AS runner
 WORKDIR /app
 
-# Install Supabase CLI for migrations
-RUN apk add --no-cache curl && \
-    curl -fsSL https://github.com/supabase/cli/releases/latest/download/supabase_linux_amd64.tar.gz | tar -xz && \
-    mv supabase /usr/local/bin/supabase && \
-    chmod +x /usr/local/bin/supabase
+# Install tini for proper signal handling
+RUN apk add --no-cache tini
 
 # Create non-root user
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 backend
 
-# Copy built application and dependencies
+# Copy Supabase CLI from builder (no more downloads!)
+COPY --from=builder /usr/local/bin/supabase /usr/local/bin/supabase
+
+# Copy built application and dependencies with proper ownership
 COPY --from=builder --chown=backend:nodejs /app/packages/backend/dist ./dist/
 COPY --from=deps --chown=backend:nodejs /app/packages/backend/node_modules ./node_modules/
 COPY --from=builder --chown=backend:nodejs /app/packages/backend/package.json ./
 
-# Copy migration-related files
+# Copy migration-related files with proper ownership
 COPY --from=builder --chown=backend:nodejs /app/packages/backend/scripts ./scripts/
 COPY --from=builder --chown=backend:nodejs /app/packages/backend/supabase ./supabase/
 
-# Copy generated types for frontend access
+# Copy generated types for frontend access with proper ownership
 COPY --from=builder --chown=backend:nodejs /app/packages/backend/src/types ./src/types/
 
-# Install tsx for migration script
+# Install tsx for migration script (build-time only)
 RUN npm install tsx --no-save
 
 # Create logs directory with proper permissions
@@ -97,4 +98,5 @@ ENV DOCKER=true
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3001/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
 
+ENTRYPOINT ["/sbin/tini", "--"]
 CMD ["/app/start.sh"]

@@ -10,10 +10,11 @@ export default defineConfig({
     },
   },
   server: {
+    host: '0.0.0.0', // Bind to all interfaces for Docker
     port: 3000,
     proxy: {
       '/trpc': {
-        target: 'http://localhost:3001',
+        target: process.env.DOCKER ? 'http://backend:3001' : 'http://localhost:3001',
         changeOrigin: true,
       },
     },
