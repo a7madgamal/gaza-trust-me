@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-disable no-console */
 
 import 'dotenv/config';
 import { spawn } from 'child_process';
@@ -24,27 +25,39 @@ if (!supabaseDbUrl) {
 console.log(`🔍 NODE_ENV: ${nodeEnv}`);
 console.log(`🚀 Command: supabase db ${command}`);
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
+// Skip interactive prompt in CI/Docker environments
+const isAutomaticMode =
+  process.env.CI === 'true' || process.env.DOCKER === 'true' || process.env.AUTO_MIGRATE === 'true';
 
-rl.question('❓ Do you want to continue? (yes/no): ', (answer: string) => {
-  rl.close();
-
-  if (answer.toLowerCase() !== 'yes') {
-    console.log('❌ Operation cancelled');
-    process.exit(0);
-  }
-
-  console.log('✅ Proceeding...');
+if (isAutomaticMode) {
+  console.log('🤖 Automatic mode detected, proceeding without confirmation...');
   runSupabaseCommand();
-});
+} else {
+  const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+  });
+
+  rl.question('❓ Do you want to continue? (yes/no): ', (answer: string) => {
+    rl.close();
+
+    if (answer.toLowerCase() !== 'yes') {
+      console.log('❌ Operation cancelled');
+      process.exit(0);
+    }
+
+    console.log('✅ Proceeding...');
+    runSupabaseCommand();
+  });
+}
 
 function runSupabaseCommand(): void {
   const supabaseArgs: string[] = ['db', command];
 
   // Add the database URL from environment variable
+  if (!supabaseDbUrl) {
+    throw new Error('SUPABASE_DB_URL is required but undefined');
+  }
   supabaseArgs.push('--db-url', supabaseDbUrl);
 
   // Add debug flag for push command

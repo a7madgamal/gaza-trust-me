@@ -28,6 +28,36 @@ RUN npm install --ignore-scripts
 # Build backend (skip types:generate for Docker build)
 RUN npm run clean && npx tsc
 
+# Migration stage
+FROM base AS migrate
+WORKDIR /app
+
+# Install Supabase CLI
+RUN apk add --no-cache curl && \
+    curl -fsSL https://github.com/supabase/cli/releases/latest/download/supabase_linux_amd64.tar.gz | tar -xz && \
+    mv supabase /usr/local/bin/supabase && \
+    chmod +x /usr/local/bin/supabase
+
+# Create non-root user
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 backend
+
+# Copy package.json and install ALL dependencies (including dev for tsx)
+COPY --from=builder --chown=backend:nodejs /app/packages/backend/package.json ./
+RUN npm install --ignore-scripts
+
+# Copy scripts, built files, and supabase migrations
+COPY --from=builder --chown=backend:nodejs /app/packages/backend/scripts ./scripts/
+COPY --from=builder --chown=backend:nodejs /app/packages/backend/dist ./dist/
+COPY --from=builder --chown=backend:nodejs /app/packages/backend/supabase ./supabase/
+
+USER backend
+
+ENV NODE_ENV=production
+ENV DOCKER=true
+
+CMD ["npm", "run", "db:migrate"]
+
 # Production image
 FROM base AS runner
 WORKDIR /app
