@@ -18,15 +18,23 @@ RUN npm install --only=production --ignore-scripts && npm cache clean --force
 FROM base AS builder
 WORKDIR /app
 
-# Copy backend source
+# Install Supabase CLI for type generation
+RUN apk add --no-cache curl && \
+    curl -fsSL https://github.com/supabase/cli/releases/latest/download/supabase_linux_amd64.tar.gz | tar -xz && \
+    mv supabase /usr/local/bin/supabase && \
+    chmod +x /usr/local/bin/supabase
+
+# Copy backend source and env file
 COPY packages/backend ./packages/backend/
 
 # Install all dependencies (including dev for build, skip scripts)
 WORKDIR /app/packages/backend
 RUN npm install --ignore-scripts
 
-# Build backend (skip types:generate for Docker build)
-RUN npm run clean && npx tsc
+# Build backend with type generation
+ARG SUPABASE_ACCESS_TOKEN
+ENV SUPABASE_ACCESS_TOKEN=$SUPABASE_ACCESS_TOKEN
+RUN npm run clean && npm run build
 
 # Production image
 FROM base AS runner
@@ -50,6 +58,9 @@ COPY --from=builder --chown=backend:nodejs /app/packages/backend/package.json ./
 # Copy migration-related files
 COPY --from=builder --chown=backend:nodejs /app/packages/backend/scripts ./scripts/
 COPY --from=builder --chown=backend:nodejs /app/packages/backend/supabase ./supabase/
+
+# Copy generated types for frontend access
+COPY --from=builder --chown=backend:nodejs /app/packages/backend/src/types ./src/types/
 
 # Install tsx for migration script
 RUN npm install tsx --no-save
