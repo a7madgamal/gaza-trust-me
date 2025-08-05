@@ -151,9 +151,6 @@ temp/
 config.local.js
 config.local.json
 
-# Docker
-.dockerignore
-
 # Terraform
 *.tfstate
 *.tfstate.*
@@ -175,4 +172,3 @@ storybook-static
 packages/e2e/test-results/
 packages/e2e/playwright-report/
 packages/backend/test-results/
-.env-dev

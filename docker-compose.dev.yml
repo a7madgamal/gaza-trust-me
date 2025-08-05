@@ -14,7 +14,7 @@ services:
       - DOCKER=true
     volumes:
       # Mount source code for hot reload
-      - ./packages/backend/src:/app/packages/backend/src:ro
+      - ./packages/backend/src:/app/packages/backend/src
       - ./packages/backend/package.json:/app/packages/backend/package.json:ro
       - ./packages/backend/tsconfig.json:/app/packages/backend/tsconfig.json:ro
       # Exclude node_modules from mount (use container's version)
@@ -44,11 +44,11 @@ services:
       - NODE_ENV=development
       - DOCKER=true
     volumes:
-      # Mount source code for hot reload
-      - ./packages/frontend/src:/app/packages/frontend/src:ro
-      - ./packages/frontend/index.html:/app/packages/frontend/index.html:ro
+      # Mount source code for hot reload (remove :ro for write access)
+      - ./packages/frontend/src:/app/packages/frontend/src
+      - ./packages/frontend/index.html:/app/packages/frontend/index.html
       - ./packages/frontend/package.json:/app/packages/frontend/package.json:ro
-      - ./packages/frontend/vite.config.ts:/app/packages/frontend/vite.config.ts:ro
+      - ./packages/frontend/vite.config.ts:/app/packages/frontend/vite.config.ts
       - ./packages/frontend/tsconfig.json:/app/packages/frontend/tsconfig.json:ro
       # Exclude node_modules from mount (use container's version)
       - /app/packages/frontend/node_modules

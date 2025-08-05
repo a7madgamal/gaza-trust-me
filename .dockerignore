@@ -1,0 +1,65 @@
+# Dependencies
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
+dist
+build
+.next
+.nuxt
+.output
+.vite
+
+# Testing
+coverage
+.nyc_output
+test-results
+playwright-report
+
+# Environment files (block sensitive local ones, allow container configs)
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.example
+
+# Logs
+*.log
+logs
+
+# Cache directories
+.cache
+.parcel-cache
+.eslintcache
+.stylelintcache
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode
+.idea
+*.swp
+*.swo
+
+# Git
+.git
+.gitignore
+
+# Documentation (not needed in containers)
+README.md
+*.md
+docs
+
+# Temporary files
+tmp
+temp
+.tmp
+
+# Docker files (avoid recursion)
+Dockerfile*
+docker-compose*
+.dockerignore
