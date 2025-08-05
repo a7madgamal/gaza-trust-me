@@ -34,6 +34,16 @@ RUN mkdir -p /app/logs && \
 # Copy source code with proper ownership (will be overridden by volume mount)
 COPY --chown=backend:nodejs packages/backend ./
 
+# Add environment variable verification script for development
+RUN echo '#!/bin/sh' > /app/verify-env.sh && \
+    echo 'echo "🔍 Verifying development environment variables..."' >> /app/verify-env.sh && \
+    echo 'test -n "$NODE_ENV" || (echo "❌ NODE_ENV not set!" && exit 1)' >> /app/verify-env.sh && \
+    echo 'test -n "$PORT" || (echo "❌ PORT not set!" && exit 1)' >> /app/verify-env.sh && \
+    echo 'test -n "$DOCKER" || (echo "❌ DOCKER not set!" && exit 1)' >> /app/verify-env.sh && \
+    echo 'echo "✅ Development environment variables verified!"' >> /app/verify-env.sh && \
+    chmod +x /app/verify-env.sh && \
+    chown backend:nodejs /app/verify-env.sh
+
 USER backend
 
 EXPOSE 3001
@@ -47,5 +57,5 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3001/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
 
 ENTRYPOINT ["/sbin/tini", "--"]
-# Use npm run dev for hot reload
-CMD ["npm", "run", "dev"]
+# Use npm run dev for hot reload with environment verification
+CMD ["/bin/sh", "-c", "/app/verify-env.sh && npm run dev"]

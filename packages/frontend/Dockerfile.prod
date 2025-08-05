@@ -21,8 +21,11 @@ COPY packages/backend ./
 # Copy env file and generate types
 COPY packages/backend/.env-prod .env-prod
 RUN set -a && . ./.env-prod && set +a && \
+    echo "🔍 Verifying backend environment variables for type generation..." && \
     echo "Checking SUPABASE_ACCESS_TOKEN: ${SUPABASE_ACCESS_TOKEN:0:10}..." && \
-    test -n "$SUPABASE_ACCESS_TOKEN" || (echo "SUPABASE_ACCESS_TOKEN not set!" && exit 1) && \
+    test -n "$SUPABASE_ACCESS_TOKEN" || (echo "❌ SUPABASE_ACCESS_TOKEN not set!" && exit 1) && \
+    test -n "$SUPABASE_URL" || (echo "❌ SUPABASE_URL not set!" && exit 1) && \
+    echo "✅ Backend environment variables verified for type generation!" && \
     npm run types:generate
 
 # Build frontend
@@ -43,6 +46,14 @@ RUN HUSKY=0 npm install --workspaces --ignore-scripts
 
 # Build frontend
 WORKDIR /app/packages/frontend
+
+# Copy frontend env file and verify variables
+COPY packages/frontend/.env-prod .env-prod
+RUN set -a && . ./.env-prod && set +a && \
+    echo "🔍 Verifying frontend environment variables..." && \
+    test -n "$VITE_API_URL" || (echo "❌ VITE_API_URL not set!" && exit 1) && \
+    test -n "$NODE_ENV" || (echo "❌ NODE_ENV not set!" && exit 1) && \
+    echo "✅ Frontend environment variables verified successfully!"
 
 # Set build-time environment variables for Vite
 ARG VITE_API_URL=http://localhost:3001

@@ -33,8 +33,24 @@ WORKDIR /app/packages/backend
 # Copy env file and build backend
 COPY packages/backend/.env-prod .env-prod
 RUN set -a && . ./.env-prod && set +a && \
+    echo "🔍 Verifying all required environment variables..." && \
     echo "Checking SUPABASE_ACCESS_TOKEN: ${SUPABASE_ACCESS_TOKEN:0:10}..." && \
-    test -n "$SUPABASE_ACCESS_TOKEN" || (echo "SUPABASE_ACCESS_TOKEN not set!" && exit 1) && \
+    test -n "$SUPABASE_ACCESS_TOKEN" || (echo "❌ SUPABASE_ACCESS_TOKEN not set!" && exit 1) && \
+    test -n "$SUPABASE_URL" || (echo "❌ SUPABASE_URL not set!" && exit 1) && \
+    test -n "$SUPABASE_DB_URL" || (echo "❌ SUPABASE_DB_URL not set!" && exit 1) && \
+    test -n "$SUPABASE_PUBLISHABLE_KEY" || (echo "❌ SUPABASE_PUBLISHABLE_KEY not set!" && exit 1) && \
+    test -n "$SUPABASE_SECRET_KEY" || (echo "❌ SUPABASE_SECRET_KEY not set!" && exit 1) && \
+    test -n "$SUPABASE_JWT_SECRET" || (echo "❌ SUPABASE_JWT_SECRET not set!" && exit 1) && \
+    test -n "$FRONTEND_URL" || (echo "❌ FRONTEND_URL not set!" && exit 1) && \
+    test -n "$JWT_SECRET" || (echo "❌ JWT_SECRET not set!" && exit 1) && \
+    test -n "$LOG_LEVEL" || (echo "❌ LOG_LEVEL not set!" && exit 1) && \
+    test -n "$RATE_LIMIT_WINDOW_MS" || (echo "❌ RATE_LIMIT_WINDOW_MS not set!" && exit 1) && \
+    test -n "$RATE_LIMIT_MAX_REQUESTS" || (echo "❌ RATE_LIMIT_MAX_REQUESTS not set!" && exit 1) && \
+    test -n "$MAX_FILE_SIZE" || (echo "❌ MAX_FILE_SIZE not set!" && exit 1) && \
+    test -n "$ALLOWED_FILE_TYPES" || (echo "❌ ALLOWED_FILE_TYPES not set!" && exit 1) && \
+    test -n "$MAX_FILES_PER_CASE" || (echo "❌ MAX_FILES_PER_CASE not set!" && exit 1) && \
+    test -n "$ENABLE_EMAIL_VERIFICATION" || (echo "❌ ENABLE_EMAIL_VERIFICATION not set!" && exit 1) && \
+    echo "✅ All environment variables verified successfully!" && \
     npm run clean && npm run build
 
 # Production image
