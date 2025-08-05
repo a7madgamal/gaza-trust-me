@@ -24,7 +24,6 @@
     "types:generate": "supabase gen types typescript --project-id sivaovkdxiluefuhlqoj --schema public > src/types/GENERATED_database.types.ts && prettier --write src/types/GENERATED_database.types.ts"
   },
   "dependencies": {
-    "@gazaconfirm/shared": "file:../shared",
     "@supabase/supabase-js": "^2.38.4",
     "@trpc/server": "^10.45.0",
     "compression": "^1.7.4",
