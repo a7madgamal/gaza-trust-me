@@ -1,10 +1,12 @@
 import { defineConfig } from 'vitest/config';
-import { resolve } from 'path';
 
 export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
+    cache: {
+      dir: 'node_modules/.vitest',
+    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json'],

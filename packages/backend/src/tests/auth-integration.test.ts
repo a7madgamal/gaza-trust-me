@@ -23,7 +23,13 @@ describe('Auth Router Integration', () => {
     const mockSignUp = vi.mocked(supabase.auth.signUp);
     mockSignUp.mockResolvedValue({
       data: {
-        user: { id: 'test-user-id' },
+        user: {
+          id: 'test-user-id',
+          app_metadata: {},
+          user_metadata: {},
+          aud: 'authenticated',
+          created_at: '2024-01-01T00:00:00.000Z',
+        },
         session: null,
       },
       error: null,
@@ -60,7 +66,13 @@ describe('Auth Router Integration', () => {
     const mockSignUp = vi.mocked(supabase.auth.signUp);
     mockSignUp.mockResolvedValue({
       data: {
-        user: { id: 'test-user-id' },
+        user: {
+          id: 'test-user-id',
+          app_metadata: {},
+          user_metadata: {},
+          aud: 'authenticated',
+          created_at: '2024-01-01T00:00:00.000Z',
+        },
         session: null,
       },
       error: null,
@@ -95,7 +107,13 @@ describe('Auth Router Integration', () => {
     const mockSignUp = vi.mocked(supabase.auth.signUp);
     mockSignUp.mockResolvedValue({
       data: {
-        user: { id: 'test-user-id' },
+        user: {
+          id: 'test-user-id',
+          app_metadata: {},
+          user_metadata: {},
+          aud: 'authenticated',
+          created_at: '2024-01-01T00:00:00.000Z',
+        },
         session: null,
       },
       error: null,
@@ -130,7 +148,13 @@ describe('Auth Router Integration', () => {
     const mockSignUp = vi.mocked(supabase.auth.signUp);
     mockSignUp.mockResolvedValue({
       data: {
-        user: { id: 'test-user-id' },
+        user: {
+          id: 'test-user-id',
+          app_metadata: {},
+          user_metadata: {},
+          aud: 'authenticated',
+          created_at: '2024-01-01T00:00:00.000Z',
+        },
         session: null,
       },
       error: null,
@@ -163,7 +187,13 @@ describe('Auth Router Integration', () => {
     const mockSignUp = vi.mocked(supabase.auth.signUp);
     mockSignUp.mockResolvedValue({
       data: {
-        user: { id: 'test-user-id' },
+        user: {
+          id: 'test-user-id',
+          app_metadata: {},
+          user_metadata: {},
+          aud: 'authenticated',
+          created_at: '2024-01-01T00:00:00.000Z',
+        },
         session: null,
       },
       error: null,

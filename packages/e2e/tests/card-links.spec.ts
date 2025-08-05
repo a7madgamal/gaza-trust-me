@@ -9,7 +9,7 @@ test.describe('Card Links', () => {
 
   test('should display LinkedIn and campaign links on user cards when available', async ({ page }) => {
     // Create a test user with LinkedIn and campaign URLs
-    await createTestUser({
+    const userId = await createTestUser({
       full_name: 'Test User with Links',
       description: 'This is a test user with LinkedIn and campaign links for testing card display functionality.',
       phone_number: '+1234567890',
@@ -19,21 +19,21 @@ test.describe('Card Links', () => {
       campaign_url: 'https://gofundme.com/test-campaign-with-links',
     });
 
-    // Navigate to the public page to see the cards
-    await page.goto(`${process.env['FRONTEND_URL']}`);
+    // Navigate directly to the created user
+    await page.goto(`${process.env['FRONTEND_URL']}/user/${userId}`);
 
     // Wait for the card to load
     await expect(page.locator('[data-testid="user-card"]')).toBeVisible();
 
     // Verify LinkedIn link is displayed with correct attributes
-    const linkedinLink = page.getByRole('link', { name: '💼 LinkedIn Profile' });
+    const linkedinLink = page.getByRole('link', { name: 'LinkedIn Profile' });
     await expect(linkedinLink).toBeVisible();
     await expect(linkedinLink).toHaveAttribute('target', '_blank');
     await expect(linkedinLink).toHaveAttribute('rel', 'noopener noreferrer');
     await expect(linkedinLink).toHaveAttribute('href', 'https://linkedin.com/in/test-user-with-links');
 
     // Verify campaign link is displayed with correct attributes
-    const campaignLink = page.getByRole('link', { name: '🎯 Campaign/Fundraising' });
+    const campaignLink = page.getByRole('link', { name: 'Campaign/Fundraising' });
     await expect(campaignLink).toBeVisible();
     await expect(campaignLink).toHaveAttribute('target', '_blank');
     await expect(campaignLink).toHaveAttribute('rel', 'noopener noreferrer');
@@ -43,6 +43,9 @@ test.describe('Card Links', () => {
   test('should handle card navigation and display user information', async ({ page }) => {
     // Navigate to the public page
     await page.goto(`${process.env['FRONTEND_URL']}`);
+
+    // Wait for auto-redirect to user URL
+    await page.waitForURL(/\/user\/\d+/);
 
     // Wait for the card to load
     await expect(page.locator('[data-testid="user-card"]')).toBeVisible();
@@ -58,17 +61,15 @@ test.describe('Card Links', () => {
     await expect(nextButton).toBeVisible();
     await expect(previousButton).toBeVisible();
 
-    // Check for action buttons
-    const acceptButton = page.getByRole('button', { name: 'Accept' });
-    const rejectButton = page.getByRole('button', { name: 'Reject' });
+    // Check for action button
+    const contactedButton = page.getByRole('button', { name: 'I contacted' });
 
-    await expect(acceptButton).toBeVisible();
-    await expect(rejectButton).toBeVisible();
+    await expect(contactedButton).toBeVisible();
   });
 
   test('should display WhatsApp link when phone number is available', async ({ page }) => {
     // Create a test user with phone number
-    await createTestUser({
+    const urlId = await createTestUser({
       full_name: 'Test User with Phone',
       description: 'This is a test user with phone number for testing WhatsApp link functionality.',
       phone_number: '+1234567890',
@@ -76,14 +77,16 @@ test.describe('Card Links', () => {
       status: 'verified',
     });
 
-    // Navigate to the public page
-    await page.goto(`${process.env['FRONTEND_URL']}`);
+    console.log('Created test user with urlId:', urlId);
+
+    // Navigate directly to the created user
+    await page.goto(`${process.env['FRONTEND_URL']}/user/${urlId}`);
 
     // Wait for the card to load
     await expect(page.locator('[data-testid="user-card"]')).toBeVisible();
 
     // Verify WhatsApp link is displayed with correct attributes
-    const whatsappLink = page.getByRole('link', { name: '💬 WhatsApp' });
+    const whatsappLink = page.getByRole('link', { name: 'WhatsApp' });
     await expect(whatsappLink).toBeVisible();
     await expect(whatsappLink).toHaveAttribute('target', '_blank');
     await expect(whatsappLink).toHaveAttribute('rel', 'noopener noreferrer');

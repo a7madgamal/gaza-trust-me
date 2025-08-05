@@ -5,10 +5,10 @@
   "private": true,
   "scripts": {
     "dev": "npx kill-port 3000 && vite",
-    "build": "tsc && vite build",
+    "build": "vite build",
     "preview": "vite preview",
-    "lint": "prettier --write \"**/*.{ts,tsx,json}\" && eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0 --fix",
-    "lint:check": "prettier --check \"**/*.{ts,tsx,json}\" && eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "format": "prettier --write . --log-level error",
+    "lint": "eslint . --fix --cache --quiet",
     "type-check": "tsc --noEmit",
     "test": "echo \"Frontend tests are run via Playwright E2E tests\" && exit 0",
     "clean": "rimraf dist"
@@ -16,7 +16,6 @@
   "dependencies": {
     "@emotion/react": "^11.11.0",
     "@emotion/styled": "^11.11.0",
-
     "@mui/icons-material": "^5.15.0",
     "@mui/material": "^5.15.0",
     "@tanstack/react-query": "^4.40.1",

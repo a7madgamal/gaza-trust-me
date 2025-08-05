@@ -44,7 +44,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 const createContext = async (opts: { req: express.Request; res: express.Response }): Promise<Context> => {
   try {
     return await createAuthContext(supabase)(opts);
-  } catch (error) {
+  } catch {
     // For public endpoints (register, login), return undefined user instead of throwing
     // This allows these endpoints to work without authentication
     logger.info('Error creating context');

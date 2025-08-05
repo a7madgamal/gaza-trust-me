@@ -18,6 +18,8 @@ dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
 const nodeEnv = process.env['NODE_ENV'];
 if (!nodeEnv) {
   throw new Error('NODE_ENV environment variable is required');
+} else {
+  console.info(`NODE_ENV: ${nodeEnv}`);
 }
 dotenv.config({ path: path.resolve(process.cwd(), `.env.${nodeEnv}`) });
 

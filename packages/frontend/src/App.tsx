@@ -22,6 +22,7 @@ function App() {
           <Header />
           <Routes>
             <Route path="/" element={<PublicPage />} />
+            <Route path="/user/:urlId" element={<PublicPage />} />
             <Route
               path="/home"
               element={

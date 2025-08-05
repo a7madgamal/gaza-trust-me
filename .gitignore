@@ -46,6 +46,15 @@ jspm_packages/
 # Optional stylelint cache
 .stylelintcache
 
+# Prettier cache
+.prettiercache
+
+# Vitest cache
+node_modules/.vitest/
+
+# Vite cache
+node_modules/.vite/
+
 # Microbundle cache
 .rpt2_cache/
 .rts2_cache_cjs/

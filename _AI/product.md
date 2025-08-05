@@ -314,6 +314,11 @@
 10.7. User registration and profile submission
 10.8. Admin verification workflow
 10.9. Super admin role management
+10.10. Type-safe test utilities with generated Supabase types
+10.11. Service role key authentication for test database access
+10.12. RLS policy bypass for test isolation
+10.13. Card interface testing (LinkedIn/campaign links, WhatsApp integration)
+10.14. URL routing and navigation testing
 
 ## Success Metrics
 

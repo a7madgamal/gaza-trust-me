@@ -11,10 +11,10 @@
   "scripts": {
     "prepare": "husky install",
     "lint": "npm run lint --workspaces",
-    "lint:check": "npm run lint:check --workspaces",
+    "format": "npm run format --workspaces",
     "lint:sql": "npm run lint:sql --workspace=@gazaconfirm/backend",
     "type-check": "npm run type-check --workspaces",
-    "check": "npm run build --workspaces && npm run lint --workspaces && npm run type-check --workspaces && npm run test --workspaces",
+    "check": "concurrently --kill-others-on-fail --names \"FRMT,LINT,TYPE,TEST\" -c \"bgYellow.bold,bgBlue.bold,bgMagenta.bold,bgGreen.bold\" \"npm run format\" \"npm run lint\" \"npm run type-check\" \"npm run test\"",
     "test": "npm run test --workspaces",
     "build": "npm run build --workspaces",
     "dev": "npm run dev --workspaces",
@@ -25,6 +25,7 @@
     "clean": "npm run clean --workspaces && rimraf node_modules packages/*/node_modules packages/*/dist packages/*/build"
   },
   "devDependencies": {
+    "concurrently": "^9.2.0",
     "husky": "^8.0.3",
     "rimraf": "^5.0.5"
   },

@@ -16,17 +16,20 @@ Production-ready Node.js backend for the Gazaconfirm help-seeking platform.
 ## Quick Start
 
 1. **Install dependencies:**
+
    ```bash
    npm install
    ```
 
 2. **Set up environment variables:**
+
    ```bash
    cp env.example .env
    # Edit .env with your Supabase credentials
    ```
 
 3. **Development:**
+
    ```bash
    npm run dev
    ```
@@ -97,4 +100,4 @@ npm run test:coverage # Run tests with coverage report
 - **Rate limiting**
 - **Input validation** with Zod
 - **JWT authentication**
-- **Role-based access control** 
+- **Role-based access control**

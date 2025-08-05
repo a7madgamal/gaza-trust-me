@@ -17,6 +17,8 @@ export default defineConfig({
   retries: process.env['CI'] ? 2 : 0,
   /* Use single worker to avoid race conditions and shared state issues */
   workers: 1,
+  /* Cache test results */
+  outputDir: 'test-results',
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
     ['list'],

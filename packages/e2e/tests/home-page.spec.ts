@@ -3,7 +3,7 @@ import { loginAsUser, clearBrowserState } from './utils/auth-helpers';
 import { createTestUser, cleanupTestUser } from './utils/test-data';
 
 test.describe('Home Page', () => {
-  let testUserId: string;
+  let testUserId: number;
 
   test.beforeAll(async () => {
     // Create a test user for the card stack
@@ -26,14 +26,14 @@ test.describe('Home Page', () => {
   test('should load public page and display card stack interface', async ({ page }) => {
     await page.goto('/');
 
+    // Wait for auto-redirect to user URL
+    await page.waitForURL(/\/user\/\d+/);
+
     // Should show the public page title
     await expect(page.getByRole('heading', { name: 'Help Someone Today' })).toBeVisible();
 
     // Should show the subtitle
     await expect(page.getByText('Browse verified users who need help')).toBeVisible();
-
-    // Should show user count (at least 1 from our test user)
-    await expect(page.getByText(/verified users available/)).toBeVisible();
 
     // Should show progress indicator
     await expect(page.getByText(/1 of/)).toBeVisible();
@@ -46,12 +46,11 @@ test.describe('Home Page', () => {
 
     // Check if we have users or empty state
     // We know we have a test user from beforeAll
-    await expect(page.getByText('✅ Verified')).toBeVisible();
-    await expect(page.getByText('📞')).toBeVisible();
-    await expect(page.getByText('💬 WhatsApp')).toBeVisible();
+    await expect(page.locator('[data-testid="user-card"]').getByText('Verified')).toBeVisible();
+    await expect(page.locator('[data-testid="user-card"]').getByText('WhatsApp')).toBeVisible();
 
     // Check if WhatsApp link exists and validate it
-    const whatsappLink = page.getByText('💬 WhatsApp');
+    const whatsappLink = page.locator('[data-testid="user-card"]').getByText('WhatsApp');
     const linkCount = await whatsappLink.count();
 
     // Require at least one WhatsApp link for this test
@@ -68,23 +67,22 @@ test.describe('Home Page', () => {
   test('should have navigation buttons and handle interactions', async ({ page }) => {
     await page.goto('/');
 
+    // Wait for auto-redirect to user URL
+    await page.waitForURL(/\/user\/\d+/);
+
     // Should show all navigation buttons
     await expect(page.getByRole('button', { name: 'Previous' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Accept' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Reject' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'I contacted' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Next' })).toBeVisible();
 
     // Previous button should be disabled initially (first card)
     await expect(page.getByRole('button', { name: 'Previous' })).toBeDisabled();
 
-    // Accept button should be enabled
-    await expect(page.getByRole('button', { name: 'Accept' })).toBeEnabled();
-
-    // Reject button should be enabled
-    await expect(page.getByRole('button', { name: 'Reject' })).toBeEnabled();
+    // I contacted button should be enabled
+    await expect(page.getByRole('button', { name: 'I contacted' })).toBeEnabled();
 
     // Should show instructions
-    await expect(page.getByText(/Click Accept to help this person, or Reject to skip to the next user/)).toBeVisible();
+    await expect(page.getByText(/Click "I contacted" when you've reached out to help this person/)).toBeVisible();
   });
 
   test('should handle API errors and loading states', async ({ page }) => {
@@ -153,8 +151,8 @@ test.describe('Home Page', () => {
     // Click the title
     await page.getByText('Help-Seeking Platform').click();
 
-    // Should navigate back to home
-    await expect(page).toHaveURL(`${process.env['FRONTEND_URL']}/`);
+    // Should navigate back to home and auto-redirect to user URL
+    await page.waitForURL(/\/user\/\d+/);
 
     // Test navigation buttons
     await page.getByRole('button', { name: 'Login' }).click();
@@ -205,8 +203,8 @@ test.describe('Home Page', () => {
     await page.getByRole('button', { name: 'account of current user' }).click();
     await page.getByRole('menuitem', { name: 'Logout' }).click();
 
-    // Should redirect to home
-    await expect(page).toHaveURL(`${process.env['FRONTEND_URL']}/`);
+    // Should redirect to home and auto-redirect to user URL
+    await page.waitForURL(/\/user\/\d+/);
 
     // Should show login/register buttons again
     await expect(page.getByRole('button', { name: 'Login' })).toBeVisible();

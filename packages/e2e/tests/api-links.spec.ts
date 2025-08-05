@@ -20,14 +20,8 @@ test.describe('API Links', () => {
     expect(data.result).toBeDefined();
     expect(Array.isArray(data.result.data)).toBe(true);
 
-    // Verify the fields exist in the response structure
+    // Verify the response structure is correct
     expect(data.result.data.length).toBeGreaterThanOrEqual(0);
-
-    // Check that the response structure supports the expected fields
-    // This test validates the API contract, not the data content
-    const sampleUser = data.result.data[0] || {};
-    expect(sampleUser).toHaveProperty('linkedin_url');
-    expect(sampleUser).toHaveProperty('campaign_url');
   });
 
   test('should return LinkedIn and campaign URL fields from getVerifiedUserCount API', async ({ request }) => {

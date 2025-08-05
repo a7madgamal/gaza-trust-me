@@ -5,15 +5,15 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc --noEmit",
+    "build": "echo 'no build needed for e2e'",
     "test": "playwright test",
     "test:headed": "playwright test --headed",
     "test:ui": "playwright test --ui",
     "test:debug": "playwright test --debug",
     "test:report": "playwright show-report",
     "install-browsers": "playwright install",
-    "lint": "prettier --write . && eslint . --fix",
-    "lint:check": "prettier --check . && eslint .",
+    "format": "prettier --write . --log-level error",
+    "lint": "eslint . --fix --cache --quiet",
     "type-check": "tsc --noEmit"
   },
   "devDependencies": {
@@ -34,6 +34,7 @@
     "node": ">=18.0.0"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.53.0",
     "dotenv": "^16.6.1"
   }
 }

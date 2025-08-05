@@ -1,3 +1,6 @@
+import { createClient } from '@supabase/supabase-js';
+import type { UserInsert, UserRole, SeekerStatus } from '../../../backend/src/types/supabase-types';
+
 /**
  * Test data utilities for E2E tests
  * Since email verification is disabled, we can use unique test emails
@@ -73,11 +76,11 @@ export async function createTestUser(userData: {
   full_name: string;
   description: string;
   phone_number: string;
-  role: 'help_seeker' | 'admin' | 'super_admin';
-  status: 'pending' | 'verified' | 'flagged';
+  role: UserRole;
+  status: SeekerStatus;
   linkedin_url?: string;
   campaign_url?: string;
-}): Promise<string> {
+}): Promise<number> {
   const response = await fetch(`${process.env['BACKEND_URL']}/trpc/register`, {
     method: 'POST',
     headers: {
@@ -102,14 +105,65 @@ export async function createTestUser(userData: {
   }
 
   const result = await response.json();
-  return result.result.data.userId;
+  const userId = result.result.data.data.userId;
+
+  // Create Supabase client for direct database access with service role key to bypass RLS
+  const supabase = createClient(process.env['SUPABASE_URL']!, process.env['SUPABASE_SECRET_KEY']!);
+
+  // First check if user exists in users table
+  const { data: existingUser } = await supabase.from('users').select('*').eq('id', userId);
+
+  // If user doesn't exist in users table, create the profile manually
+  if (!existingUser || existingUser.length === 0) {
+    const userInsert: UserInsert = {
+      email: `test-${Date.now()}@example.com`,
+      id: userId,
+      full_name: userData.full_name,
+      phone_number: userData.phone_number,
+      description: userData.description,
+      ...(userData.linkedin_url && { linkedin_url: userData.linkedin_url }),
+      ...(userData.campaign_url && { campaign_url: userData.campaign_url }),
+      status: userData.status,
+      role: userData.role,
+    };
+
+    const { data: createdUser, error: createError } = await supabase
+      .from('users')
+      .insert(userInsert)
+      .select('url_id')
+      .single();
+
+    if (createError) {
+      throw new Error(`Failed to create user profile: ${createError.message}`);
+    }
+
+    return createdUser.url_id;
+  }
+
+  // Update user status directly in Supabase
+  const { data: updatedUser, error: updateError } = await supabase
+    .from('users')
+    .update({ status: userData.status })
+    .eq('id', userId)
+    .select('url_id')
+    .single();
+
+  if (updateError) {
+    throw new Error(`Failed to update user status: ${updateError.message}`);
+  }
+
+  if (!updatedUser) {
+    throw new Error('Failed to get updated user data');
+  }
+
+  return updatedUser.url_id;
 }
 
 /**
  * Clean up a test user from the database
  */
-export async function cleanupTestUser(userId: string): Promise<void> {
+export async function cleanupTestUser(urlId: number): Promise<void> {
   // For now, just log the cleanup
   // In a real implementation, this would delete the user via API or direct DB
-  console.log('Cleaned up test user:', userId);
+  console.log('Cleaned up test user:', urlId);
 }

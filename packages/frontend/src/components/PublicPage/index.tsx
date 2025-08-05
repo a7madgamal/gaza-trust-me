@@ -10,6 +10,7 @@ import {
   NavigateNext,
   Check,
 } from '@mui/icons-material';
+import { useParams, useNavigate } from 'react-router-dom';
 import { trpc } from '../../utils/trpc';
 import { useToast } from '../../hooks/useToast';
 import type { RouterOutputs } from '../../utils/trpc';
@@ -30,6 +31,9 @@ const createWhatsAppLink = (phone: string): string => {
 type User = RouterOutputs['getUsersForCards'][number];
 
 const PublicPage: React.FC = () => {
+  const { urlId } = useParams<{ urlId: string }>();
+  const navigate = useNavigate();
+
   const [currentUserIndex, setCurrentUserIndex] = useState(0);
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -51,8 +55,16 @@ const PublicPage: React.FC = () => {
     if (usersData) {
       setUsers(usersData);
       setLoading(false);
+
+      // If we have a urlId, find the matching user and set the index
+      if (urlId) {
+        const userIndex = usersData.findIndex(user => user.url_id === parseInt(urlId, 10));
+        if (userIndex !== -1) {
+          setCurrentUserIndex(userIndex);
+        }
+      }
     }
-  }, [usersData]);
+  }, [usersData, urlId]);
 
   // Handle errors
   useEffect(() => {
@@ -62,15 +74,28 @@ const PublicPage: React.FC = () => {
     }
   }, [usersError, showToast]);
 
+  // Navigate to first user when component loads (only when not already on a specific user URL)
+  useEffect(() => {
+    if (!urlId && users.length > 0 && users[0]?.url_id) {
+      navigate(`/user/${users[0].url_id}`, { replace: true });
+    }
+  }, [urlId, users, navigate]);
+
   const handleNext = () => {
     if (currentUserIndex < users.length - 1) {
-      setCurrentUserIndex(currentUserIndex + 1);
+      const nextIndex = currentUserIndex + 1;
+      const nextUser = users[nextIndex];
+      setCurrentUserIndex(nextIndex);
+      navigate(`/user/${nextUser.url_id}`, { replace: true });
     }
   };
 
   const handlePrevious = () => {
     if (currentUserIndex > 0) {
-      setCurrentUserIndex(currentUserIndex - 1);
+      const prevIndex = currentUserIndex - 1;
+      const prevUser = users[prevIndex];
+      setCurrentUserIndex(prevIndex);
+      navigate(`/user/${prevUser.url_id}`, { replace: true });
     }
   };
 
@@ -131,7 +156,7 @@ const PublicPage: React.FC = () => {
       {/* Card Stack */}
       <Box position="relative" mb={4}>
         {/* Progress indicator */}
-        <Box display="flex" justifyContent="center" mb={2}>
+        <Box display="flex" justifyContent="center" mb={2} data-testid="progress-indicator">
           <Typography variant="body2" color="text.secondary">
             {currentUserIndex + 1} of {users.length}
           </Typography>

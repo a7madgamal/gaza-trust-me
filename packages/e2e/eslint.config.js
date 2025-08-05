@@ -30,7 +30,7 @@ export default [
       'playwright/no-networkidle': 'warn',
       'playwright/no-conditional-in-test': 'warn',
       'playwright/no-conditional-expect': 'error',
-
+      'playwright/prefer-web-first-assertions': 'warn',
       // Disable other rules for now to focus on test quality
       'no-unused-vars': 'off',
       'no-undef': 'off',

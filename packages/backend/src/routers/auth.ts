@@ -47,11 +47,15 @@ export const authRouter = t.router({
 
         // If email verification is disabled, auto-confirm the user
         if (!env.ENABLE_EMAIL_VERIFICATION) {
-          // Don't set options when email verification is disabled
+          // Keep the metadata options even when email verification is disabled
         } else if (env.FRONTEND_URL) {
-          signUpOptions.options = {
-            emailRedirectTo: `${env.FRONTEND_URL}/auth/callback`,
-          };
+          if (signUpOptions.options) {
+            signUpOptions.options.emailRedirectTo = `${env.FRONTEND_URL}/auth/callback`;
+          } else {
+            signUpOptions.options = {
+              emailRedirectTo: `${env.FRONTEND_URL}/auth/callback`,
+            };
+          }
         }
 
         logger.info('SignUp options:', JSON.stringify(signUpOptions, null, 2));
