@@ -28,6 +28,7 @@ A verification platform for Gazans to confirm their identity and location.
    ```
    copy packages\backend\.env-dev packages\backend\.env
    copy packages\frontend\.env-dev packages\frontend\.env
+   copy packages\e2e\.env-dev packages\e2e\.env
    ```
 4. Start development servers:
    ```
@@ -39,6 +40,12 @@ A verification platform for Gazans to confirm their identity and location.
 - Frontend: `http://localhost:3000`
 - Backend: `http://localhost:3001`
 - Admin Dashboard: `http://localhost:3000/admin/dashboard`
+
+## Production
+
+- Website: `http://gazatrust.me`
+- API: `http://gazatrust.me:3001`
+- Admin Dashboard: `http://gazatrust.me/admin/dashboard`
 
 ## Testing
 
