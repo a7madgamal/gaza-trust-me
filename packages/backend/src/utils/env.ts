@@ -8,12 +8,6 @@ import { z } from 'zod';
 // 3. .env.local file (if exists)
 // 4. .env.development/.env.production (based on NODE_ENV)
 
-// Load .env file first
-dotenv.config({ path: path.resolve(process.cwd(), '.env') });
-
-// Load .env.local if it exists (for local overrides)
-dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
-
 // Load environment-specific file
 const nodeEnv = process.env['NODE_ENV'];
 if (!nodeEnv) {
