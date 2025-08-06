@@ -15,7 +15,7 @@ if (!nodeEnv) {
 } else {
   console.info(`NODE_ENV: ${nodeEnv}`);
 }
-dotenv.config({ path: path.resolve(process.cwd(), `.env.${nodeEnv}`) });
+dotenv.config({ path: path.resolve(process.cwd(), `.env-${nodeEnv}`) });
 
 // Environment variable schema
 const envSchema = z.object({
