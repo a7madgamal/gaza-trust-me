@@ -23,7 +23,9 @@ import {
   Pagination,
   CircularProgress,
   Alert,
+  Link,
 } from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
 import { trpc } from '../../utils/trpc';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../hooks/useToast';
@@ -35,6 +37,7 @@ const statusFilterSchema = z.union([z.literal(''), z.enum(['pending', 'verified'
 
 interface User {
   id: string;
+  url_id: number;
   email: string;
   full_name: string;
   description: string;
@@ -218,7 +221,25 @@ const AdminDashboard: React.FC = () => {
               ) : usersData?.success && usersData.data?.users && usersData.data.users.length > 0 ? (
                 usersData.data.users.map((user: User) => (
                   <TableRow key={user.id}>
-                    <TableCell>{user.full_name}</TableCell>
+                    <TableCell>
+                      {user.status === 'verified' ? (
+                        <Link
+                          component={RouterLink}
+                          to={`/user/${user.url_id}`}
+                          sx={{
+                            textDecoration: 'none',
+                            color: 'primary.main',
+                            '&:hover': {
+                              textDecoration: 'underline',
+                            },
+                          }}
+                        >
+                          {user.full_name}
+                        </Link>
+                      ) : (
+                        user.full_name
+                      )}
+                    </TableCell>
                     <TableCell>{user.email}</TableCell>
                     <TableCell>{user.phone_number}</TableCell>
                     <TableCell>

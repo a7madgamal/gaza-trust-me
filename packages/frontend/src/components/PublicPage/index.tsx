@@ -197,13 +197,36 @@ const PublicPage: React.FC = () => {
             </Box>
 
             {/* Description */}
-            <Box flex={1}>
+            <Box flex={1} sx={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
               <Typography variant="h6" gutterBottom>
                 Needs Help With:
               </Typography>
-              <Typography variant="body1" sx={{ lineHeight: 1.6 }}>
-                {currentUser.description || 'No description provided.'}
-              </Typography>
+              <Box
+                sx={{
+                  flex: 1,
+                  overflowY: 'auto',
+                  maxHeight: '200px',
+                  pr: 1,
+                  '&::-webkit-scrollbar': {
+                    width: '6px',
+                  },
+                  '&::-webkit-scrollbar-track': {
+                    background: 'rgba(255,255,255,0.1)',
+                    borderRadius: '3px',
+                  },
+                  '&::-webkit-scrollbar-thumb': {
+                    background: 'rgba(255,255,255,0.3)',
+                    borderRadius: '3px',
+                    '&:hover': {
+                      background: 'rgba(255,255,255,0.5)',
+                    },
+                  },
+                }}
+              >
+                <Typography variant="body1" sx={{ lineHeight: 1.6 }}>
+                  {currentUser.description || 'No description provided.'}
+                </Typography>
+              </Box>
             </Box>
 
             {/* Details Section - All info below the line */}

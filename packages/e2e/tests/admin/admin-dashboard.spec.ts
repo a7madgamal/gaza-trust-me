@@ -78,4 +78,70 @@ test.describe('Admin Dashboard', () => {
     // Should redirect to login page
     await expect(page).toHaveURL('/login');
   });
+
+  test('should make verified user names clickable and link to card pages', async ({ page }) => {
+    await loginAsUser(page, 'admin');
+    await page.goto('/admin/dashboard');
+
+    // Wait for the table to load
+    await expect(page.locator('[data-testid="users-table"]')).toBeVisible();
+
+    // Look for verified users in the table
+    const verifiedRows = page.locator('tbody tr').filter({
+      has: page.locator('td:nth-child(5)').filter({ hasText: 'verified' }),
+    });
+
+    // Get the first verified row
+    const firstVerifiedRow = verifiedRows.first();
+
+    // Find the name cell (first column) in this row
+    const nameCell = firstVerifiedRow.locator('td:first-child');
+
+    // Check if the name is a clickable link
+    const nameLink = nameCell.locator('a');
+    await expect(nameLink).toBeVisible();
+
+    // Get the href attribute to verify it follows the /user/:urlId pattern
+    const href = await nameLink.getAttribute('href');
+    expect(href).toMatch(/^\/user\/\d+$/);
+
+    // Click the link and verify navigation
+    await nameLink.click();
+
+    // Should navigate to the user card page
+    await expect(page).toHaveURL(new RegExp(`^${process.env['FRONTEND_URL']}/user/\\d+$`));
+
+    // Verify we're on a card page by checking for card content
+    await expect(page.locator('[data-testid="user-card"]')).toBeVisible();
+  });
+
+  test('should not make non-verified user names clickable', async ({ page }) => {
+    await loginAsUser(page, 'admin');
+    await page.goto('/admin/dashboard');
+
+    // Wait for the table to load
+    await expect(page.locator('[data-testid="users-table"]')).toBeVisible();
+
+    // Filter to show only pending users (unverified)
+    const statusFilter = page.locator('[data-testid="status-filter"]');
+    await statusFilter.click();
+    await page.locator('[role="option"]:has-text("Pending")').click();
+    await page.waitForLoadState('domcontentloaded');
+
+    // Look for non-verified users (should be all rows now due to filter)
+    const nonVerifiedRows = page.locator('tbody tr');
+
+    // Get the first non-verified user row
+    const firstNonVerifiedRow = nonVerifiedRows.first();
+
+    // Find the name cell (first column) in this row
+    const nameCell = firstNonVerifiedRow.locator('td:first-child');
+
+    // Check that the name is NOT a clickable link
+    const nameLink = nameCell.locator('a');
+    await expect(nameLink).toHaveCount(0);
+
+    // Verify the name is displayed as plain text
+    await expect(nameCell).toHaveText(/.+/); // Should have some text content
+  });
 });

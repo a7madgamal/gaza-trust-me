@@ -246,14 +246,6 @@ const Dashboard = () => {
           </Alert>
         </Paper>
       )}
-
-      {/* Coming Soon Notice */}
-      <Alert severity="info" sx={{ mt: 4 }}>
-        <Typography variant="body2">
-          <strong>Coming Soon:</strong> Profile image uploads and enhanced profile management features are currently
-          being developed. You'll be able to upload profile images and enhance your profile information.
-        </Typography>
-      </Alert>
     </Container>
   );
 };
