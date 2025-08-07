@@ -9,7 +9,7 @@ WORKDIR /app/packages/backend
 
 # Copy package.json first for better layer caching
 COPY packages/backend/package.json ./
-RUN npm install --omit=dev --ignore-scripts && npm cache clean --force
+RUN npm install --omit=dev --ignore-scripts && npm cache clean
 
 # Build backend
 FROM base AS builder
