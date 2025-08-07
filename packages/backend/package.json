@@ -6,7 +6,7 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "npm run types:generate && tsc",
+    "build": "tsc",
     "build:prod": "tsc",
     "start": "node dist/index.js",
     "format": "prettier --write . --log-level error",

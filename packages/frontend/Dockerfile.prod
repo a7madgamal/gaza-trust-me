@@ -26,7 +26,7 @@ RUN set -a && . ./.env-prod && set +a && \
     test -n "$SUPABASE_ACCESS_TOKEN" || (echo "❌ SUPABASE_ACCESS_TOKEN not set!" && exit 1) && \
     test -n "$SUPABASE_URL" || (echo "❌ SUPABASE_URL not set!" && exit 1) && \
     echo "✅ Backend environment variables verified for type generation!" && \
-    npm run types:generate
+    # npm run types:generate
 
 # Build frontend
 FROM base AS builder
