@@ -54,9 +54,7 @@ RUN set -a && . ./.env-prod && set +a && \
     test -n "$NODE_ENV" || (echo "❌ NODE_ENV not set!" && exit 1) && \
     echo "✅ Frontend environment variables verified successfully!"
 
-# Set build-time environment variables for Vite
-ARG VITE_API_URL=https://gazatrust.me/api
-ENV VITE_API_URL=$VITE_API_URL
+# Vite will use environment variables during build
 
 RUN npm run build
 

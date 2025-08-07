@@ -48,8 +48,6 @@ USER backend
 
 EXPOSE 3001
 
-ENV NODE_ENV=development
-ENV PORT=3001
 ENV DOCKER=true
 
 # Health check

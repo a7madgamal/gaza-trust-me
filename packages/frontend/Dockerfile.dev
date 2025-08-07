@@ -40,7 +40,6 @@ WORKDIR /app/packages/frontend
 EXPOSE 3000
 
 ENV NODE_ENV=development
-ENV VITE_API_URL=http://localhost:3001
 
 # Health check for dev server
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \

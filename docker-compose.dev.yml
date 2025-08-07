@@ -32,14 +32,12 @@ services:
       dockerfile: packages/frontend/Dockerfile.dev
       args:
         SUPABASE_ACCESS_TOKEN: ${SUPABASE_ACCESS_TOKEN}
-        VITE_API_URL: http://localhost:3001
     ports:
       - "3000:3000"
-    env_file:
-      - packages/frontend/.env-development
     environment:
       - NODE_ENV=development
       - DOCKER=true
+      - VITE_API_URL=http://localhost:3001
     volumes:
       # Mount source code for hot reload (remove :ro for write access)
       - ./packages/frontend/src:/app/packages/frontend/src

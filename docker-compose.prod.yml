@@ -43,10 +43,9 @@ services:
       dockerfile: packages/frontend/Dockerfile.prod
     ports:
       - "8080:80"
-    env_file:
-      - packages/frontend/.env-prod
     environment:
       - NODE_ENV=production
+      - VITE_API_URL=https://gazatrust.me/api
     depends_on:
       backend:
         condition: service_healthy
