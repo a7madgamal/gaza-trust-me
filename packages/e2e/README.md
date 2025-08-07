@@ -7,7 +7,7 @@ End-to-end tests for the Gazaconfirm help-seeking platform using Playwright with
 - ✅ **Real Backend Testing** - Tests against actual backend with fake data
 - ✅ **Email Verification Disabled** - No email verification complexity
 - ✅ **Strict TypeScript** - No `any`, explicit types, strict mode
-- ✅ **Comprehensive ESLint** - Airbnb + custom rules for testing
+- ✅ **Comprehensive ESLint** - custom rules for testing
 - ✅ **Cross-browser Testing** - Chrome, Firefox, Safari, Mobile
 - ✅ **Parallel Execution** - Fast test execution
 - ✅ **Visual Testing** - Screenshots and videos on failures
