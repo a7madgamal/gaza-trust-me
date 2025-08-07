@@ -73,9 +73,9 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
   res.status(500).json({ error: 'Something went wrong!' });
 });
 
-// 404 handler
-app.use('*', (_req, res) => {
-  res.status(404).json({ error: 'Not found' });
+// 404 handler for unmatched routes
+app.use(/(.*)/, (_req, res) => {
+  res.status(404).json({ error: 'Route not found' });
 });
 
 export { app, PORT };

@@ -88,14 +88,9 @@ RUN npm install tsx --no-save
 RUN mkdir -p /app/logs && \
     chown backend:nodejs /app/logs
 
-# Create startup script that runs migration then starts server
-RUN echo '#!/bin/sh' > /app/start.sh && \
-    echo 'echo "🔄 Running database migrations..."' >> /app/start.sh && \
-    echo 'npm run db:migrate' >> /app/start.sh && \
-    echo 'echo "✅ Database migrations completed successfully"' >> /app/start.sh && \
-    echo 'echo "Starting server..."' >> /app/start.sh && \
-    echo 'exec node dist/index.js' >> /app/start.sh && \
-    chmod +x /app/start.sh && \
+# Copy and setup startup script
+COPY start.sh /app/start.sh
+RUN chmod +x /app/start.sh && \
     chown backend:nodejs /app/start.sh
 
 USER backend
