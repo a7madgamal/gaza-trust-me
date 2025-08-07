@@ -22,6 +22,8 @@
     "docker:dev:down": "docker-compose -f docker-compose.dev.yml down",
     "docker:prod": "docker-compose -f docker-compose.prod.yml up --build",
     "docker:prod:down": "docker-compose -f docker-compose.prod.yml down",
+    "docker:prod:build": "docker-compose -f docker-compose.prod.yml build --progress=plain",
+    "docker:prod:verbose": "docker-compose -f docker-compose.prod.yml build --progress=plain --no-cache",
     "clean": "npm run clean --workspaces && rimraf node_modules packages/*/node_modules packages/*/dist packages/*/build"
   },
   "devDependencies": {
