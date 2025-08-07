@@ -25,9 +25,6 @@ services:
         limits:
           cpus: "1.0"
           memory: 1G
-        reservations:
-          cpus: "0.5"
-          memory: 512M
 
   frontend:
     build:
@@ -61,6 +58,3 @@ services:
         limits:
           cpus: "1.0"
           memory: 1G
-        reservations:
-          cpus: "0.5"
-          memory: 512M

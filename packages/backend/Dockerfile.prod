@@ -1,7 +1,7 @@
 # Backend Dockerfile for Gazaconfirm Platform
 # Note: This should be built from the project root with: docker build -f packages/backend/Dockerfile .
 
-FROM node:20-alpine AS base
+FROM node:22-alpine AS base
 
 # Install dependencies only
 FROM base AS deps
@@ -9,7 +9,7 @@ WORKDIR /app/packages/backend
 
 # Copy package.json first for better layer caching
 COPY packages/backend/package.json ./
-RUN npm install --only=production --ignore-scripts && npm cache clean --force
+RUN npm install --omit=dev --ignore-scripts && npm cache clean --force
 
 # Build backend
 FROM base AS builder
