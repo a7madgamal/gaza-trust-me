@@ -181,5 +181,4 @@ storybook-static
 packages/e2e/test-results/
 packages/e2e/playwright-report/
 packages/backend/test-results/
-packages/*/.env-development
-packages/*/.env-prod
+packages/*/.env-*
