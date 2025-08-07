@@ -68,7 +68,3 @@ services:
           cpus: "0.1"
           memory: 64M
     restart: unless-stopped
-
-networks:
-  default:
-    name: gazaconfirm-network
