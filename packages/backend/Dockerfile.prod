@@ -89,7 +89,7 @@ RUN mkdir -p /app/logs && \
     chown backend:nodejs /app/logs
 
 # Copy and setup startup script
-COPY start.sh /app/start.sh
+COPY packages/backend/start.sh /app/start.sh
 RUN chmod +x /app/start.sh && \
     chown backend:nodejs /app/start.sh
 
