@@ -4,7 +4,7 @@
   "description": "Frontend React application for Gazaconfirm platform",
   "private": true,
   "scripts": {
-    "dev": "npx kill-port 3000 && vite",
+    "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
     "format": "prettier --write . --log-level error",

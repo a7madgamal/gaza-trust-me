@@ -8,7 +8,7 @@ services:
     ports:
       - "3001:3001"
     env_file:
-      - packages/backend/.env-dev
+      - packages/backend/.env-development
     environment:
       - NODE_ENV=development
       - DOCKER=true
@@ -36,7 +36,7 @@ services:
     ports:
       - "3000:3000"
     env_file:
-      - packages/frontend/.env-dev
+      - packages/frontend/.env-development
     environment:
       - NODE_ENV=development
       - DOCKER=true

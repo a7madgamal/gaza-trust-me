@@ -42,14 +42,15 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Create context function
 const createContext = async (opts: { req: express.Request; res: express.Response }): Promise<Context> => {
-  try {
-    return await createAuthContext(supabase)(opts);
-  } catch {
-    // For public endpoints (register, login), return undefined user instead of throwing
-    // This allows these endpoints to work without authentication
-    logger.info('Error creating context');
+  const authHeader = opts.req.headers.authorization;
+  
+  // If no auth header, return undefined user (for public endpoints)
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return { user: undefined };
   }
+  
+  // If auth header exists, validate it (will throw for invalid tokens)
+  return await createAuthContext(supabase)(opts);
 };
 
 // tRPC middleware

@@ -26,9 +26,9 @@ A verification platform for Gazans to confirm their identity and location.
    ```
 3. Copy environment files:
    ```
-   copy packages\backend\.env-dev packages\backend\.env
-   copy packages\frontend\.env-dev packages\frontend\.env
-   copy packages\e2e\.env-dev packages\e2e\.env
+   copy packages\backend\.env-development packages\backend\.env
+   copy packages\frontend\.env-development packages\frontend\.env
+   copy packages\e2e\.env-development packages\e2e\.env
    ```
 4. Start development servers:
    ```
