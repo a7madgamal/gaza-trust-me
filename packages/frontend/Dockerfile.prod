@@ -55,7 +55,7 @@ RUN set -a && . ./.env-prod && set +a && \
     echo "✅ Frontend environment variables verified successfully!"
 
 # Set build-time environment variables for Vite
-ARG VITE_API_URL=http://gazatrust.me:3001
+ARG VITE_API_URL=https://gazatrust.me/api
 ENV VITE_API_URL=$VITE_API_URL
 
 RUN npm run build
