@@ -3,6 +3,9 @@ services:
     build:
       context: .
       dockerfile: packages/backend/Dockerfile.prod
+      network: host  # Temporary network access for Supabase CLI during build only
+    networks:
+      - app-network
     ports:
       - "3001:3001"
     env_file:
@@ -72,3 +75,13 @@ services:
           cpus: "0.5"
           memory: 256M
     restart: unless-stopped
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+        - subnet: 2001:db8::/32
