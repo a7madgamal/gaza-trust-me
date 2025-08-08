@@ -182,3 +182,4 @@ packages/e2e/test-results/
 packages/e2e/playwright-report/
 packages/backend/test-results/
 packages/*/.env-*
+packages/backend/.env-prod

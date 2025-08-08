@@ -18,13 +18,10 @@
     "clean": "rimraf dist",
     "format:sql": "prettier --write \"supabase/**/*.sql\"",
     "format:sql:check": "prettier --check \"supabase/**/*.sql\"",
-    "db:migrate": "tsx scripts/db-migrate.ts push",
-    "db:migrate:reset": "tsx scripts/db-migrate.ts reset",
-    "db:migrate:status": "tsx scripts/db-migrate.ts list",
-    "db:create-migration": "supabase migration new",
-    "types:generate": "supabase gen types typescript --project-id sivaovkdxiluefuhlqoj --schema public > src/types/GENERATED_database.types.ts && prettier --write src/types/GENERATED_database.types.ts"
+    "db": "tsx scripts/db-migrate.ts"
   },
   "dependencies": {
+    "@inquirer/prompts": "^7.8.0",
     "@supabase/supabase-js": "^2.54.0",
     "@trpc/server": "^10.45.2",
     "compression": "^1.8.1",
@@ -49,6 +46,7 @@
     "@typescript-eslint/parser": "^8.39.0",
     "@vitest/coverage-v8": "^2.1.9",
     "cross-env": "^10.0.0",
+    "dotenv-cli": "^10.0.0",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.2",
     "eslint-plugin-prettier": "^5.5.4",
