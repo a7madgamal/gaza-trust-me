@@ -80,6 +80,7 @@ export async function createTestUser(userData: {
   status: SeekerStatus;
   linkedin_url?: string;
   campaign_url?: string;
+  email?: string;
 }): Promise<number> {
   const response = await fetch(`${process.env['BACKEND_URL']}/trpc/register`, {
     method: 'POST',
@@ -157,13 +158,4 @@ export async function createTestUser(userData: {
   }
 
   return updatedUser.url_id;
-}
-
-/**
- * Clean up a test user from the database
- */
-export async function cleanupTestUser(urlId: number): Promise<void> {
-  // For now, just log the cleanup
-  // In a real implementation, this would delete the user via API or direct DB
-  console.log('Cleaned up test user:', urlId);
 }

@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { createTestUser, cleanupTestUser } from './utils/test-data';
+import { createTestUser } from './utils/test-data';
 
 test.describe('URL Routing Tests', () => {
   let testUserIds: number[] = [];
@@ -37,13 +37,6 @@ test.describe('URL Routing Tests', () => {
     });
 
     testUserIds = [user1Id, user2Id, user3Id];
-  });
-
-  test.afterAll(async () => {
-    // Clean up test users
-    for (const userId of testUserIds) {
-      await cleanupTestUser(userId);
-    }
   });
 
   test.beforeEach(async ({ page }) => {

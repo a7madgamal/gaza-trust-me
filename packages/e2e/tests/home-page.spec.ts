@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 import { loginAsUser, clearBrowserState } from './utils/auth-helpers';
-import { createTestUser, cleanupTestUser } from './utils/test-data';
+import { createTestUser } from './utils/test-data';
 
 test.describe('Home Page', () => {
   let testUserId: number;
@@ -16,11 +16,6 @@ test.describe('Home Page', () => {
       linkedin_url: 'https://linkedin.com/in/test-help-seeker',
       campaign_url: 'https://gofundme.com/test-campaign',
     });
-  });
-
-  test.afterAll(async () => {
-    // Clean up test user
-    await cleanupTestUser(testUserId);
   });
 
   test('should load public page and display card stack interface', async ({ page }) => {

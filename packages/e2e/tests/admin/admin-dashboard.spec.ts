@@ -1,7 +1,30 @@
 import { test, expect } from '@playwright/test';
 import { loginAsUser, clearBrowserState } from '../utils/auth-helpers';
+import { createTestUser } from '../utils/test-data';
 
 test.describe('Admin Dashboard', () => {
+  test.beforeAll(async () => {
+    // Create admin user
+    await createTestUser({
+      full_name: 'Admin User',
+      description: 'Admin test user',
+      phone_number: '+1234567890',
+      role: 'admin',
+      status: 'verified',
+      email: 'admin@admin.com',
+    });
+
+    // Create help seeker user
+    await createTestUser({
+      full_name: 'Help Seeker',
+      description: 'Help seeker test user',
+      phone_number: '+0987654321',
+      role: 'help_seeker',
+      status: 'verified',
+      email: 'seeker@seeker.com',
+    });
+  });
+
   test.beforeEach(async ({ page }) => {
     await clearBrowserState(page);
   });
@@ -115,7 +138,7 @@ test.describe('Admin Dashboard', () => {
     await expect(page.locator('[data-testid="user-card"]')).toBeVisible();
   });
 
-  test('should not make non-verified user names clickable', async ({ page }) => {
+  test('should make unverified user names clickable for admin validation', async ({ page }) => {
     await loginAsUser(page, 'admin');
     await page.goto('/admin/dashboard');
 
@@ -137,11 +160,17 @@ test.describe('Admin Dashboard', () => {
     // Find the name cell (first column) in this row
     const nameCell = firstNonVerifiedRow.locator('td:first-child');
 
-    // Check that the name is NOT a clickable link
+    // Check that the name IS a clickable link (for admin validation)
     const nameLink = nameCell.locator('a');
-    await expect(nameLink).toHaveCount(0);
+    await expect(nameLink).toBeVisible();
 
-    // Verify the name is displayed as plain text
-    await expect(nameCell).toHaveText(/.+/); // Should have some text content
+    // Get the href attribute to verify it follows the /user/:urlId pattern
+    const href = await nameLink.getAttribute('href');
+    expect(href).toMatch(/^\/user\/\d+$/);
+
+    // Verify the link has appropriate styling for unverified users
+    const linkColor = await nameLink.evaluate(el => getComputedStyle(el).color);
+    // Should have a different color than verified users (text.secondary vs primary.main)
+    expect(linkColor).toBeTruthy();
   });
 });

@@ -30,8 +30,8 @@ export const AuthRegistrationInputSchema = z.object({
     .string()
     .min(10, 'Description must be at least 10 characters')
     .max(2000, 'Description must be less than 2000 characters'),
-  linkedinUrl: z.string().url('Invalid LinkedIn URL').optional(),
-  campaignUrl: z.string().url('Invalid campaign URL').optional(),
+  linkedinUrl: z.string().url('Invalid LinkedIn URL').or(z.literal('')).optional(),
+  campaignUrl: z.string().url('Invalid campaign URL').or(z.literal('')).optional(),
 });
 
 export const AuthLoginInputSchema = z.object({
