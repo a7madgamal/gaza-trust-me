@@ -20,7 +20,7 @@ export default defineConfig({
       port: 3000, // Use same port for HMR
     },
     proxy: {
-      '/trpc': {
+      '/api/trpc': {
         target: process.env.DOCKER ? 'http://backend:3001' : 'http://localhost:3001',
         changeOrigin: true,
       },
