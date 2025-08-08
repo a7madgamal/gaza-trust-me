@@ -41,11 +41,12 @@ services:
     build:
       context: .
       dockerfile: packages/frontend/Dockerfile.prod
+      args:
+        - VITE_API_URL=https://gazatrust.me/api
     ports:
       - "8080:80"
     environment:
       - NODE_ENV=production
-      - VITE_API_URL=https://gazatrust.me/api
     depends_on:
       backend:
         condition: service_healthy

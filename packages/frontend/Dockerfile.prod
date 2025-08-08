@@ -31,6 +31,10 @@ RUN set -a && . ./.env-prod && set +a && \
 FROM base AS builder
 WORKDIR /app
 
+# Accept build arguments
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
+
 # Copy root package.json for workspace setup
 COPY package.json ./
 
