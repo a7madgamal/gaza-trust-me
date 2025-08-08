@@ -55,7 +55,7 @@ const createContext = async (opts: { req: express.Request; res: express.Response
 
 // tRPC middleware
 app.use(
-  '/trpc',
+  '/api/trpc',
   createExpressMiddleware({
     router: appRouter,
     createContext,

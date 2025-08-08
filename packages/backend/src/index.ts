@@ -9,5 +9,5 @@ export { appRouter, type AppRouter } from './routers';
 app.listen(PORT, () => {
   logger.info(`🚀 Server running on port ${PORT}`);
   logger.info(`📊 Health check: http://localhost:${PORT}/health`);
-  logger.info(`🔗 tRPC endpoint: http://localhost:${PORT}/trpc`);
+  logger.info(`🔗 tRPC endpoint: http://localhost:${PORT}/api/trpc`);
 });
