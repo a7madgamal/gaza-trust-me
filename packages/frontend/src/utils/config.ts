@@ -13,7 +13,7 @@ const getConfig = (): Config => {
   // In development, use the Vite proxy
   if (environment === 'development') {
     return {
-      trpcUrl: '/trpc',
+      trpcUrl: '/api/trpc',
       environment,
     };
   }

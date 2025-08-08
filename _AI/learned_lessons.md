@@ -125,3 +125,19 @@
 - **Rule:** `.env` files are protected by globalIgnore and cannot be accessed
 - **Lesson:** When user says "environment variables are already there", don't try to create/read `.env` files
 - **Fix:** Trust that environment variables exist and focus on using them correctly
+
+### 🚨 **NEVER Create Isolated Custom Scripts - Use Existing Helpers**
+
+- **Problem:** Created standalone scripts instead of using existing helper functions
+- **Rule:** Always use existing helper functions from E2E package for database operations
+- **Examples:** Use `createTestUser()` from `test-data.ts` instead of custom database scripts
+- **Lesson:** The codebase already has utilities - don't reinvent the wheel with isolated scripts
+- **Fix:** Leverage existing `auth-helpers.ts` and `test-data.ts` functions for user management
+
+### 🚨 **NEVER Create Fake Tests - Use Proper Setup/Teardown**
+
+- **Problem:** Creating fake tests just to run setup code
+- **Rule:** Use `beforeAll`/`afterAll` for test suite setup, `beforeEach`/`afterEach` for test case setup
+- **Examples:** Don't create a test called "setup admin user" - use `beforeAll` to create users
+- **Lesson:** Tests should test behavior, not be disguised setup scripts
+- **Fix:** Proper setup/teardown in lifecycle hooks, real tests for actual functionality

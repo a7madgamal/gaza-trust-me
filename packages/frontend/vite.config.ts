@@ -3,7 +3,10 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    // @ts-ignore
+    react(),
+  ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -20,7 +23,7 @@ export default defineConfig({
       port: 3000, // Use same port for HMR
     },
     proxy: {
-      '/api/trpc': {
+      '/api': {
         target: process.env.DOCKER ? 'http://backend:3001' : 'http://localhost:3001',
         changeOrigin: true,
       },
