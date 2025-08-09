@@ -1,44 +1,7 @@
 import { test, expect } from '@playwright/test';
-import { createTestUser } from './utils/test-data';
+import { env } from './utils/env';
 
 test.describe('URL Routing Tests', () => {
-  let testUserIds: number[] = [];
-
-  test.beforeAll(async () => {
-    // Create multiple test users for navigation testing
-    const user1Id = await createTestUser({
-      full_name: 'Test User One',
-      description: 'First test user for navigation',
-      phone_number: '+1234567891',
-      role: 'help_seeker',
-      status: 'verified',
-      linkedin_url: 'https://linkedin.com/in/test-user-one',
-      campaign_url: 'https://gofundme.com/test-campaign-one',
-    });
-
-    const user2Id = await createTestUser({
-      full_name: 'Test User Two',
-      description: 'Second test user for navigation',
-      phone_number: '+1234567892',
-      role: 'help_seeker',
-      status: 'verified',
-      linkedin_url: 'https://linkedin.com/in/test-user-two',
-      campaign_url: 'https://gofundme.com/test-campaign-two',
-    });
-
-    const user3Id = await createTestUser({
-      full_name: 'Test User Three',
-      description: 'Third test user for navigation',
-      phone_number: '+1234567893',
-      role: 'help_seeker',
-      status: 'verified',
-      linkedin_url: 'https://linkedin.com/in/test-user-three',
-      campaign_url: 'https://gofundme.com/test-campaign-three',
-    });
-
-    testUserIds = [user1Id, user2Id, user3Id];
-  });
-
   test.beforeEach(async ({ page }) => {
     // Clear any existing state
     await page.context().clearCookies();
@@ -47,7 +10,7 @@ test.describe('URL Routing Tests', () => {
 
   test('should redirect home to user URL pattern', async ({ page }) => {
     // Navigate to the home page
-    await page.goto(`${process.env['FRONTEND_URL']}`);
+    await page.goto(env.FRONTEND_URL);
 
     // Wait for the card to load
     await expect(page.locator('[data-testid="user-card"]')).toBeVisible();
@@ -61,7 +24,7 @@ test.describe('URL Routing Tests', () => {
 
   test('should change user data when navigating Next', async ({ page }) => {
     // Navigate to home and wait for initial load
-    await page.goto(`${process.env['FRONTEND_URL']}`);
+    await page.goto(env.FRONTEND_URL);
     await expect(page.locator('[data-testid="user-card"]')).toBeVisible();
     await page.waitForURL(/\/user\/\d+/);
 
@@ -91,7 +54,7 @@ test.describe('URL Routing Tests', () => {
 
   test('should change user data when navigating Previous', async ({ page }) => {
     // Navigate to home and wait for initial load
-    await page.goto(`${process.env['FRONTEND_URL']}`);
+    await page.goto(env.FRONTEND_URL);
     await expect(page.locator('[data-testid="user-card"]')).toBeVisible();
     await page.waitForURL(/\/user\/\d+/);
 

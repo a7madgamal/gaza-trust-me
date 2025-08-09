@@ -231,7 +231,7 @@
 **Type Safety:**
 
 - ✅ `TestUser` interface uses `UserRole` and `SeekerStatus` types
-- ✅ `createTestUser` function uses `UserInsert` type
+- ✅ `createTestUserViaAPI` function uses `UserInsert` type
 - ✅ Import from generated Supabase types (`../../../backend/src/types/supabase-types`)
 - ✅ Consistent typing across test utilities
 

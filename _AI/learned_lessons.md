@@ -130,7 +130,7 @@
 
 - **Problem:** Created standalone scripts instead of using existing helper functions
 - **Rule:** Always use existing helper functions from E2E package for database operations
-- **Examples:** Use `createTestUser()` from `test-data.ts` instead of custom database scripts
+- **Examples:** Use `createTestUserViaAPI()` from `test-data.ts` instead of custom database scripts
 - **Lesson:** The codebase already has utilities - don't reinvent the wheel with isolated scripts
 - **Fix:** Leverage existing `auth-helpers.ts` and `test-data.ts` functions for user management
 

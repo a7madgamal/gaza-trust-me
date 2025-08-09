@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
-import type { UserInsert, UserRole, SeekerStatus } from '../../../backend/src/types/supabase-types';
+import type { UserRole, SeekerStatus } from '../../../backend/src/types/supabase-types';
+import { env } from './env';
 
 /**
  * Test data utilities for E2E tests
@@ -41,111 +42,170 @@ export function generateTestUser(): TestUser {
   };
 }
 
+// important: keep all emails here lowwer case!
+const TEST_USERS = {
+  helpSeeker: {
+    email: 'seeker@seeker.com',
+    password: 'testtest1',
+    fullName: 'Help Seeker',
+    phoneNumber: '9999999',
+    linkedinUrl: 'https://linkedin.com/in/help-seeker',
+    campaignUrl: 'https://gofundme.com/help-seeker-campaign',
+    role: 'help_seeker' as const,
+    status: 'verified' as const,
+  },
+  admin: {
+    email: 'admin@admin.com',
+    password: 'testtest1',
+    fullName: 'Ahmed Admn',
+    phoneNumber: '9999999',
+    role: 'admin' as const,
+    status: 'verified' as const,
+  },
+  userWithLinkedinandcampaign: {
+    email: 'liandcampaing@liandcampain.com',
+    password: 'testtest1',
+    fullName: 'userWithLinkedinandcampaign',
+    phoneNumber: '9999999',
+    linkedinUrl: 'https://linkedin.com/in/userWithLinkedinandcampaign',
+    campaignUrl: 'https://gofundme.com/userWithLinkedinandcampaign',
+    role: 'help_seeker' as const,
+    status: 'verified' as const,
+  },
+} as const;
 /**
  * Predefined test users for consistent testing
  * These users should NEVER be deleted or edited by tests
  */
-export const PREDEFINED_TEST_USERS = {
-  helpSeeker: {
-    email: 'seeker@seeker.com',
-    password: 'seekerseeker1',
-    fullName: 'Help Seeker',
-    phoneNumber: '+1234567890',
-    linkedinUrl: 'https://linkedin.com/in/help-seeker',
-    campaignUrl: 'https://gofundme.com/help-seeker-campaign',
-  },
-  admin: {
-    email: 'admin@admin.com',
-    password: 'adminadmin1',
-    fullName: 'admin',
-    phoneNumber: '9999999',
-  },
-  // Add a third fixed user if needed
-  // thirdUser: {
-  //   email: 'third@third.com',
-  //   password: 'thirdthird1',
-  //   fullName: 'Third User',
-  //   phoneNumber: '+1234567891',
-  // },
-} as const;
+export const PREDEFINED_TEST_USERS: Record<
+  keyof typeof TEST_USERS,
+  {
+    email: string;
+    password: string;
+    fullName: string;
+    phoneNumber: string;
+    linkedinUrl?: string;
+    campaignUrl?: string;
+    role: UserRole;
+    status: SeekerStatus;
+  }
+> = TEST_USERS;
 
 /**
- * Create a test user in the database for testing
+ * Create a predefined test user in the database for testing
  */
-export async function createTestUser(userData: {
-  full_name: string;
-  description: string;
-  phone_number: string;
-  role: UserRole;
-  status: SeekerStatus;
-  linkedin_url?: string;
-  campaign_url?: string;
-  email?: string;
-}): Promise<number> {
-  const response = await fetch(`${process.env['BACKEND_URL']}/trpc/register`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      email: `test-${Date.now()}@example.com`,
-      password: 'testpassword123',
-      fullName: userData.full_name,
-      phoneNumber: userData.phone_number,
-      description:
-        userData.description.length >= 10
-          ? userData.description
-          : `${userData.description} - This is a test user created for automated testing purposes.`,
-      linkedinUrl: userData.linkedin_url,
-      campaignUrl: userData.campaign_url,
-    }),
-  });
-
-  if (!response.ok) {
-    throw new Error(`Failed to create test user: ${response.statusText}`);
+export async function createTestUserViaAPI(userType: keyof typeof PREDEFINED_TEST_USERS): Promise<number> {
+  const user = PREDEFINED_TEST_USERS[userType];
+  if (!user) {
+    throw new Error(`User type ${userType} not found in PREDEFINED_TEST_USERS`);
   }
-
-  const result = await response.json();
-  const userId = result.result.data.data.userId;
 
   // Create Supabase client for direct database access with service role key to bypass RLS
-  const supabase = createClient(process.env['SUPABASE_URL']!, process.env['SUPABASE_SECRET_KEY']!);
+  const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SECRET_KEY);
 
   // First check if user exists in users table
-  const { data: existingUser } = await supabase.from('users').select('*').eq('id', userId);
+  const { data: existingUser, error: existingUserError } = await supabase
+    .from('users')
+    .select('*')
+    .eq('email', user.email);
 
+  if (existingUserError) {
+    console.log({ existingUserError });
+  }
   // If user doesn't exist in users table, create the profile manually
   if (!existingUser || existingUser.length === 0) {
-    const userInsert: UserInsert = {
-      email: `test-${Date.now()}@example.com`,
-      id: userId,
-      full_name: userData.full_name,
-      phone_number: userData.phone_number,
-      description: userData.description,
-      ...(userData.linkedin_url && { linkedin_url: userData.linkedin_url }),
-      ...(userData.campaign_url && { campaign_url: userData.campaign_url }),
-      status: userData.status,
-      role: userData.role,
-    };
+    // Check if orphaned auth user exists (auth user without profile)
+    // Get ALL auth users without pagination to ensure we find any orphaned user
+    const { data: authUsers, error: getUserError } = await supabase.auth.admin.listUsers();
 
-    const { data: createdUser, error: createError } = await supabase
-      .from('users')
-      .insert(userInsert)
-      .select('url_id')
-      .single();
-
-    if (createError) {
-      throw new Error(`Failed to create user profile: ${createError.message}`);
+    if (getUserError) {
+      console.log('DEBUG: Error fetching auth users:', getUserError);
     }
 
-    return createdUser.url_id;
+    const orphanedAuthUser = authUsers?.users?.find(u => u.email?.toLowerCase() === user.email.toLowerCase());
+
+    if (orphanedAuthUser) {
+      const { error: deleteError } = await supabase.auth.admin.deleteUser(orphanedAuthUser.id);
+
+      if (deleteError) {
+        console.log(`DEBUG: Failed to delete orphaned auth user:`, deleteError);
+      }
+    } else {
+      console.log('DEBUG: No orphaned auth user found, proceeding with registration');
+    }
+
+    console.log('DEBUG: Attempting to register new user via API...');
+    const requestBody = {
+      email: user.email,
+      password: user.password,
+      fullName: user.fullName,
+      phoneNumber: user.phoneNumber,
+      description: `${user.fullName} test user - This is a test user created for automated testing purposes.`,
+      ...(user.linkedinUrl && { linkedinUrl: user.linkedinUrl }),
+      ...(user.campaignUrl && { campaignUrl: user.campaignUrl }),
+    };
+
+    const response = await fetch(`${env.BACKEND_URL}/api/trpc/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    if (!response.ok) {
+      const result = await response.json();
+      console.log('DEBUG: Error response body:', result);
+      throw new Error(`Failed to create test user: ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    console.log('DEBUG: Success response body:', result);
+
+    const data = result.result.data;
+    console.log('DEBUG: Extracted data:', data);
+
+    // Handle nested response structure: data.data.userId
+    const userId = data.success && data.data ? data.data.userId : data.userId;
+
+    if (userId) {
+      // Update user role and status after creation
+      const { data: updatedUser, error: updateError } = await supabase
+        .from('users')
+        .update({ 
+          status: user.status,
+          role: user.role 
+        })
+        .eq('email', user.email)
+        .select('url_id')
+        .single();
+
+      if (updateError) {
+        throw new Error(`Failed to update user role/status: ${updateError.message}`);
+      }
+
+      if (!updatedUser) {
+        throw new Error('Failed to get updated user data');
+      }
+
+      return updatedUser.url_id;
+    } else {
+      throw new Error('Failed to create test user');
+    }
   }
 
-  // Update user status directly in Supabase
+  // Update user data to match TEST_USERS definition
   const { data: updatedUser, error: updateError } = await supabase
     .from('users')
-    .update({ status: userData.status })
-    .eq('id', userId)
+    .update({ 
+      full_name: user.fullName,
+      phone_number: user.phoneNumber,
+      linkedin_url: user.linkedinUrl || null,
+      campaign_url: user.campaignUrl || null,
+      status: user.status,
+      role: user.role 
+    })
+    .eq('email', user.email)
     .select('url_id')
     .single();
 

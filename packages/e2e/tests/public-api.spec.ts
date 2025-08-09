@@ -1,9 +1,10 @@
 import { test, expect } from '@playwright/test';
+import { env } from './utils/env';
 
 test.describe('Public API Endpoints', () => {
   test('should get users for cards', async ({ request }) => {
     const response = await request.get(
-      `${process.env['BACKEND_URL']}/trpc/getUsersForCards?input=` +
+      `${env.BACKEND_URL}/api/trpc/getUsersForCards?input=` +
         encodeURIComponent(
           JSON.stringify({
             limit: 10,
@@ -19,7 +20,7 @@ test.describe('Public API Endpoints', () => {
   });
 
   test('should get verified user count', async ({ request }) => {
-    const response = await request.get(`${process.env['BACKEND_URL']}/trpc/getVerifiedUserCount`);
+    const response = await request.get(`${env.BACKEND_URL}/api/trpc/getVerifiedUserCount`);
 
     expect(response.status()).toBe(200);
     const data = await response.json();
@@ -30,7 +31,7 @@ test.describe('Public API Endpoints', () => {
 
   test('should validate user schema when users exist', async ({ request }) => {
     const response = await request.get(
-      `${process.env['BACKEND_URL']}/trpc/getUsersForCards?input=` +
+      `${env.BACKEND_URL}/api/trpc/getUsersForCards?input=` +
         encodeURIComponent(
           JSON.stringify({
             limit: 10,
@@ -72,7 +73,7 @@ test.describe('Public API Endpoints', () => {
 
   test('should handle invalid input gracefully', async ({ request }) => {
     const response = await request.get(
-      `${process.env['BACKEND_URL']}/trpc/getUsersForCards?input=` +
+      `${env.BACKEND_URL}/api/trpc/getUsersForCards?input=` +
         encodeURIComponent(
           JSON.stringify({
             limit: -1, // Invalid negative limit
@@ -86,7 +87,7 @@ test.describe('Public API Endpoints', () => {
 
   test('should handle large limit gracefully', async ({ request }) => {
     const response = await request.get(
-      `${process.env['BACKEND_URL']}/trpc/getUsersForCards?input=` +
+      `${env.BACKEND_URL}/api/trpc/getUsersForCards?input=` +
         encodeURIComponent(
           JSON.stringify({
             limit: 1000, // Very large limit
@@ -100,7 +101,7 @@ test.describe('Public API Endpoints', () => {
 
   test('should return only verified help_seeker users', async ({ request }) => {
     const response = await request.get(
-      `${process.env['BACKEND_URL']}/trpc/getUsersForCards?input=` +
+      `${env.BACKEND_URL}/api/trpc/getUsersForCards?input=` +
         encodeURIComponent(
           JSON.stringify({
             limit: 50,
@@ -125,7 +126,7 @@ test.describe('Public API Endpoints', () => {
 
   test('should order users by creation date (newest first)', async ({ request }) => {
     const response = await request.get(
-      `${process.env['BACKEND_URL']}/trpc/getUsersForCards?input=` +
+      `${env.BACKEND_URL}/api/trpc/getUsersForCards?input=` +
         encodeURIComponent(
           JSON.stringify({
             limit: 10,

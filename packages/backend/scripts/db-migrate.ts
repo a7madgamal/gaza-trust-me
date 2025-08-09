@@ -153,7 +153,12 @@ async function main(): Promise<void> {
 
     // Commands that accept --db-url
     if (['db push', 'db reset', 'db lint', 'migration list'].includes(command)) {
-      args.push('--db-url', process.env.SUPABASE_DB_URL!);
+      const SUPABASE_DB_URL = process.env.SUPABASE_DB_URL;
+      if (!SUPABASE_DB_URL) {
+        console.error('❌ SUPABASE_DB_URL is not set in environment variables');
+        process.exit(1);
+      }
+      args.push('--db-url', SUPABASE_DB_URL);
     }
 
     console.log(`📝 Command: supabase ${args.join(' ')}`);

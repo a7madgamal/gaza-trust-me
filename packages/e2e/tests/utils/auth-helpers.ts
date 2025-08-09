@@ -1,5 +1,6 @@
 import { Page, expect } from '@playwright/test';
 import { TestUser, PREDEFINED_TEST_USERS, generateTestUser } from './test-data';
+import { env } from './env';
 
 /**
  * Authentication helper functions for E2E tests
@@ -10,6 +11,9 @@ import { TestUser, PREDEFINED_TEST_USERS, generateTestUser } from './test-data';
  */
 export async function loginAsUser(page: Page, userType: keyof typeof PREDEFINED_TEST_USERS): Promise<void> {
   const user = PREDEFINED_TEST_USERS[userType];
+  if (!user) {
+    throw new Error(`User type ${userType} not found in PREDEFINED_TEST_USERS`);
+  }
   await loginWithCredentials(page, user);
 }
 
@@ -178,7 +182,7 @@ export async function clearBrowserState(page: Page): Promise<void> {
   await page.context().clearCookies();
 
   // Navigate to the app first to ensure we can access localStorage
-  await page.goto(`${process.env['FRONTEND_URL']}`);
+  await page.goto(env.FRONTEND_URL);
 
   // Clear localStorage and sessionStorage
   await page.evaluate(() => {
@@ -192,7 +196,7 @@ export async function clearBrowserState(page: Page): Promise<void> {
 /**
  * Create a test user and verify them as admin so they appear in public cards
  */
-export async function createTestUser(page: Page, user: TestUser): Promise<void> {
+export async function createAndVerifyTestUserViaUI(page: Page, user: TestUser): Promise<void> {
   // First register the user
   await registerNewUser(page, user);
 

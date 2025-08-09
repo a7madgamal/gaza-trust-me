@@ -276,7 +276,8 @@ test.describe('Auth Pages', () => {
 
     // Test form submission with valid data
     await page.goto('/register');
-    await page.fill('[data-testid="email"]', 'test@example.com');
+    const uniqueEmail = `test-${Date.now()}@example.com`;
+    await page.fill('[data-testid="email"]', uniqueEmail);
     await page.fill('[data-testid="password"]', 'Password123!');
     await page.fill('[data-testid="confirmPassword"]', 'Password123!');
     await page.fill('[data-testid="fullName"]', 'Test User');
@@ -286,19 +287,15 @@ test.describe('Auth Pages', () => {
       'This is a detailed description of the help I need. It should be long enough to pass validation.'
     );
 
-    // Verify description is filled
-    await expect(page.locator('[data-testid="description"]')).toHaveValue(
-      'This is a detailed description of the help I need. It should be long enough to pass validation.'
-    );
-
     // Submit form
     await page.click('[data-testid="register-button"]');
 
-    // Wait for any network activity to complete
-    await page.waitForLoadState('domcontentloaded');
+    // Should show loading state during submission
+    await expect(page.locator('[data-testid="register-button"]')).toBeDisabled();
 
-    // Verify form submission was attempted (button should be enabled after attempt)
-    await expect(page.locator('[data-testid="register-button"]')).toBeEnabled();
+    // Wait for navigation to complete and verify redirect to login page
+    await page.waitForURL(/\/login/);
+    await expect(page.url()).toMatch(/\/login/);
   });
 
   test('should handle registration loading states and status validation', async ({ page }) => {

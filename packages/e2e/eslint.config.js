@@ -1,5 +1,6 @@
 import js from '@eslint/js';
 import typescriptParser from '@typescript-eslint/parser';
+import typescriptPlugin from '@typescript-eslint/eslint-plugin';
 import playwrightPlugin from 'eslint-plugin-playwright';
 
 export default [
@@ -20,6 +21,9 @@ export default [
         window: 'readonly',
       },
     },
+    plugins: {
+      '@typescript-eslint': typescriptPlugin,
+    },
     rules: {
       // Focus on Playwright rules for test quality
       'playwright/no-skipped-test': 'error',
@@ -31,6 +35,8 @@ export default [
       'playwright/no-conditional-in-test': 'warn',
       'playwright/no-conditional-expect': 'error',
       'playwright/prefer-web-first-assertions': 'warn',
+      // TypeScript-specific rules
+      '@typescript-eslint/no-unused-vars': 'error',
       // Disable other rules for now to focus on test quality
       'no-unused-vars': 'off',
       'no-undef': 'off',

@@ -1,23 +1,8 @@
 import { test, expect } from '@playwright/test';
 import { loginAsUser, clearBrowserState } from './utils/auth-helpers';
-import { createTestUser } from './utils/test-data';
+import { env } from './utils/env';
 
 test.describe('Home Page', () => {
-  let testUserId: number;
-
-  test.beforeAll(async () => {
-    // Create a test user for the card stack
-    testUserId = await createTestUser({
-      full_name: 'Test Help Seeker',
-      description: 'I need help with my project',
-      phone_number: '+1234567890',
-      role: 'help_seeker',
-      status: 'verified',
-      linkedin_url: 'https://linkedin.com/in/test-help-seeker',
-      campaign_url: 'https://gofundme.com/test-campaign',
-    });
-  });
-
   test('should load public page and display card stack interface', async ({ page }) => {
     await page.goto('/');
 
@@ -127,7 +112,7 @@ test.describe('Home Page', () => {
   });
 
   test('should display header and handle navigation when not logged in', async ({ page }) => {
-    await page.goto(`${process.env['FRONTEND_URL']}`);
+    await page.goto(env.FRONTEND_URL);
 
     // Check title is visible and clickable
     const title = page.getByText('Help-Seeking Platform');
@@ -141,7 +126,7 @@ test.describe('Home Page', () => {
     await expect(page.getByRole('button', { name: 'account of current user' })).toBeHidden();
 
     // Navigate to a different page first
-    await page.goto(`${process.env['FRONTEND_URL']}/login`);
+    await page.goto(`${env.FRONTEND_URL}/login`);
 
     // Click the title
     await page.getByText('Help-Seeking Platform').click();
@@ -151,22 +136,22 @@ test.describe('Home Page', () => {
 
     // Test navigation buttons
     await page.getByRole('button', { name: 'Login' }).click();
-    await expect(page).toHaveURL(`${process.env['FRONTEND_URL']}/login`);
+    await expect(page).toHaveURL(`${env.FRONTEND_URL}/login`);
 
-    await page.goto(`${process.env['FRONTEND_URL']}/`);
+    await page.goto(`${env.FRONTEND_URL}/`);
     await page.getByRole('button', { name: 'Register' }).click();
-    await expect(page).toHaveURL(`${process.env['FRONTEND_URL']}/register`);
+    await expect(page).toHaveURL(`${env.FRONTEND_URL}/register`);
   });
 
   test('should handle header navigation for logged in users', async ({ page }) => {
-    await page.goto(`${process.env['FRONTEND_URL']}`);
+    await page.goto(env.FRONTEND_URL);
 
     // Test help seeker login
     await loginAsUser(page, 'helpSeeker');
 
-    // Check user info is displayed
-    await expect(page.getByText('Help Seeker')).toBeVisible();
-    await expect(page.getByText('(Help Seeker)')).toBeVisible();
+    // Check user info is displayed - target the header specifically
+    await expect(page.getByRole('banner').getByText('Help Seeker', { exact: true })).toBeVisible();
+    await expect(page.getByRole('banner').getByText('(Help Seeker)')).toBeVisible();
 
     // Check account menu button is visible
     await expect(page.getByRole('button', { name: 'account of current user' })).toBeVisible();
@@ -185,16 +170,16 @@ test.describe('Home Page', () => {
 
     // Test navigation to profile
     await page.getByRole('menuitem', { name: 'Profile' }).click();
-    await expect(page).toHaveURL(`${process.env['FRONTEND_URL']}/profile`);
+    await expect(page).toHaveURL(`${env.FRONTEND_URL}/profile`);
 
     // Go back and test dashboard navigation
-    await page.goto(`${process.env['FRONTEND_URL']}/`);
+    await page.goto(`${env.FRONTEND_URL}/`);
     await page.getByRole('button', { name: 'account of current user' }).click();
     await page.getByRole('menuitem', { name: 'Dashboard' }).click();
-    await expect(page).toHaveURL(`${process.env['FRONTEND_URL']}/dashboard`);
+    await expect(page).toHaveURL(`${env.FRONTEND_URL}/dashboard`);
 
     // Test logout
-    await page.goto(`${process.env['FRONTEND_URL']}/`);
+    await page.goto(`${env.FRONTEND_URL}/`);
     await page.getByRole('button', { name: 'account of current user' }).click();
     await page.getByRole('menuitem', { name: 'Logout' }).click();
 
@@ -210,13 +195,13 @@ test.describe('Home Page', () => {
   });
 
   test('should handle admin user header and responsive behavior', async ({ page }) => {
-    await page.goto(`${process.env['FRONTEND_URL']}`);
+    await page.goto(env.FRONTEND_URL);
 
     // Test admin login
     await loginAsUser(page, 'admin');
 
     // Check user info is displayed - target the header specifically
-    await expect(page.getByRole('banner').getByText('Admin 1')).toBeVisible();
+    await expect(page.getByRole('banner').getByText('Ahmed Admn', { exact: true })).toBeVisible();
     await expect(page.getByRole('banner').getByText('(Admin)')).toBeVisible();
 
     // Check account menu button is visible
@@ -227,10 +212,10 @@ test.describe('Home Page', () => {
     await page.getByRole('menuitem', { name: 'Dashboard' }).click();
 
     // Should navigate to admin dashboard
-    await expect(page).toHaveURL(`${process.env['FRONTEND_URL']}/admin/dashboard`);
+    await expect(page).toHaveURL(`${env.FRONTEND_URL}/admin/dashboard`);
 
     // Test responsive behavior - go back to home page
-    await page.goto(`${process.env['FRONTEND_URL']}/`);
+    await page.goto(`${env.FRONTEND_URL}/`);
     await page.setViewportSize({ width: 375, height: 667 });
 
     // Check title is still visible
@@ -252,7 +237,7 @@ test.describe('Home Page', () => {
   });
 
   test('should handle menu interactions and basic navigation', async ({ page }) => {
-    await page.goto(`${process.env['FRONTEND_URL']}`);
+    await page.goto(env.FRONTEND_URL);
 
     // Test menu close behavior
     await loginAsUser(page, 'helpSeeker');
