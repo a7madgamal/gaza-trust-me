@@ -50,7 +50,6 @@ RUN set -a && . ./.env-prod && set +a && \
     test -n "$MAX_FILE_SIZE" || (echo "❌ MAX_FILE_SIZE not set!" && exit 1) && \
     test -n "$ALLOWED_FILE_TYPES" || (echo "❌ ALLOWED_FILE_TYPES not set!" && exit 1) && \
     test -n "$MAX_FILES_PER_CASE" || (echo "❌ MAX_FILES_PER_CASE not set!" && exit 1) && \
-    test -n "$ENABLE_EMAIL_VERIFICATION" || (echo "❌ ENABLE_EMAIL_VERIFICATION not set!" && exit 1) && \
     echo "✅ All environment variables verified successfully!" && \
     npm run clean && npm run build
 

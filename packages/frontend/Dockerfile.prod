@@ -31,9 +31,16 @@ RUN set -a && . ./.env-prod && set +a && \
 FROM base AS builder
 WORKDIR /app
 
-# Accept build arguments
-ARG VITE_API_URL
-ENV VITE_API_URL=$VITE_API_URL
+# Copy environment file and set variables
+COPY packages/frontend/.env-production ./packages/frontend/.env-production
+
+# Source environment variables from file
+RUN set -a && . ./packages/frontend/.env-production && set +a && \
+    echo "🔍 Verifying frontend production environment variables..." && \
+    test -n "$VITE_API_URL" || (echo "❌ VITE_API_URL not set!" && exit 1) && \
+    test -n "$VITE_SUPABASE_URL" || (echo "❌ VITE_SUPABASE_URL not set!" && exit 1) && \
+    test -n "$VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY" || (echo "❌ VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY not set!" && exit 1) && \
+    echo "✅ Frontend production environment variables verified!"
 
 # Copy root package.json for workspace setup
 COPY package.json ./
@@ -50,8 +57,8 @@ RUN HUSKY=0 npm install --workspaces --ignore-scripts
 # Build frontend
 WORKDIR /app/packages/frontend
 
-
-RUN npm run build
+# Source env vars and build
+RUN set -a && . ./.env-production && set +a && npm run build
 
 # Production image with nginx
 FROM nginx:alpine AS runner

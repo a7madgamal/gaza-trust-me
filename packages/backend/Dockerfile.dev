@@ -13,12 +13,16 @@ RUN apk add --no-cache curl tini && \
     mv supabase /usr/local/bin/supabase && \
     chmod +x /usr/local/bin/supabase
 
+# Copy root package.json and ESLint config first for better caching
+COPY package.json ./
+COPY eslint.config.mjs ./
+
 # Copy package.json first for better caching
 COPY packages/backend/package.json ./packages/backend/
 WORKDIR /app/packages/backend
 
-# Install dependencies (skip Husky in Docker)
-RUN HUSKY=0 npm install
+# Install dependencies (skip Husky in Docker) - run from backend package directory
+RUN npm install --ignore-scripts
 
 # Install nodemon globally for hot reload
 RUN npm install -g nodemon tsx

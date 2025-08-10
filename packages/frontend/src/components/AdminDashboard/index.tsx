@@ -54,9 +54,9 @@ const AdminDashboard: React.FC = () => {
   const [page, setPage] = useState(1);
   const [actionDialog, setActionDialog] = useState<{
     open: boolean;
-    // eslint-disable-next-line vibe-coder/no-optional-properties
+
     user: User | null;
-    // eslint-disable-next-line vibe-coder/no-optional-properties
+
     action: 'verify' | 'flag' | null;
   }>({
     open: false,

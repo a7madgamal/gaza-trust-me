@@ -172,9 +172,9 @@ export async function createTestUserViaAPI(userType: keyof typeof PREDEFINED_TES
       // Update user role and status after creation
       const { data: updatedUser, error: updateError } = await supabase
         .from('users')
-        .update({ 
+        .update({
           status: user.status,
-          role: user.role 
+          role: user.role,
         })
         .eq('email', user.email)
         .select('url_id')
@@ -197,13 +197,13 @@ export async function createTestUserViaAPI(userType: keyof typeof PREDEFINED_TES
   // Update user data to match TEST_USERS definition
   const { data: updatedUser, error: updateError } = await supabase
     .from('users')
-    .update({ 
+    .update({
       full_name: user.fullName,
       phone_number: user.phoneNumber,
       linkedin_url: user.linkedinUrl || null,
       campaign_url: user.campaignUrl || null,
       status: user.status,
-      role: user.role 
+      role: user.role,
     })
     .eq('email', user.email)
     .select('url_id')

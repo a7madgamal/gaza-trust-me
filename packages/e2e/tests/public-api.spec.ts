@@ -118,7 +118,7 @@ test.describe('Public API Endpoints', () => {
     expect(Array.isArray(data.result.data)).toBe(true);
 
     // All returned users should be verified help_seekers
-    data.result.data.forEach((user: any) => {
+    data.result.data.forEach((user: { status: string; role: string }) => {
       expect(user.status).toBe('verified');
       expect(user.role).toBe('help_seeker');
     });

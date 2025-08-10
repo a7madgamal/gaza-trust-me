@@ -4,7 +4,7 @@ import path from 'path';
 
 export default defineConfig({
   plugins: [
-    // @ts-ignore
+    // @ts-expect-error - Vite plugin react is not typed
     react(),
   ],
   resolve: {

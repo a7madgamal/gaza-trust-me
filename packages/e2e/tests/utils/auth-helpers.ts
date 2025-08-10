@@ -186,9 +186,7 @@ export async function clearBrowserState(page: Page): Promise<void> {
 
   // Clear localStorage and sessionStorage
   await page.evaluate(() => {
-    // @ts-ignore - localStorage and sessionStorage are available in browser context
     localStorage.clear();
-    // @ts-ignore - localStorage and sessionStorage are available in browser context
     sessionStorage.clear();
   });
 }

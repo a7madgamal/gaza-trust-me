@@ -19,7 +19,6 @@ End-to-end tests for the Gazaconfirm help-seeking platform using Playwright with
 
 1. **Backend running** on `http://localhost:3001`
 2. **Frontend running** on `http://localhost:3000`
-3. **Email verification disabled** (`ENABLE_EMAIL_VERIFICATION=false`)
 
 ### Install Dependencies
 
@@ -243,7 +242,6 @@ await expect(page.locator('[data-testid="error"]')).toBeVisible();
 
 2. **Backend not responding**
    - Ensure backend is running on port 3001
-   - Check `ENABLE_EMAIL_VERIFICATION=false` in backend env
 
 3. **Frontend not loading**
    - Ensure frontend is running on port 3000

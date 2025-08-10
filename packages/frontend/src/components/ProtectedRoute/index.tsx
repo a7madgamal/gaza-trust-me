@@ -5,7 +5,7 @@ import { Box, CircularProgress } from '@mui/material';
 
 interface ProtectedRouteProps {
   children: ReactNode;
-  // eslint-disable-next-line vibe-coder/no-optional-properties
+
   redirectTo?: string;
 }
 

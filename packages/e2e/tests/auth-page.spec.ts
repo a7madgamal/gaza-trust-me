@@ -295,7 +295,7 @@ test.describe('Auth Pages', () => {
 
     // Wait for navigation to complete and verify redirect to login page
     await page.waitForURL(/\/login/);
-    await expect(page.url()).toMatch(/\/login/);
+    expect(page.url()).toMatch(/\/login/);
   });
 
   test('should handle registration loading states and status validation', async ({ page }) => {

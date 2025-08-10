@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-/* eslint-disable no-console */
 
 import { spawn } from 'child_process';
 import { select, input } from '@inquirer/prompts';

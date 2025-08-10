@@ -10,7 +10,7 @@
   ],
   "scripts": {
     "prepare": "husky install",
-    "lint": "npm run lint --workspaces",
+    "lint": "eslint . --fix --cache",
     "format": "npm run format --workspaces",
     "lint:sql": "npm run lint:sql --workspace=@gazaconfirm/backend",
     "type-check": "npm run type-check --workspaces",
@@ -27,7 +27,19 @@
     "clean": "npm run clean --workspaces && rimraf node_modules packages/*/node_modules packages/*/dist packages/*/build"
   },
   "devDependencies": {
+    "@eslint/js": "^9.33.0",
+    "@typescript-eslint/eslint-plugin": "^8.39.0",
+    "@typescript-eslint/parser": "^8.39.0",
     "concurrently": "^9.2.0",
+    "eslint": "9.33.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-playwright": "^2.2.2",
+    "eslint-plugin-prettier": "^5.5.4",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "eslint-plugin-vibe-coder": "^0.0.5",
+    "globals": "^16.3.0",
     "husky": "^8.0.3",
     "rimraf": "^5.0.5"
   },
