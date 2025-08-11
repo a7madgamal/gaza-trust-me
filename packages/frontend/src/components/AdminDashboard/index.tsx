@@ -97,7 +97,7 @@ const AdminDashboard: React.FC = () => {
     onSuccess: result => {
       if (result.success) {
         showToast('User status updated successfully', 'success');
-        refetchUsers();
+        void refetchUsers();
         setActionDialog({ open: false, user: null, action: null });
         setRemarks('');
       } else {
@@ -115,7 +115,7 @@ const AdminDashboard: React.FC = () => {
         const actionText =
           result.data?.action === 'upgrade_to_admin' ? 'upgraded to admin' : 'downgraded to help seeker';
         showToast(`User ${actionText} successfully`, 'success');
-        refetchUsers();
+        void refetchUsers();
         setRoleUpgradeDialog({ open: false, user: null, newRole: null });
         setRemarks('');
       } else {
@@ -309,7 +309,7 @@ const AdminDashboard: React.FC = () => {
                             variant="contained"
                             color="success"
                             onClick={() => handleAction(user, 'verify')}
-                            disabled={updateUserStatusMutation.isLoading}
+                            disabled={updateUserStatusMutation.isPending}
                             data-testid={`verify-button-${user.id}`}
                           >
                             Verify
@@ -319,7 +319,7 @@ const AdminDashboard: React.FC = () => {
                             variant="contained"
                             color="error"
                             onClick={() => handleAction(user, 'flag')}
-                            disabled={updateUserStatusMutation.isLoading}
+                            disabled={updateUserStatusMutation.isPending}
                             data-testid={`flag-button-${user.id}`}
                           >
                             Flag
@@ -408,19 +408,19 @@ const AdminDashboard: React.FC = () => {
         <DialogActions>
           <Button
             onClick={() => setActionDialog({ open: false, user: null, action: null })}
-            disabled={updateUserStatusMutation.isLoading}
+            disabled={updateUserStatusMutation.isPending}
             data-testid="cancel-action-button"
           >
             Cancel
           </Button>
           <Button
-            onClick={confirmAction}
+            onClick={() => void confirmAction()}
             variant="contained"
             color={actionDialog.action === 'verify' ? 'success' : 'error'}
-            disabled={updateUserStatusMutation.isLoading}
+            disabled={updateUserStatusMutation.isPending}
             data-testid="confirm-action-button"
           >
-            {updateUserStatusMutation.isLoading ? (
+            {updateUserStatusMutation.isPending ? (
               <CircularProgress size={20} />
             ) : actionDialog.action === 'verify' ? (
               'Verify'
@@ -471,7 +471,7 @@ const AdminDashboard: React.FC = () => {
             Cancel
           </Button>
           <Button
-            onClick={confirmRoleUpgrade}
+            onClick={() => void confirmRoleUpgrade()}
             variant="contained"
             color={roleUpgradeDialog.newRole === 'admin' ? 'primary' : 'warning'}
             disabled={upgradeUserRoleMutation.isPending}

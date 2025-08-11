@@ -70,7 +70,7 @@ test.describe('Home Page', () => {
     await page.route('**/trpc/**', route => {
       console.log('Intercepted tRPC request to:', route.request().url());
       if (route.request().url().includes('getUsersForCards')) {
-        route.fulfill({
+        void route.fulfill({
           status: 500,
           contentType: 'application/json',
           body: JSON.stringify({
@@ -81,7 +81,7 @@ test.describe('Home Page', () => {
           }),
         });
       } else {
-        route.continue();
+        void route.continue();
       }
     });
 
@@ -100,8 +100,8 @@ test.describe('Home Page', () => {
     // Mock slow API response
     await page.route('**/trpc/getUsersForCards', route => {
       // Delay the response to test loading state
-      setTimeout(() => {
-        route.continue();
+      void setTimeout(() => {
+        void route.continue();
       }, 1000);
     });
 
@@ -129,17 +129,17 @@ test.describe('Home Page', () => {
     await page.goto(`${env.FRONTEND_URL}/login`);
 
     // Click the title
-    await page.getByText('Help-Seeking Platform').click();
+    void page.getByText('Help-Seeking Platform').click();
 
     // Should navigate back to home and auto-redirect to user URL
     await page.waitForURL(/\/user\/\d+/);
 
     // Test navigation buttons
-    await page.getByRole('button', { name: 'Login' }).click();
+    void page.getByRole('button', { name: 'Login' }).click();
     await expect(page).toHaveURL(`${env.FRONTEND_URL}/login`);
 
     await page.goto(`${env.FRONTEND_URL}/`);
-    await page.getByRole('button', { name: 'Register' }).click();
+    void page.getByRole('button', { name: 'Register' }).click();
     await expect(page).toHaveURL(`${env.FRONTEND_URL}/register`);
   });
 
@@ -257,7 +257,7 @@ test.describe('Home Page', () => {
     await page.goto('/dashboard');
 
     // Wait for authentication check to complete and redirect to happen
-    await page.waitForURL('/login', { timeout: 15000 });
+    await page.waitForURL('/login');
 
     // Check that the page loads
     await expect(page).toHaveTitle(/Gazaconfirm/);

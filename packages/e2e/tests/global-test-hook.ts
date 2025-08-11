@@ -1,4 +1,4 @@
-// eslint-disable-next-line no-restricted-imports -- ok here
+/* eslint-disable no-restricted-imports */
 import { test as base } from '@playwright/test';
 import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
@@ -258,7 +258,5 @@ function writeDebugFile(testTitle: string, debugEvents: DebugEvent[]) {
   writeFileSync(debugFile, textContent);
 }
 
-// eslint-disable-next-line no-restricted-imports -- ok here
 export { expect, chromium } from '@playwright/test';
-// eslint-disable-next-line no-restricted-imports -- ok here
 export type { Page, Browser, BrowserContext, Locator, FullConfig } from '@playwright/test';

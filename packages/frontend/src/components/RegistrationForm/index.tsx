@@ -42,7 +42,7 @@ const RegistrationForm = () => {
         {/* Success message will be shown here */}
         <div data-testid="success-message" style={{ display: 'none' }}></div>
 
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }} noValidate>
+        <Box component="form" onSubmit={e => void handleSubmit(e)} sx={{ mt: 2 }} noValidate>
           <TextField
             fullWidth
             label="Full Name"

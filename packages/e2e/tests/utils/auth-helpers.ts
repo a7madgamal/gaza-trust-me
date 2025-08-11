@@ -53,12 +53,10 @@ export async function loginWithCredentials(
   // Wait for successful login - check for dashboard elements based on user type
   if (userType === 'admin' || userType === 'superAdmin') {
     // Admin and super admin users should be redirected to admin dashboard
-    await page.waitForSelector('[data-testid="admin-dashboard-title"]');
     await expect(page.locator('[data-testid="admin-dashboard-title"]')).toBeVisible();
     await expect(page).toHaveURL('/admin/dashboard');
   } else {
     // Regular users should be redirected to regular dashboard
-    await page.waitForSelector('[data-testid="dashboard-title"]');
     await expect(page.locator('[data-testid="dashboard-title"]')).toBeVisible();
     await expect(page).toHaveURL('/dashboard');
   }
@@ -154,7 +152,7 @@ export async function logoutUser(page: Page): Promise<void> {
  */
 export async function isUserLoggedIn(page: Page): Promise<boolean> {
   try {
-    await page.waitForSelector('[data-testid="user-avatar"]', { timeout: 5000 });
+    await expect(page.locator('[data-testid="user-avatar"]')).toBeVisible();
     return true;
   } catch {
     return false;
@@ -165,7 +163,7 @@ export async function isUserLoggedIn(page: Page): Promise<boolean> {
  * Wait for user to be logged in
  */
 export async function waitForUserLogin(page: Page): Promise<void> {
-  await page.waitForSelector('[data-testid="user-avatar"]', { timeout: 10000 });
+  await expect(page.locator('[data-testid="user-avatar"]')).toBeVisible();
 }
 
 /**

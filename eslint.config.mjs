@@ -12,25 +12,32 @@ import tsPlugin from '@typescript-eslint/eslint-plugin';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import playwright from 'eslint-plugin-playwright';
+import eslintComments from 'eslint-plugin-eslint-comments';
+import react from 'eslint-plugin-react';
 // import vibeCoder from 'eslint-plugin-vibe-coder';
 
 // Common TypeScript rules for all packages with tsconfig - REVIEW: Fix strict rules later
 const TS_RULES = {
   ...tsPlugin.configs['recommended-requiring-type-checking'].rules,
   '@typescript-eslint/no-unsafe-assignment': 'error',
-  '@typescript-eslint/no-unsafe-member-access': 'error', // REVIEW: Fix unsafe member access
-  '@typescript-eslint/no-unsafe-call': 'warn', // REVIEW: Fix unsafe function calls
-  '@typescript-eslint/no-unsafe-return': 'warn', // REVIEW: Fix unsafe return types
-  '@typescript-eslint/no-redundant-type-constituents': 'warn', // REVIEW: Remove redundant types
-  '@typescript-eslint/no-floating-promises': 'warn', // REVIEW: Fix floating promises
-  '@typescript-eslint/require-await': 'warn', // REVIEW: Fix async/await usage
-  '@typescript-eslint/await-thenable': 'warn', // REVIEW: Fix await on non-promises
-  '@typescript-eslint/no-unsafe-argument': 'warn', // REVIEW: Fix unsafe arguments
-  '@typescript-eslint/no-misused-promises': 'warn', // REVIEW: Fix promise usage in event handlers
-  '@typescript-eslint/unbound-method': 'warn', // REVIEW: Fix unbound methods
+  '@typescript-eslint/no-unsafe-member-access': 'error',
+  '@typescript-eslint/no-unsafe-call': 'error',
+  '@typescript-eslint/no-unsafe-return': 'error',
+  '@typescript-eslint/no-redundant-type-constituents': 'error', // REVIEW: Remove redundant types
+  '@typescript-eslint/no-floating-promises': 'error', // REVIEW: Fix floating promises
+  '@typescript-eslint/require-await': 'error', // REVIEW: Fix async/await usage
+  '@typescript-eslint/await-thenable': 'error', // REVIEW: Fix await on non-promises
+  '@typescript-eslint/no-unsafe-argument': 'error', // REVIEW: Fix unsafe arguments
+  '@typescript-eslint/no-misused-promises': 'error', // REVIEW: Fix promise usage in event handlers
+  '@typescript-eslint/unbound-method': 'error', // REVIEW: Fix unbound methods
   '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }], // REVIEW: Fix unbound methods
   '@typescript-eslint/no-explicit-any': 'error', // REVIEW: Avoid 'any' type
-  '@typescript-eslint/no-unsafe-type-assertion': 'warn', // REVIEW: Avoid unsafe type assertions
+  '@typescript-eslint/no-unsafe-type-assertion': 'error', // REVIEW: Avoid unsafe type assertions
+  '@typescript-eslint/no-non-null-assertion': 'error',
+  ...eslintComments.configs.recommended.rules,
+  'eslint-comments/disable-enable-pair': 'warn',
+  'eslint-comments/no-restricted-disable': 'warn',
+  'eslint-comments/no-use': 'warn',
 };
 
 // Common ignore patterns for all sections
@@ -73,6 +80,7 @@ export default [
     },
     plugins: {
       '@typescript-eslint': tsPlugin,
+      'eslint-comments': eslintComments,
     },
     rules: {
       ...TS_RULES,
@@ -99,11 +107,14 @@ export default [
       '@typescript-eslint': tsPlugin,
       'react-hooks': reactHooks,
       'react-refresh': reactRefresh,
+      'eslint-comments': eslintComments,
+      react: react,
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
       ...reactRefresh.configs.recommended.rules,
       ...TS_RULES,
+      'react/jsx-no-bind': 'warn', // REVIEW: Avoid inline function creation in JSX
     },
   },
 
@@ -125,11 +136,14 @@ export default [
     plugins: {
       '@typescript-eslint': tsPlugin,
       playwright,
+      'eslint-comments': eslintComments,
     },
     rules: {
       ...TS_RULES,
       ...playwright.configs.recommended.rules,
       'playwright/expect-expect': 'error',
+      'playwright/no-conditional-in-test': 'warn',
+      'playwright/no-wait-for-selector': 'error',
       // Prevent importing from @playwright/test directly - use global-test-hook instead
       'no-restricted-imports': [
         'error',

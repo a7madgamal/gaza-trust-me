@@ -17,10 +17,9 @@ export const Header: React.FC = () => {
     setAnchorEl(null);
   };
 
-  const handleLogout = async () => {
+  const handleLogout = () => {
     handleClose();
-    await logout();
-    navigate('/');
+    void logout().then(() => navigate('/'));
   };
 
   const handleProfile = () => {
@@ -35,6 +34,18 @@ export const Header: React.FC = () => {
     } else {
       navigate('/dashboard');
     }
+  };
+
+  const handleHomeClick = () => {
+    navigate('/');
+  };
+
+  const handleLoginClick = () => {
+    navigate('/login');
+  };
+
+  const handleRegisterClick = () => {
+    navigate('/register');
   };
 
   const getDisplayName = () => {
@@ -65,7 +76,7 @@ export const Header: React.FC = () => {
   return (
     <AppBar position="static" elevation={1}>
       <Toolbar>
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1, cursor: 'pointer' }} onClick={() => navigate('/')}>
+        <Typography variant="h6" component="div" sx={{ flexGrow: 1, cursor: 'pointer' }} onClick={handleHomeClick}>
           Help-Seeking Platform
         </Typography>
 
@@ -117,10 +128,10 @@ export const Header: React.FC = () => {
           </Box>
         ) : (
           <Box sx={{ display: 'flex', gap: 1 }}>
-            <Button color="inherit" onClick={() => navigate('/login')}>
+            <Button color="inherit" onClick={handleLoginClick}>
               Login
             </Button>
-            <Button color="inherit" onClick={() => navigate('/register')}>
+            <Button color="inherit" onClick={handleRegisterClick}>
               Register
             </Button>
           </Box>

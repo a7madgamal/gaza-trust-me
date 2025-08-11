@@ -46,7 +46,7 @@ export const useRegistrationForm = () => {
   }, [formData]);
 
   const handleSubmit = useCallback(
-    async (event: React.FormEvent) => {
+    (event: React.FormEvent) => {
       event.preventDefault();
       console.log('Registration form submitted', formData);
 
@@ -58,41 +58,42 @@ export const useRegistrationForm = () => {
       setLoading(true);
       setApiError('');
 
-      try {
-        console.log('Making Supabase signup request');
-        const result = await signup(formData.email, formData.password, {
-          full_name: formData.fullName,
-          phone_number: formData.phoneNumber,
-          description: formData.description,
-          linkedin_url: formData.linkedinUrl,
-          campaign_url: formData.campaignUrl,
+      console.log('Making Supabase signup request');
+      signup(formData.email, formData.password, {
+        full_name: formData.fullName,
+        phone_number: formData.phoneNumber,
+        description: formData.description,
+        linkedin_url: formData.linkedinUrl,
+        campaign_url: formData.campaignUrl,
+      })
+        .then(result => {
+          console.log('Backend signup response:', result);
+
+          if (!result) {
+            setApiError('Registration failed. Please try again.');
+            return;
+          }
+
+          // Check if email verification is required
+          if ('requiresEmailVerification' in result && result.requiresEmailVerification) {
+            console.log('Registration successful, email verification required');
+            navigate('/login', { state: { needsVerification: true } });
+          } else if (result.user) {
+            console.log('Registration successful, user logged in');
+            navigate('/dashboard');
+          } else {
+            console.log('Registration successful');
+            navigate('/login', { state: { registrationComplete: true } });
+          }
+        })
+        .catch((error: unknown) => {
+          console.error('Registration error:', error);
+          const errorMessage = error instanceof Error ? error.message : 'Registration failed. Please try again.';
+          setApiError(errorMessage);
+        })
+        .finally(() => {
+          setLoading(false);
         });
-
-        console.log('Backend signup response:', result);
-
-        if (!result) {
-          setApiError('Registration failed. Please try again.');
-          return;
-        }
-
-        // Check if email verification is required
-        if ('requiresEmailVerification' in result && result.requiresEmailVerification) {
-          console.log('Registration successful, email verification required');
-          navigate('/login', { state: { needsVerification: true } });
-        } else if (result.user) {
-          console.log('Registration successful, user logged in');
-          navigate('/dashboard');
-        } else {
-          console.log('Registration successful');
-          navigate('/login', { state: { registrationComplete: true } });
-        }
-      } catch (error: unknown) {
-        console.error('Registration error:', error);
-        const errorMessage = error instanceof Error ? error.message : 'Registration failed. Please try again.';
-        setApiError(errorMessage);
-      } finally {
-        setLoading(false);
-      }
     },
     [formData, validateForm, navigate, signup]
   );

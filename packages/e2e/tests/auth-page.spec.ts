@@ -119,7 +119,7 @@ test.describe('Auth Pages', () => {
     await page.goto('/profile');
 
     // Should redirect to login due to authentication error
-    await page.waitForURL('/login', { timeout: 10000 });
+    await page.waitForURL('/login');
   });
 
   test('should handle registration form validation and field requirements', async ({ page }) => {

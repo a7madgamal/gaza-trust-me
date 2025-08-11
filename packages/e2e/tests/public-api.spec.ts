@@ -1,5 +1,6 @@
 import { test, expect } from './global-test-hook';
 import { testTRPC } from './utils/trpc-client';
+import { assertNotEmptyString, assertNotNull, assertNotUndefined } from './utils/test-utils';
 
 test.describe('Public API Endpoints', () => {
   test('should get users for cards', async () => {
@@ -29,8 +30,8 @@ test.describe('Public API Endpoints', () => {
     // Require at least one user for this test
     expect(users.length).toBeGreaterThan(0);
 
-    const user = users[0]!; // Assert user exists since we checked length > 0
-    expect(user).toBeDefined();
+    const user = users[0];
+    assertNotUndefined(user);
 
     // Check required fields
     expect(user).toHaveProperty('id');
@@ -97,14 +98,30 @@ test.describe('Public API Endpoints', () => {
 
     // Check that users are ordered by created_at descending
     for (let i = 0; i < users.length - 1; i++) {
-      const currentUser = users[i]!; // Assert user exists since we're in bounds
-      const nextUser = users[i + 1]!; // Assert user exists since we're in bounds
+      const currentUser = users[i]; // Assert user exists since we're in bounds
+      const nextUser = users[i + 1]; // Assert user exists since we're in bounds
+
+      assertNotUndefined(currentUser);
+      assertNotUndefined(nextUser);
 
       expect(currentUser.created_at).toBeDefined();
       expect(nextUser.created_at).toBeDefined();
 
-      const currentDate = new Date(currentUser.created_at!);
-      const nextDate = new Date(nextUser.created_at!);
+      const { created_at: currentCreatedAt } = currentUser;
+      const { created_at: nextCreatedAt } = nextUser;
+      assertNotNull(currentCreatedAt);
+      assertNotNull(nextCreatedAt);
+
+      const currentDate = new Date(currentCreatedAt);
+      const nextDate = new Date(nextCreatedAt);
+
+      assertNotUndefined(currentDate);
+      assertNotUndefined(nextDate);
+      assertNotNull(currentDate);
+      assertNotNull(nextDate);
+      assertNotEmptyString(currentDate);
+      assertNotEmptyString(nextDate);
+
       expect(currentDate.getTime()).toBeGreaterThanOrEqual(nextDate.getTime());
     }
   });

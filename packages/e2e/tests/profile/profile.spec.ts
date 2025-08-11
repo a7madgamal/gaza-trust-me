@@ -7,7 +7,7 @@ test.describe('Profile Management', () => {
     await page.goto('/profile');
 
     // Wait for authentication check to complete and redirect to happen
-    await page.waitForURL('/login', { timeout: 10000 });
+    await page.waitForURL('/login');
 
     // Assert we're on the login page
     await expect(page).toHaveURL(/.*login/);
@@ -70,7 +70,7 @@ test.describe('Profile Management', () => {
     await page.goto('/profile');
 
     // Should redirect to login due to invalid token
-    await page.waitForURL('/login', { timeout: 10000 });
+    await page.waitForURL('/login');
     await expect(page).toHaveURL('/login');
   });
 

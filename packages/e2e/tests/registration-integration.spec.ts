@@ -19,15 +19,15 @@ test.describe('Registration Integration', () => {
     );
 
     // Fill LinkedIn and campaign URLs
-    await page.fill('[data-testid="linkedinUrl"]', testUser.linkedinUrl!);
-    await page.fill('[data-testid="campaignUrl"]', testUser.campaignUrl!);
+    await page.fill('[data-testid="linkedinUrl"]', testUser.linkedinUrl ?? '');
+    await page.fill('[data-testid="campaignUrl"]', testUser.campaignUrl ?? '');
 
     // Verify all fields are filled correctly
     await expect(page.locator('[data-testid="email"]')).toHaveValue(testUser.email);
     await expect(page.locator('[data-testid="fullName"]')).toHaveValue(testUser.fullName);
     await expect(page.locator('[data-testid="phoneNumber"]')).toHaveValue(testUser.phoneNumber);
-    await expect(page.locator('[data-testid="linkedinUrl"]')).toHaveValue(testUser.linkedinUrl!);
-    await expect(page.locator('[data-testid="campaignUrl"]')).toHaveValue(testUser.campaignUrl!);
+    await expect(page.locator('[data-testid="linkedinUrl"]')).toHaveValue(testUser.linkedinUrl ?? '');
+    await expect(page.locator('[data-testid="campaignUrl"]')).toHaveValue(testUser.campaignUrl ?? '');
 
     // Submit form
     await page.click('[data-testid="register-button"]');
@@ -62,7 +62,7 @@ test.describe('Registration Integration', () => {
     );
 
     // Fill only LinkedIn URL
-    await page.fill('[data-testid="linkedinUrl"]', testUser.linkedinUrl!);
+    await page.fill('[data-testid="linkedinUrl"]', testUser.linkedinUrl ?? '');
     // Leave campaign URL empty
 
     // Submit form
@@ -92,7 +92,7 @@ test.describe('Registration Integration', () => {
     );
 
     // Fill only campaign URL
-    await page.fill('[data-testid="campaignUrl"]', testUser.campaignUrl!);
+    await page.fill('[data-testid="campaignUrl"]', testUser.campaignUrl ?? '');
     // Leave LinkedIn URL empty
 
     // Submit form

@@ -1,10 +1,11 @@
 import { Box, Container, Typography, Button, AppBar, Toolbar, Avatar, Menu, MenuItem, IconButton } from '@mui/material';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 
 const HomePage = () => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -15,9 +16,9 @@ const HomePage = () => {
     setAnchorEl(null);
   };
 
-  const handleLogout = async () => {
+  const handleLogout = () => {
     handleMenuClose();
-    await logout();
+    void logout().then(() => navigate('/'));
   };
 
   return (

@@ -40,7 +40,7 @@ export const AuthCallback = () => {
       }
     };
 
-    handleAuthCallback();
+    void handleAuthCallback();
   }, [navigate, showToast]);
 
   if (!isProcessing) {

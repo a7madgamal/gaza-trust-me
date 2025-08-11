@@ -54,7 +54,7 @@ const LoginForm = () => {
     return !newErrors.email && !newErrors.password;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setApiError('');
     setLoading(true);
@@ -64,26 +64,27 @@ const LoginForm = () => {
       return;
     }
 
-    try {
-      const result = await login(email, password, (userProfile: UserProfile | null) => {
-        // This callback is called after the profile is loaded
-        if (userProfile?.role === 'admin' || userProfile?.role === 'super_admin') {
-          navigate('/admin/dashboard');
-        } else {
-          navigate('/dashboard');
-        }
-      });
-
-      // If no callback was provided, use the default redirect logic
-      if (!result) {
+    login(email, password, (userProfile: UserProfile | null) => {
+      // This callback is called after the profile is loaded
+      if (userProfile?.role === 'admin' || userProfile?.role === 'super_admin') {
+        navigate('/admin/dashboard');
+      } else {
         navigate('/dashboard');
       }
-    } catch (error) {
-      console.error('Error logging in:', error);
-      setApiError('Invalid credentials. Please try again.');
-    } finally {
-      setLoading(false);
-    }
+    })
+      .then(result => {
+        // If no callback was provided, use the default redirect logic
+        if (!result) {
+          navigate('/dashboard');
+        }
+      })
+      .catch(error => {
+        console.error('Error logging in:', error);
+        setApiError('Invalid credentials. Please try again.');
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -146,7 +147,7 @@ const LoginForm = () => {
           </Alert>
         )}
 
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }} noValidate>
+        <Box component="form" onSubmit={e => void handleSubmit(e)} sx={{ mt: 2 }} noValidate>
           <TextField
             fullWidth
             label="Email"

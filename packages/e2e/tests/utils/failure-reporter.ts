@@ -145,7 +145,11 @@ class FailureReporter implements Reporter {
       const eventMatch = line.match(/^(\d+)\. (\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z) (.+) \[(\w+)\] (.+)$/);
       if (eventMatch && eventMatch[2] && eventMatch[4] && eventMatch[5]) {
         const timestamp = new Date(eventMatch[2]).getTime();
-        const eventType = eventMatch[4].toLowerCase() as 'console' | 'network' | 'navigation';
+        const eventTypeRaw = eventMatch[4].toLowerCase();
+        const eventType =
+          eventTypeRaw === 'console' || eventTypeRaw === 'network' || eventTypeRaw === 'navigation'
+            ? eventTypeRaw
+            : 'console';
         const eventData = eventMatch[5];
 
         switch (eventType) {
@@ -200,7 +204,12 @@ class FailureReporter implements Reporter {
                 timestamp,
                 type: 'navigation',
                 data: {
-                  type: navMatch[2].toLowerCase() as 'navigate' | 'redirect' | 'load',
+                  type: (() => {
+                    const navType = navMatch[2].toLowerCase();
+                    return navType === 'navigate' || navType === 'redirect' || navType === 'load'
+                      ? navType
+                      : 'navigate';
+                  })(),
                   url: navMatch[3],
                 },
               });
