@@ -11,4 +11,4 @@ elif [ -f ~/.profile ]; then
 fi
 
 # Run all checks including formatting
-npm run check
+GIT_HOOKS=1 npm run check

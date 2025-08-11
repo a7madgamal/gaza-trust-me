@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../global-test-hook';
 import { loginAsUser, clearBrowserState } from '../utils/auth-helpers';
 import { createTestUserViaAPI } from '../utils/test-data';
 import { env } from '../utils/env';
@@ -42,7 +42,10 @@ test.describe('Admin Dashboard', () => {
     await loginAsUser(page, 'admin');
     await page.goto('/admin/dashboard');
 
-    // Check table headers
+    // Wait for the admin dashboard to load
+    await expect(page.locator('[data-testid="admin-dashboard-title"]')).toBeVisible();
+
+    // Wait for the users table to be visible (this waits for profile + users to load)
     const table = page.locator('[data-testid="users-table"]');
     await expect(table).toBeVisible();
 
@@ -60,6 +63,9 @@ test.describe('Admin Dashboard', () => {
   test('should filter users by status', async ({ page }) => {
     await loginAsUser(page, 'admin');
     await page.goto('/admin/dashboard');
+
+    // Wait for the admin dashboard to load and profile to be fetched
+    await expect(page.locator('[data-testid="admin-dashboard-title"]')).toBeVisible();
 
     // Check status filter dropdown
     const statusFilter = page.locator('[data-testid="status-filter"]');
@@ -89,6 +95,9 @@ test.describe('Admin Dashboard', () => {
   test('should make verified user names clickable and link to card pages', async ({ page }) => {
     await loginAsUser(page, 'admin');
     await page.goto('/admin/dashboard');
+
+    // Wait for the admin dashboard to load and profile to be fetched
+    await expect(page.locator('[data-testid="admin-dashboard-title"]')).toBeVisible();
 
     // Wait for the table to load
     await expect(page.locator('[data-testid="users-table"]')).toBeVisible();

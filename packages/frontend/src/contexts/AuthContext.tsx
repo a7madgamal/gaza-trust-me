@@ -16,13 +16,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       throw new Error('Supabase user must have an email');
     }
 
-    const RoleSchema = z.enum(['help_seeker', 'admin', 'super_admin']);
+    const RoleSchema = z.enum(['help_seeker', 'admin', 'super_admin']).optional();
     const metadata = supabaseUser.user_metadata;
 
     // If role is not in metadata, we'll get it from the profile later
     // For now, default to help_seeker to avoid validation errors
-    let parsedRole: 'help_seeker' | 'admin' | 'super_admin' | undefined;
-    parsedRole = RoleSchema.parse(metadata?.role);
+    let parsedRole = RoleSchema.parse(metadata?.role);
 
     return {
       id: supabaseUser.id,

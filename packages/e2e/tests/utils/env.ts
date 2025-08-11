@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { z } from 'zod';
 
-dotenv.config({ path: path.resolve(process.cwd(), `.env-test`) });
+dotenv.config({ path: path.resolve(process.cwd(), '.env-test') });
 
 // Environment variable schema for E2E tests
 const envSchema = z.object({
@@ -18,10 +18,6 @@ const envSchema = z.object({
 });
 
 // Parse and validate environment variables
-const envParseResult = envSchema.safeParse(process.env);
+const envParseResult = envSchema.parse(process.env);
 
-if (!envParseResult.success) {
-  throw new Error(`Invalid E2E environment variables: ${envParseResult.error.message}`);
-}
-
-export const env = envParseResult.data;
+export const env = envParseResult;

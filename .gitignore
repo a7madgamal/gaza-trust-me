@@ -183,3 +183,4 @@ packages/e2e/playwright-report/
 packages/backend/test-results/
 packages/*/.env-*
 packages/backend/.env-prod
+packages/frontend/.env.development

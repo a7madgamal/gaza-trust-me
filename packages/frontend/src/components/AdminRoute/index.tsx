@@ -31,13 +31,26 @@ export const AdminRoute = ({ children }: AdminRouteProps) => {
     return <Navigate to="/login" replace />;
   }
 
-  // Check both user.role (from login) and userProfile.role (from profile fetch)
-  // userProfile might be null while loading, but user.role is available immediately
-  const isAdmin =
-    user.role === 'admin' ||
-    user.role === 'super_admin' ||
-    userProfile?.role === 'admin' ||
-    userProfile?.role === 'super_admin';
+  // Wait for userProfile to be loaded before checking admin permissions
+  if (!userProfile) {
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          minHeight: 'calc(100vh - 64px)',
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: 2,
+        }}
+      >
+        <CircularProgress size={60} />
+      </Box>
+    );
+  }
+
+  // Check admin permissions using userProfile.role (which is the authoritative source)
+  const isAdmin = userProfile.role === 'admin' || userProfile.role === 'super_admin';
 
   if (!isAdmin) {
     return <Navigate to="/dashboard" replace />;

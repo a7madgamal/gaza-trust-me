@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './global-test-hook';
 import { clearBrowserState } from './utils/auth-helpers';
 import { createTestUserViaAPI } from './utils/test-data';
 import { env } from './utils/env';

@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from '../global-test-hook';
 import { clearBrowserState } from '../utils/auth-helpers';
 
 test.describe('Profile Management', () => {

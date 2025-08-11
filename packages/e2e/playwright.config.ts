@@ -19,14 +19,13 @@ export default defineConfig({
   /* Use single worker to avoid race conditions and shared state issues */
   workers: 1,
   /* Stop on first failure */
-  // maxFailures: 1,
+  maxFailures: process.env['GIT_HOOKS'] ? 1 : 0,
   /* Cache test results */
   outputDir: 'test-results',
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: [
     ['list'],
-    ['json', { outputFile: 'test-results/results.json' }],
-    ['junit', { outputFile: 'test-results/results.xml' }],
+    ['./tests/utils/failure-reporter.ts'], // Custom reporter for detailed failure info
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
@@ -45,7 +44,15 @@ export default defineConfig({
     /* Global test timeout */
     actionTimeout: 10000,
     navigationTimeout: 30000,
+
+    /* Auto-capture console and network data */
+    launchOptions: {
+      args: ['--enable-logging', '--v=1'],
+    },
   },
+
+  /* Global test setup for logging */
+  globalSetup: './tests/global-setup.ts',
 
   /* Configure projects for major browsers */
   projects: [
@@ -75,8 +82,4 @@ export default defineConfig({
   //     timeout: 120 * 1000,
   //   },
   // ],
-
-  /* Global setup and teardown */
-  globalSetup: './tests/global-setup.ts',
-  globalTeardown: './tests/global-teardown.ts',
 });

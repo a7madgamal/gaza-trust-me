@@ -5,6 +5,21 @@
 
 ---
 
+## Critical Rules Violations
+
+### Git Commands
+
+- **NEVER use `--no-verify` or any git bypass flags without explicit user permission first**
+- Always ask before attempting to bypass any git hooks or verification steps
+- This is a critical rule that must be followed without exception
+
+### Commit Standards
+
+- **ALWAYS fix all tests and ESLint errors when committing, regardless of what you were originally working on**
+- Never commit with failing tests or linting warnings
+- The commit should be clean and pass all checks
+- This applies even if the failures are unrelated to your current work
+
 ## Development Workflow
 
 ### ❌ **PowerShell Command Syntax**

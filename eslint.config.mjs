@@ -28,7 +28,9 @@ const TS_RULES = {
   '@typescript-eslint/no-unsafe-argument': 'warn', // REVIEW: Fix unsafe arguments
   '@typescript-eslint/no-misused-promises': 'warn', // REVIEW: Fix promise usage in event handlers
   '@typescript-eslint/unbound-method': 'warn', // REVIEW: Fix unbound methods
-  '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }], // REVIEW: Fix unbound methods
+  '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }], // REVIEW: Fix unbound methods
+  '@typescript-eslint/no-explicit-any': 'error', // REVIEW: Avoid 'any' type
+  '@typescript-eslint/no-unsafe-type-assertion': 'warn', // REVIEW: Avoid unsafe type assertions
 };
 
 // Common ignore patterns for all sections
@@ -128,6 +130,19 @@ export default [
       ...TS_RULES,
       ...playwright.configs.recommended.rules,
       'playwright/expect-expect': 'error',
+      // Prevent importing from @playwright/test directly - use global-test-hook instead
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@playwright/test'],
+              message:
+                'Import from "./global-test-hook" instead of "@playwright/test" to enable logging and debugging features.',
+            },
+          ],
+        },
+      ],
     },
   },
 ];

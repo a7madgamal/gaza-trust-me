@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './global-test-hook';
 import { env } from './utils/env';
 
 test.describe('Public API Endpoints', () => {

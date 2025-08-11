@@ -1,4 +1,4 @@
-import { Page, expect } from '@playwright/test';
+import { Page, expect } from '../global-test-hook';
 import { TestUser, PREDEFINED_TEST_USERS, generateTestUser } from './test-data';
 import { env } from './env';
 

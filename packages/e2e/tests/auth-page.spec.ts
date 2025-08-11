@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './global-test-hook';
 import { generateTestUser } from './utils/test-data';
 
 test.describe('Auth Pages', () => {
