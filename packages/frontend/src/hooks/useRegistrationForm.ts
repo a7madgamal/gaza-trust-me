@@ -2,11 +2,11 @@ import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { RegistrationFormData, ValidationErrors } from '@/types/auth';
 import { validateRegistrationForm, isFormValid } from '@/utils/validation';
-import { trpc } from '@/utils/trpc';
+import { useAuth } from './useAuth';
 
 export const useRegistrationForm = () => {
   const navigate = useNavigate();
-  const registerMutation = trpc.register.useMutation();
+  const { signup } = useAuth();
   const [formData, setFormData] = useState<RegistrationFormData>({
     email: '',
     password: '',
@@ -59,35 +59,42 @@ export const useRegistrationForm = () => {
       setApiError('');
 
       try {
-        console.log('Making tRPC registration request');
-        const result = await registerMutation.mutateAsync({
-          email: formData.email,
-          password: formData.password,
-          fullName: formData.fullName,
-          phoneNumber: formData.phoneNumber,
+        console.log('Making Supabase signup request');
+        const result = await signup(formData.email, formData.password, {
+          full_name: formData.fullName,
+          phone_number: formData.phoneNumber,
           description: formData.description,
-          linkedinUrl: formData.linkedinUrl,
-          campaignUrl: formData.campaignUrl,
+          linkedin_url: formData.linkedinUrl,
+          campaign_url: formData.campaignUrl,
         });
 
-        console.log('tRPC response:', result);
+        console.log('Backend signup response:', result);
 
-        if (!result.success) {
-          setApiError(result.error || 'Registration failed. Please try again.');
+        if (!result) {
+          setApiError('Registration failed. Please try again.');
           return;
         }
 
-        // Registration successful
-        console.log('Registration successful, navigating to login');
-        navigate('/login?registered=true');
-      } catch (error) {
+        // Check if email verification is required
+        if ('requiresEmailVerification' in result && result.requiresEmailVerification) {
+          console.log('Registration successful, email verification required');
+          navigate('/login', { state: { needsVerification: true } });
+        } else if (result.user) {
+          console.log('Registration successful, user logged in');
+          navigate('/dashboard');
+        } else {
+          console.log('Registration successful');
+          navigate('/login', { state: { registrationComplete: true } });
+        }
+      } catch (error: unknown) {
         console.error('Registration error:', error);
-        setApiError('Network error. Please check your connection and try again.');
+        const errorMessage = error instanceof Error ? error.message : 'Registration failed. Please try again.';
+        setApiError(errorMessage);
       } finally {
         setLoading(false);
       }
     },
-    [formData, validateForm, navigate, registerMutation]
+    [formData, validateForm, navigate, signup]
   );
 
   return {

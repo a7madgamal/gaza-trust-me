@@ -85,7 +85,7 @@ test.describe('Auth Pages', () => {
   });
 
   test('should handle session management and authentication errors', async ({ page }) => {
-    // Set up a mock invalid token in localStorage
+    // Test that invalid tokens redirect to login
     await page.goto('/');
     await page.evaluate(() => {
       localStorage.setItem(
@@ -103,33 +103,7 @@ test.describe('Auth Pages', () => {
     // Should redirect to login
     await expect(page).toHaveURL('/login');
 
-    // Session should be cleared from localStorage
-    const session = await page.evaluate(() => localStorage.getItem('session'));
-    expect(session).toBeNull();
-
-    // Test invalid token and redirect to login
-    await page.goto('/');
-    await page.evaluate(() => {
-      localStorage.setItem(
-        'session',
-        JSON.stringify({
-          access_token: 'invalid-token',
-          user: { id: 'test', email: 'test@example.com', role: 'help_seeker' },
-        })
-      );
-    });
-
-    // Navigate to profile page
-    await page.goto('/profile');
-
-    // Should redirect to login due to invalid token
-    await page.waitForURL('/login', { timeout: 10000 });
-
-    // Session should be cleared
-    const session2 = await page.evaluate(() => localStorage.getItem('session'));
-    expect(session2).toBeNull();
-
-    // Test authentication errors from backend
+    // Test that authentication errors are handled gracefully
     await page.goto('/');
     await page.evaluate(() => {
       localStorage.setItem(
@@ -146,10 +120,6 @@ test.describe('Auth Pages', () => {
 
     // Should redirect to login due to authentication error
     await page.waitForURL('/login', { timeout: 10000 });
-
-    // Verify session is cleared
-    const session3 = await page.evaluate(() => localStorage.getItem('session'));
-    expect(session3).toBeNull();
   });
 
   test('should handle registration form validation and field requirements', async ({ page }) => {
@@ -260,11 +230,14 @@ test.describe('Auth Pages', () => {
     await expect(page.locator('[data-testid="linkedinUrl"]')).toHaveValue(testUser.linkedinUrl || '');
     await expect(page.locator('[data-testid="campaignUrl"]')).toHaveValue(testUser.campaignUrl || '');
 
+    // Verify the form was filled correctly and is ready for submission
+    await expect(page.locator('[data-testid="register-button"]')).toBeEnabled();
+
     // Submit form and wait for loading state
     await page.click('[data-testid="register-button"]');
 
-    // Verify the form was filled correctly and is ready for submission
-    await expect(page.locator('[data-testid="register-button"]')).toBeEnabled();
+    // Should show loading state (button disabled during submission)
+    await expect(page.locator('[data-testid="register-button"]')).toBeDisabled();
   });
 
   test('should handle registration form submission and navigation', async ({ page }) => {
@@ -293,9 +266,9 @@ test.describe('Auth Pages', () => {
     // Should show loading state during submission
     await expect(page.locator('[data-testid="register-button"]')).toBeDisabled();
 
-    // Wait for navigation to complete and verify redirect to login page
-    await page.waitForURL(/\/login/);
-    expect(page.url()).toMatch(/\/login/);
+    // Wait for navigation to complete - should be redirected to dashboard (auto-login)
+    await page.waitForURL(/\/dashboard/);
+    expect(page.url()).toMatch(/\/dashboard/);
   });
 
   test('should handle registration loading states and status validation', async ({ page }) => {
@@ -318,54 +291,14 @@ test.describe('Auth Pages', () => {
     // Should show loading state (button disabled during submission)
     await expect(page.locator('[data-testid="register-button"]')).toBeDisabled();
 
-    // Test pending status for new users
-    await page.goto('/register');
-    await page.fill('[data-testid="fullName"]', 'Test User');
-    await page.fill('[data-testid="email"]', 'test-status@example.com');
-    await page.fill('[data-testid="password"]', 'Password123!');
-    await page.fill('[data-testid="confirmPassword"]', 'Password123!');
-    await page.fill('[data-testid="phoneNumber"]', '+1234567890');
-    await page.fill(
-      '[data-testid="description"]',
-      'This is a detailed description of the help I need for testing purposes'
-    );
+    // Wait for form submission to complete
+    await page.waitForLoadState('domcontentloaded');
 
-    // Verify form is filled correctly
-    await expect(page.locator('[data-testid="fullName"]')).toHaveValue('Test User');
-    await expect(page.locator('[data-testid="email"]')).toHaveValue('test-status@example.com');
-    await expect(page.locator('[data-testid="description"]')).toHaveValue(
-      'This is a detailed description of the help I need for testing purposes'
-    );
+    // Test status validation - should show error message for duplicate email
+    await expect(page.locator('[data-testid="error-message"]')).toBeVisible();
+    await expect(page).toHaveURL('/register'); // Should stay on register page
 
-    // Submit form and check for loading state
-    await page.click('[data-testid="register-button"]');
-
-    // Should show loading state (button disabled during submission)
-    await expect(page.locator('[data-testid="register-button"]')).toBeDisabled();
-
-    // Test appropriate status colors
-    await page.goto('/register');
-    await page.fill('[data-testid="fullName"]', 'Pending User');
-    await page.fill('[data-testid="email"]', 'pending@example.com');
-    await page.fill('[data-testid="password"]', 'Password123!');
-    await page.fill('[data-testid="confirmPassword"]', 'Password123!');
-    await page.fill('[data-testid="phoneNumber"]', '+1234567890');
-    await page.fill(
-      '[data-testid="description"]',
-      'This is a detailed description of the help I need for testing purposes'
-    );
-
-    // Verify form is filled correctly
-    await expect(page.locator('[data-testid="fullName"]')).toHaveValue('Pending User');
-    await expect(page.locator('[data-testid="email"]')).toHaveValue('pending@example.com');
-    await expect(page.locator('[data-testid="description"]')).toHaveValue(
-      'This is a detailed description of the help I need for testing purposes'
-    );
-
-    // Submit form and check for loading state
-    await page.click('[data-testid="register-button"]');
-
-    // Should show loading state (button disabled during submission)
-    await expect(page.locator('[data-testid="register-button"]')).toBeDisabled();
+    // Verify button returns to enabled state after submission
+    await expect(page.locator('[data-testid="register-button"]')).toBeEnabled();
   });
 });

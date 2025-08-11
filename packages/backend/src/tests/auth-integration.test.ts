@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { authRouter } from '../routers/auth';
 import { supabase } from '../utils/supabase';
+import { t } from '../routers/shared';
 
 // Mock Supabase client
 vi.mock('../utils/supabase', () => ({
@@ -15,6 +16,8 @@ vi.mock('../utils/supabase', () => ({
 }));
 
 describe('Auth Router Integration', () => {
+  const caller = t.createCallerFactory(authRouter);
+
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -45,7 +48,7 @@ describe('Auth Router Integration', () => {
       campaignUrl: 'https://gofundme.com/test-campaign',
     };
 
-    await authRouter.createCaller({}).register(input);
+    await caller({}).register(input);
 
     expect(mockSignUp).toHaveBeenCalledWith({
       email: 'test@example.com',
@@ -58,6 +61,7 @@ describe('Auth Router Integration', () => {
           linkedin_url: 'https://linkedin.com/in/test-user',
           campaign_url: 'https://gofundme.com/test-campaign',
         },
+        emailRedirectTo: 'http://localhost:3000/auth/callback',
       },
     });
   });
@@ -87,7 +91,7 @@ describe('Auth Router Integration', () => {
       linkedinUrl: 'https://linkedin.com/in/test-user',
     };
 
-    await authRouter.createCaller({}).register(input);
+    await caller({}).register(input);
 
     expect(mockSignUp).toHaveBeenCalledWith({
       email: 'test@example.com',
@@ -99,6 +103,7 @@ describe('Auth Router Integration', () => {
           description: 'This is a detailed description of the help I need',
           linkedin_url: 'https://linkedin.com/in/test-user',
         },
+        emailRedirectTo: 'http://localhost:3000/auth/callback',
       },
     });
   });
@@ -128,7 +133,7 @@ describe('Auth Router Integration', () => {
       campaignUrl: 'https://gofundme.com/test-campaign',
     };
 
-    await authRouter.createCaller({}).register(input);
+    await caller({}).register(input);
 
     expect(mockSignUp).toHaveBeenCalledWith({
       email: 'test@example.com',
@@ -140,6 +145,7 @@ describe('Auth Router Integration', () => {
           description: 'This is a detailed description of the help I need',
           campaign_url: 'https://gofundme.com/test-campaign',
         },
+        emailRedirectTo: 'http://localhost:3000/auth/callback',
       },
     });
   });
@@ -168,7 +174,7 @@ describe('Auth Router Integration', () => {
       description: 'This is a detailed description of the help I need',
     };
 
-    await authRouter.createCaller({}).register(input);
+    await caller({}).register(input);
 
     expect(mockSignUp).toHaveBeenCalledWith({
       email: 'test@example.com',
@@ -179,6 +185,7 @@ describe('Auth Router Integration', () => {
           phone_number: '+1234567890',
           description: 'This is a detailed description of the help I need',
         },
+        emailRedirectTo: 'http://localhost:3000/auth/callback',
       },
     });
   });
@@ -209,10 +216,10 @@ describe('Auth Router Integration', () => {
       campaignUrl: undefined,
     };
 
-    await authRouter.createCaller({}).register(input);
+    await caller({}).register(input);
 
-    const callArgs = mockSignUp.mock.calls[0][0];
-    expect(callArgs.options?.data).not.toHaveProperty('linkedin_url');
-    expect(callArgs.options?.data).not.toHaveProperty('campaign_url');
+    const callArgs = mockSignUp.mock.calls[0]?.[0];
+    expect(callArgs?.options?.data).not.toHaveProperty('linkedin_url');
+    expect(callArgs?.options?.data).not.toHaveProperty('campaign_url');
   });
 });

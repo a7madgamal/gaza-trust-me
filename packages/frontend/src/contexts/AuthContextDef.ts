@@ -1,6 +1,6 @@
 import { createContext } from 'react';
 
-export interface User {
+export interface AuthContextUser {
   id: string;
   email: string;
   role: string;
@@ -14,22 +14,30 @@ export interface UserProfile {
   role: 'help_seeker' | 'admin' | 'super_admin';
   description: string;
   status: string;
-  // eslint-disable-next-line vibe-coder/no-optional-properties
+
   verifiedAt?: string | null;
-  // eslint-disable-next-line vibe-coder/no-optional-properties
+
   verifiedBy?: string | null;
 }
 
 interface AuthContextType {
-  // eslint-disable-next-line vibe-coder/no-optional-properties
-  user: User | null;
-  // eslint-disable-next-line vibe-coder/no-optional-properties
+  user: AuthContextUser | null;
+
   userProfile: UserProfile | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<{ user: User } | null>;
+  login: (
+    email: string,
+    password: string,
+    onProfileLoaded?: (userProfile: UserProfile | null) => void
+  ) => Promise<{ user: AuthContextUser } | null>;
+  signup: (
+    email: string,
+    password: string,
+    metadata?: Record<string, unknown>
+  ) => Promise<{ user: AuthContextUser } | { user: null; requiresEmailVerification: true } | null>;
   logout: () => Promise<void>;
   fetchUserProfile: () => Promise<void>;
-  setUser: (user: User | null) => void;
+  setUser: (user: AuthContextUser | null) => void;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);

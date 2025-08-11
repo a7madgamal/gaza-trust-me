@@ -10,6 +10,7 @@ import {
   AuthLoginOutputSchema,
   AuthLogoutOutputSchema,
 } from '../types/supabase-types';
+import { z } from 'zod';
 
 export const authRouter = t.router({
   register: publicProcedure
@@ -45,17 +46,12 @@ export const authRouter = t.router({
           },
         };
 
-        // If email verification is disabled, auto-confirm the user
-        if (!env.ENABLE_EMAIL_VERIFICATION) {
-          // Keep the metadata options even when email verification is disabled
-        } else if (env.FRONTEND_URL) {
-          if (signUpOptions.options) {
-            signUpOptions.options.emailRedirectTo = `${env.FRONTEND_URL}/auth/callback`;
-          } else {
-            signUpOptions.options = {
-              emailRedirectTo: `${env.FRONTEND_URL}/auth/callback`,
-            };
-          }
+        if (signUpOptions.options) {
+          signUpOptions.options.emailRedirectTo = `${env.FRONTEND_URL}/auth/callback`;
+        } else {
+          signUpOptions.options = {
+            emailRedirectTo: `${env.FRONTEND_URL}/auth/callback`,
+          };
         }
 
         logger.info('SignUp options:', JSON.stringify(signUpOptions, null, 2));
@@ -69,16 +65,6 @@ export const authRouter = t.router({
         if (!authData.user) {
           throw new Error('Failed to create user');
         }
-
-        // If email verification is disabled, auto-confirm the user
-        if (!env.ENABLE_EMAIL_VERIFICATION) {
-          await supabase.auth.admin.updateUserById(authData.user.id, {
-            email_confirm: true,
-          });
-        }
-
-        // User profile is created automatically by database trigger
-        // No need to manually insert - the trigger handles it
 
         return {
           success: true,
@@ -172,6 +158,79 @@ export const authRouter = t.router({
       };
     }
   }),
+
+  // PKCE callback endpoint for auth code exchange
+  callback: publicProcedure
+    .input(
+      z.object({
+        code: z.string().min(1, 'Auth code is required'),
+        state: z.string().optional(),
+      })
+    )
+    .output(
+      ApiResponseSchema(
+        z.object({
+          token: z.string(),
+          user: z.object({
+            id: z.string(),
+            email: z.string(),
+            role: z.string(),
+            status: z.string(),
+          }),
+        })
+      )
+    )
+    .mutation(async ({ input }) => {
+      try {
+        logger.info('Processing PKCE callback with code:', input.code.substring(0, 10) + '...');
+
+        // Exchange auth code for session using PKCE
+        const { data, error } = await supabase.auth.exchangeCodeForSession(input.code);
+
+        if (error) {
+          logger.error('PKCE code exchange error:', error);
+          throw new Error(error.message);
+        }
+
+        if (!data.user || !data.session) {
+          throw new Error('Failed to exchange code for session');
+        }
+
+        // Get user role from database
+        logger.info('Looking for user profile with ID:', data.user.id);
+        const { data: userData, error: userError } = await supabase
+          .from('users')
+          .select('role, status')
+          .eq('id', data.user.id)
+          .single();
+
+        if (userError || !userData) {
+          logger.error('User profile not found. Error:', userError);
+          throw new Error(`User profile not found: ${userError?.message || 'Unknown error'}`);
+        }
+
+        logger.info('PKCE callback successful for user:', data.user.email);
+
+        return {
+          success: true,
+          data: {
+            token: data.session.access_token,
+            user: {
+              id: data.user.id,
+              email: data.user.email ?? '',
+              role: userData.role,
+              status: userData.status,
+            },
+          },
+        };
+      } catch (error) {
+        logger.error('PKCE callback error:', error);
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Auth callback failed',
+        };
+      }
+    }),
 });
 
 export type AuthRouter = typeof authRouter;

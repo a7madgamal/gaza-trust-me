@@ -127,6 +127,7 @@ export default [
     rules: {
       ...TS_RULES,
       ...playwright.configs.recommended.rules,
+      'playwright/expect-expect': 'error',
     },
   },
 ];

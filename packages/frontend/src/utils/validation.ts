@@ -148,14 +148,28 @@ export const isFormValid = (errors: ValidationErrors): boolean => {
   return Object.keys(errors).length === 0;
 };
 
-// Session data schema
+// Session data schema - matches actual Supabase AuthSession structure
 export const SessionDataSchema = z.object({
+  access_token: z.string(),
+  refresh_token: z.string(),
+  expires_in: z.number(),
+  expires_at: z.number(),
+  token_type: z.string(),
   user: z.object({
     id: z.string(),
     email: z.string(),
-    role: z.string(),
+    user_metadata: z
+      .object({
+        role: z.string().optional(),
+        full_name: z.string().optional(),
+        email: z.string().optional(),
+        phone_number: z.string().optional(),
+        description: z.string().optional(),
+        linkedin_url: z.string().optional(),
+        campaign_url: z.string().optional(),
+      })
+      .optional(),
   }),
-  access_token: z.string(),
 });
 
 export type SessionData = z.infer<typeof SessionDataSchema>;
@@ -186,7 +200,8 @@ export const parseSessionData = (json: string): SessionData | null => {
   try {
     const parsed = JSON.parse(json) as unknown;
     return SessionDataSchema.parse(parsed);
-  } catch {
+  } catch (error) {
+    console.error('Failed to parse session data:', error);
     return null;
   }
 };

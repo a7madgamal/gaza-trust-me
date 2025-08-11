@@ -141,3 +141,14 @@
 - **Examples:** Don't create a test called "setup admin user" - use `beforeAll` to create users
 - **Lesson:** Tests should test behavior, not be disguised setup scripts
 - **Fix:** Proper setup/teardown in lifecycle hooks, real tests for actual functionality
+
+## TypeScript and Zod Best Practices
+
+- Avoid using `unknown` and `any` types in TypeScript and Zod schemas
+- Always use strict typing with proper type definitions
+- Use Zod schemas for runtime validation with specific, well-defined types
+- Prefer explicit error handling over type assertions
+- When parsing data, use specific Zod schemas that match the expected structure
+- Avoid fallback to generic types - let validation errors surface for debugging
+- Prefer reusing generated types from external libraries (like Supabase) when they describe the same thing exactly
+- Don't duplicate type definitions when the external library already provides the correct types

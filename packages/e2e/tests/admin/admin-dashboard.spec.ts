@@ -32,10 +32,7 @@ test.describe('Admin Dashboard', () => {
     // Login as admin
     await loginAsUser(page, 'admin');
 
-    // Navigate to admin dashboard
-    await page.goto('/admin/dashboard');
-
-    // Should be on admin dashboard
+    // After login, admin users should be redirected to admin dashboard
     await expect(page).toHaveURL('/admin/dashboard');
     await expect(page.locator('[data-testid="admin-dashboard-title"]')).toBeVisible();
     await expect(page.locator('[data-testid="admin-welcome-message"]')).toContainText('admin');
@@ -96,7 +93,15 @@ test.describe('Admin Dashboard', () => {
     // Wait for the table to load
     await expect(page.locator('[data-testid="users-table"]')).toBeVisible();
 
-    // Look for verified users in the table
+    // Filter by verified status first
+    const statusFilter = page.locator('[data-testid="status-filter"]');
+    await statusFilter.click();
+    await page.locator('[role="option"]:has-text("Verified")').click();
+
+    // Wait for the filter to be applied
+    await page.waitForLoadState('domcontentloaded');
+
+    // Now look for verified users in the filtered table
     const verifiedRows = page.locator('tbody tr').filter({
       has: page.locator('td:nth-child(5)').filter({ hasText: 'verified' }),
     });

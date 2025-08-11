@@ -1,85 +1,51 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '../../hooks/useToast';
-import { useAuth } from '../../hooks/useAuth';
 import { Box, CircularProgress, Typography } from '@mui/material';
-import type { User } from '../../contexts/AuthContextDef';
-import { parseUser } from '../../utils/validation';
-
-interface AuthTokens {
-  access_token: string;
-  refresh_token: string;
-  expires_in: number;
-  expires_at: number;
-  token_type: string;
-  type: string;
-}
+import { supabase } from '../../lib/supabase';
 
 export const AuthCallback = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const { login, setUser } = useAuth();
+  const [isProcessing, setIsProcessing] = useState(true);
 
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        // Get tokens from URL hash
-        const hash = window.location.hash.substring(1);
-        const params = new URLSearchParams(hash);
+        // Handle the auth callback from Supabase
+        const { data, error } = await supabase.auth.getSession();
 
-        const tokens: AuthTokens = {
-          access_token: params.get('access_token') || '',
-          refresh_token: params.get('refresh_token') || '',
-          expires_in: parseInt(params.get('expires_in') || '0'),
-          expires_at: parseInt(params.get('expires_at') || '0'),
-          token_type: params.get('token_type') || '',
-          type: params.get('type') || '',
-        };
-
-        // Validate required tokens
-        if (!tokens.access_token || !tokens.refresh_token) {
-          throw new Error('Missing authentication tokens');
+        if (error) {
+          console.error('Supabase auth session error:', error);
+          showToast(`Authentication failed: ${error.message}`, 'error');
+          setTimeout(() => navigate('/login'), 2000);
+          return;
         }
 
-        // Validate token expiration
-        const now = Math.floor(Date.now() / 1000);
-        if (tokens.expires_at && tokens.expires_at < now) {
-          throw new Error('Authentication tokens have expired');
+        if (data.session) {
+          // Session is established, user is authenticated
+          showToast('Authentication successful! Welcome', 'success');
+          setTimeout(() => navigate('/dashboard'), 2000);
+        } else {
+          // No session found, redirect to login
+          showToast('Authentication failed. Please try again.', 'error');
+          setTimeout(() => navigate('/login'), 2000);
         }
-
-        // Store tokens securely
-        localStorage.setItem('access_token', tokens.access_token);
-        localStorage.setItem('refresh_token', tokens.refresh_token);
-        localStorage.setItem('expires_at', tokens.expires_at.toString());
-        localStorage.setItem('token_type', tokens.token_type);
-
-        // Get user info from the token (decode JWT)
-        const userInfo = decodeJWT(tokens.access_token);
-        if (userInfo) {
-          localStorage.setItem('user', JSON.stringify(userInfo));
-          setUser(userInfo);
-        }
-
-        // Show success message
-        showToast(
-          tokens.type === 'signup'
-            ? 'Account created successfully! Welcome to Gazaconfirm.'
-            : 'Login successful! Welcome back.',
-          'success'
-        );
-
-        // Clear URL hash and redirect
-        window.location.hash = '';
-        navigate('/');
       } catch (error) {
         console.error('Auth callback error:', error);
         showToast(error instanceof Error ? error.message : 'Authentication failed', 'error');
-        navigate('/login');
+        setTimeout(() => navigate('/login'), 2000);
+      } finally {
+        setIsProcessing(false);
       }
     };
 
     handleAuthCallback();
-  }, [navigate, showToast, login, setUser]);
+  }, [navigate, showToast]);
+
+  if (!isProcessing) {
+    return null; // Component will unmount after navigation
+  }
 
   return (
     <Box
@@ -94,27 +60,9 @@ export const AuthCallback = () => {
       }}
     >
       <CircularProgress size={60} />
-      <Typography variant="h6" color="text.secondary">
-        Validating authentication...
+      <Typography variant="h6" color="text.secondary" sx={{ mt: 2 }}>
+        Completing authentication...
       </Typography>
     </Box>
   );
-};
-
-// Helper function to decode JWT token
-const decodeJWT = (token: string): User | null => {
-  try {
-    const base64Url = token.split('.')[1];
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join('')
-    );
-    return parseUser(jsonPayload);
-  } catch (error) {
-    console.error('Failed to decode JWT:', error);
-    return null;
-  }
 };

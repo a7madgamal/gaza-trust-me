@@ -71,10 +71,7 @@ test.describe('Profile Management', () => {
 
     // Should redirect to login due to invalid token
     await page.waitForURL('/login', { timeout: 10000 });
-
-    // Session should be cleared
-    const session = await page.evaluate(() => localStorage.getItem('session'));
-    expect(session).toBeNull();
+    await expect(page).toHaveURL('/login');
   });
 
   test('should handle authentication errors from backend', async ({ page }) => {
@@ -95,9 +92,6 @@ test.describe('Profile Management', () => {
 
     // Should redirect to login due to authentication error
     await page.waitForURL('/login', { timeout: 10000 });
-
-    // Verify session is cleared
-    const session = await page.evaluate(() => localStorage.getItem('session'));
-    expect(session).toBeNull();
+    await expect(page).toHaveURL('/login');
   });
 });

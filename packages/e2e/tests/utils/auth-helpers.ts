@@ -14,7 +14,7 @@ export async function loginAsUser(page: Page, userType: keyof typeof PREDEFINED_
   if (!user) {
     throw new Error(`User type ${userType} not found in PREDEFINED_TEST_USERS`);
   }
-  await loginWithCredentials(page, user);
+  await loginWithCredentials(page, user, userType);
 }
 
 /**
@@ -36,7 +36,11 @@ export async function registerAndLoginUniqueUser(page: Page): Promise<TestUser> 
 /**
  * Login with custom credentials
  */
-export async function loginWithCredentials(page: Page, user: TestUser): Promise<void> {
+export async function loginWithCredentials(
+  page: Page,
+  user: TestUser,
+  userType?: keyof typeof PREDEFINED_TEST_USERS
+): Promise<void> {
   await page.goto('/login');
 
   // Fill login form
@@ -46,20 +50,17 @@ export async function loginWithCredentials(page: Page, user: TestUser): Promise<
   // Submit form
   await page.click('[data-testid="login-button"]');
 
-  // Wait for successful login - check for dashboard elements instead of URL
-  // Admin users go to admin dashboard, regular users go to regular dashboard
-  try {
-    // First try to wait for admin dashboard
-    await page.waitForSelector('[data-testid="admin-dashboard-title"]', {
-      timeout: 5000,
-    });
+  // Wait for successful login - check for dashboard elements based on user type
+  if (userType === 'admin') {
+    // Admin users should be redirected to admin dashboard
+    await page.waitForSelector('[data-testid="admin-dashboard-title"]');
     await expect(page.locator('[data-testid="admin-dashboard-title"]')).toBeVisible();
-  } catch {
-    // If admin dashboard not found, wait for regular dashboard
-    await page.waitForSelector('[data-testid="dashboard-title"]', {
-      timeout: 5000,
-    });
+    await expect(page).toHaveURL('/admin/dashboard');
+  } else {
+    // Regular users should be redirected to regular dashboard
+    await page.waitForSelector('[data-testid="dashboard-title"]');
     await expect(page.locator('[data-testid="dashboard-title"]')).toBeVisible();
+    await expect(page).toHaveURL('/dashboard');
   }
 }
 

@@ -102,10 +102,24 @@ export const createAuthContext = (supabase: typeof import('../utils/supabase').s
     }
 
     // Get user role from database
+    logger.info('Looking for user with ID:', user.id);
     const { data: userData, error: userError } = await supabase.from('users').select('role').eq('id', user.id).single();
 
     if (userError) {
       logger.error('User role lookup error:', userError);
+
+      // Debug: Check if user exists at all
+      const { data: allUsers, error: allUsersError } = await supabase
+        .from('users')
+        .select('id, email, role')
+        .eq('id', user.id);
+
+      if (allUsersError) {
+        logger.error('Error checking all users:', allUsersError);
+      } else {
+        logger.info('Users found with this ID:', allUsers);
+      }
+
       throw new TRPCError({
         code: 'UNAUTHORIZED',
         message: `User role lookup failed: ${userError.message}`,

@@ -55,6 +55,69 @@ const createContext = async (opts: { req: express.Request; res: express.Response
   return await createAuthContext(supabase)(opts);
 };
 
+// Auth callback REST endpoint (for browser redirects)
+app.get('/auth/callback', async (req, res) => {
+  try {
+    const { code } = req.query;
+
+    if (!code || typeof code !== 'string') {
+      logger.error('Auth callback missing code parameter');
+      return res.status(400).json({ error: 'Missing auth code' });
+    }
+
+    logger.info('Processing auth callback with code:', code.substring(0, 10) + '...');
+
+    // Exchange auth code for session using PKCE
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+
+    if (error) {
+      logger.error('PKCE code exchange error:', error);
+      return res.status(400).json({ error: error.message });
+    }
+
+    if (!data.user || !data.session) {
+      logger.error('Failed to exchange code for session');
+      return res.status(400).json({ error: 'Failed to exchange code for session' });
+    }
+
+    // Get user role from database
+    const { data: userData, error: userError } = await supabase
+      .from('users')
+      .select('role, status')
+      .eq('id', data.user.id)
+      .single();
+
+    if (userError || !userData) {
+      logger.error('User profile not found. Error:', userError);
+      return res.status(400).json({ error: 'User profile not found' });
+    }
+
+    logger.info('Auth callback successful for user:', data.user.email);
+
+    // Redirect to frontend with auth data
+    const redirectUrl = new URL('/auth/success', env.FRONTEND_URL);
+
+    // Pass auth data as URL parameters (will be handled by frontend)
+    redirectUrl.searchParams.set('token', data.session.access_token);
+    redirectUrl.searchParams.set(
+      'user',
+      JSON.stringify({
+        id: data.user.id,
+        email: data.user.email ?? '',
+        role: userData.role,
+        status: userData.status,
+      })
+    );
+
+    return res.redirect(redirectUrl.toString());
+  } catch (error) {
+    logger.error('Auth callback error:', error);
+    const errorUrl = new URL('/auth/error', env.FRONTEND_URL);
+    errorUrl.searchParams.set('error', error instanceof Error ? error.message : 'Auth callback failed');
+    return res.redirect(errorUrl.toString());
+  }
+});
+
 // tRPC middleware
 app.use(
   '/api/trpc',
