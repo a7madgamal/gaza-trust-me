@@ -8,6 +8,9 @@ test.describe('Admin Dashboard', () => {
     // Create admin user
     await createTestUserViaAPI('admin');
 
+    // Create super admin user
+    await createTestUserViaAPI('superAdmin');
+
     // Create help seeker user
     await createTestUserViaAPI('helpSeeker');
   });
@@ -137,5 +140,116 @@ test.describe('Admin Dashboard', () => {
 
     // Verify we're on a card page by checking for card content
     await expect(page.locator('[data-testid="user-card"]')).toBeVisible();
+  });
+
+  test('should allow super admin to upgrade users to admin role', async ({ page }) => {
+    await loginAsUser(page, 'superAdmin');
+    await page.goto('/admin/dashboard');
+
+    // Wait for the admin dashboard to load
+    await expect(page.locator('[data-testid="admin-dashboard-title"]')).toBeVisible();
+    await expect(page.locator('[data-testid="admin-welcome-message"]')).toContainText('super_admin');
+
+    // Wait for the table to load
+    await expect(page.locator('[data-testid="users-table"]')).toBeVisible();
+
+    // Find a help seeker user by looking for the "Make Admin" button
+    const makeAdminButton = page.locator('[data-testid^="upgrade-to-admin-"]').first();
+    await expect(makeAdminButton).toBeVisible();
+    await expect(makeAdminButton).toHaveText('Make Admin');
+
+    // Click the upgrade button
+    await makeAdminButton.click();
+
+    // Verify the role upgrade dialog appears
+    await expect(page.locator('[data-testid="role-upgrade-dialog"]')).toBeVisible();
+    await expect(page.locator('[data-testid="role-upgrade-dialog-title"]')).toHaveText('Upgrade to Admin');
+
+    // Add remarks
+    const remarksInput = page.locator('[data-testid="role-upgrade-remarks-input"] textarea').first();
+    await remarksInput.fill('Promoting to admin for testing');
+
+    // Confirm the upgrade
+    await page.locator('[data-testid="confirm-role-upgrade-button"]').click();
+
+    // Wait for success message
+    await expect(page.locator('[data-testid="toast-success"]')).toContainText('upgraded to admin');
+
+    // Verify the dialog is closed
+    await expect(page.locator('[data-testid="role-upgrade-dialog"]')).toBeHidden();
+  });
+
+  test('should allow super admin to remove admin role from users', async ({ page }) => {
+    await loginAsUser(page, 'superAdmin');
+    await page.goto('/admin/dashboard');
+
+    // Wait for the admin dashboard to load
+    await expect(page.locator('[data-testid="admin-dashboard-title"]')).toBeVisible();
+
+    // Wait for the table to load
+    await expect(page.locator('[data-testid="users-table"]')).toBeVisible();
+
+    // Find a "Remove Admin" button (for users who are already admins)
+    const removeAdminButton = page.locator('[data-testid^="downgrade-to-help-seeker-"]').first();
+    await expect(removeAdminButton).toBeVisible();
+    await expect(removeAdminButton).toHaveText('Remove Admin');
+
+    // Click the remove admin button
+    await removeAdminButton.click();
+
+    // Verify the role upgrade dialog appears
+    await expect(page.locator('[data-testid="role-upgrade-dialog"]')).toBeVisible();
+    await expect(page.locator('[data-testid="role-upgrade-dialog-title"]')).toHaveText('Remove Admin Role');
+
+    // Add remarks
+    const downgradeRemarksInput = page.locator('[data-testid="role-upgrade-remarks-input"] textarea').first();
+    await downgradeRemarksInput.fill('Removing admin privileges');
+
+    // Confirm the removal
+    await page.locator('[data-testid="confirm-role-upgrade-button"]').click();
+
+    // Wait for success message
+    await expect(page.locator('[data-testid="toast-success"]')).toContainText('downgraded to help seeker');
+
+    // Verify the dialog is closed
+    await expect(page.locator('[data-testid="role-upgrade-dialog"]')).toBeHidden();
+  });
+
+  test('should not show role upgrade buttons for regular admins', async ({ page }) => {
+    await loginAsUser(page, 'admin');
+    await page.goto('/admin/dashboard');
+
+    // Wait for the admin dashboard to load
+    await expect(page.locator('[data-testid="admin-dashboard-title"]')).toBeVisible();
+
+    // Wait for the table to load
+    await expect(page.locator('[data-testid="users-table"]')).toBeVisible();
+
+    // Verify that role upgrade buttons are not visible for regular admins
+    await expect(page.locator('[data-testid^="upgrade-to-admin-"]')).toBeHidden();
+    await expect(page.locator('[data-testid^="downgrade-to-help-seeker-"]')).toBeHidden();
+  });
+
+  test('should not show role upgrade buttons for super admin users', async ({ page }) => {
+    await loginAsUser(page, 'superAdmin');
+    await page.goto('/admin/dashboard');
+
+    // Wait for the admin dashboard to load
+    await expect(page.locator('[data-testid="admin-dashboard-title"]')).toBeVisible();
+
+    // Wait for the table to load
+    await expect(page.locator('[data-testid="users-table"]')).toBeVisible();
+
+    // Find super admin rows
+    const superAdminRows = page.locator('tbody tr').filter({
+      has: page.locator('td:nth-child(4)').filter({ hasText: 'super_admin' }),
+    });
+
+    // Verify that role upgrade buttons are not visible for super admin users
+    for (let i = 0; i < (await superAdminRows.count()); i++) {
+      const row = superAdminRows.nth(i);
+      await expect(row.locator('[data-testid^="upgrade-to-admin-"]')).toBeHidden();
+      await expect(row.locator('[data-testid^="downgrade-to-help-seeker-"]')).toBeHidden();
+    }
   });
 });

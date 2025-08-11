@@ -42,9 +42,9 @@ interface User {
   full_name: string;
   description: string;
   phone_number: string;
-  status: UserStatus;
+  status: UserStatus | null;
   role: 'help_seeker' | 'admin' | 'super_admin';
-  created_at: string;
+  created_at: string | null;
 }
 
 const AdminDashboard: React.FC = () => {
@@ -54,14 +54,21 @@ const AdminDashboard: React.FC = () => {
   const [page, setPage] = useState(1);
   const [actionDialog, setActionDialog] = useState<{
     open: boolean;
-
     user: User | null;
-
     action: 'verify' | 'flag' | null;
   }>({
     open: false,
     user: null,
     action: null,
+  });
+  const [roleUpgradeDialog, setRoleUpgradeDialog] = useState<{
+    open: boolean;
+    user: User | null;
+    newRole: 'admin' | 'help_seeker' | null;
+  }>({
+    open: false,
+    user: null,
+    newRole: null,
   });
   const [remarks, setRemarks] = useState('');
 
@@ -102,8 +109,30 @@ const AdminDashboard: React.FC = () => {
     },
   });
 
+  const upgradeUserRoleMutation = trpc.adminUpgradeUserRole.useMutation({
+    onSuccess: result => {
+      if (result.success) {
+        const actionText =
+          result.data?.action === 'upgrade_to_admin' ? 'upgraded to admin' : 'downgraded to help seeker';
+        showToast(`User ${actionText} successfully`, 'success');
+        refetchUsers();
+        setRoleUpgradeDialog({ open: false, user: null, newRole: null });
+        setRemarks('');
+      } else {
+        showToast(result.error || 'Failed to update user role', 'error');
+      }
+    },
+    onError: error => {
+      showToast(error.message || 'Failed to update user role', 'error');
+    },
+  });
+
   const handleAction = (user: User, action: 'verify' | 'flag') => {
     setActionDialog({ open: true, user, action });
+  };
+
+  const handleRoleUpgrade = (user: User, newRole: 'admin' | 'help_seeker') => {
+    setRoleUpgradeDialog({ open: true, user, newRole });
   };
 
   const confirmAction = async () => {
@@ -116,7 +145,17 @@ const AdminDashboard: React.FC = () => {
     });
   };
 
-  const getStatusColor = (status: UserStatus) => {
+  const confirmRoleUpgrade = async () => {
+    if (!roleUpgradeDialog.user || !roleUpgradeDialog.newRole) return;
+
+    await upgradeUserRoleMutation.mutateAsync({
+      userId: roleUpgradeDialog.user.id,
+      newRole: roleUpgradeDialog.newRole,
+      remarks: remarks || undefined,
+    });
+  };
+
+  const getStatusColor = (status: UserStatus | null) => {
     switch (status) {
       case 'pending':
         return 'warning';
@@ -246,7 +285,7 @@ const AdminDashboard: React.FC = () => {
                       <Chip label={user.role} color={getRoleColor(user.role)} size="small" />
                     </TableCell>
                     <TableCell>
-                      <Chip label={user.status} color={getStatusColor(user.status)} size="small" />
+                      <Chip label={user.status || 'N/A'} color={getStatusColor(user.status)} size="small" />
                     </TableCell>
                     <TableCell>
                       <Typography
@@ -261,7 +300,7 @@ const AdminDashboard: React.FC = () => {
                         {user.description}
                       </Typography>
                     </TableCell>
-                    <TableCell>{new Date(user.created_at).toLocaleDateString()}</TableCell>
+                    <TableCell>{user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}</TableCell>
                     <TableCell>
                       {user.status === 'pending' && (
                         <Box display="flex" gap={1}>
@@ -285,6 +324,34 @@ const AdminDashboard: React.FC = () => {
                           >
                             Flag
                           </Button>
+                        </Box>
+                      )}
+                      {/* Super admin role management */}
+                      {userProfile.role === 'super_admin' && user.role !== 'super_admin' && (
+                        <Box display="flex" gap={1} mt={1}>
+                          {user.role === 'help_seeker' ? (
+                            <Button
+                              size="small"
+                              variant="outlined"
+                              color="primary"
+                              onClick={() => handleRoleUpgrade(user, 'admin')}
+                              disabled={upgradeUserRoleMutation.isPending}
+                              data-testid={`upgrade-to-admin-${user.id}`}
+                            >
+                              Make Admin
+                            </Button>
+                          ) : (
+                            <Button
+                              size="small"
+                              variant="outlined"
+                              color="warning"
+                              onClick={() => handleRoleUpgrade(user, 'help_seeker')}
+                              disabled={upgradeUserRoleMutation.isPending}
+                              data-testid={`downgrade-to-help-seeker-${user.id}`}
+                            >
+                              Remove Admin
+                            </Button>
+                          )}
                         </Box>
                       )}
                     </TableCell>
@@ -359,6 +426,63 @@ const AdminDashboard: React.FC = () => {
               'Verify'
             ) : (
               'Flag'
+            )}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Role Upgrade Confirmation Dialog */}
+      <Dialog
+        open={roleUpgradeDialog.open}
+        onClose={() => setRoleUpgradeDialog({ open: false, user: null, newRole: null })}
+        data-testid="role-upgrade-dialog"
+      >
+        <DialogTitle data-testid="role-upgrade-dialog-title">
+          {roleUpgradeDialog.newRole === 'admin' ? 'Upgrade to Admin' : 'Remove Admin Role'}
+        </DialogTitle>
+        <DialogContent>
+          <Typography gutterBottom>
+            Are you sure you want to {roleUpgradeDialog.newRole === 'admin' ? 'upgrade' : 'remove admin role from'}{' '}
+            {roleUpgradeDialog.user?.full_name}?
+          </Typography>
+          <Typography variant="body2" color="text.secondary" gutterBottom>
+            {roleUpgradeDialog.newRole === 'admin'
+              ? 'This user will gain access to the admin dashboard and can verify/flag other users.'
+              : 'This user will lose admin privileges and return to help seeker role.'}
+          </Typography>
+          <TextField
+            fullWidth
+            multiline
+            rows={3}
+            label="Remarks (optional)"
+            value={remarks}
+            onChange={e => setRemarks(e.target.value)}
+            margin="normal"
+            placeholder="Add any notes about this role change..."
+            data-testid="role-upgrade-remarks-input"
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setRoleUpgradeDialog({ open: false, user: null, newRole: null })}
+            disabled={upgradeUserRoleMutation.isPending}
+            data-testid="cancel-role-upgrade-button"
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={confirmRoleUpgrade}
+            variant="contained"
+            color={roleUpgradeDialog.newRole === 'admin' ? 'primary' : 'warning'}
+            disabled={upgradeUserRoleMutation.isPending}
+            data-testid="confirm-role-upgrade-button"
+          >
+            {upgradeUserRoleMutation.isPending ? (
+              <CircularProgress size={20} />
+            ) : roleUpgradeDialog.newRole === 'admin' ? (
+              'Upgrade to Admin'
+            ) : (
+              'Remove Admin Role'
             )}
           </Button>
         </DialogActions>

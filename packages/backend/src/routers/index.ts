@@ -23,6 +23,7 @@ export const appRouter = t.router({
   // Admin routes
   adminGetUsers: adminRouter.getUsers,
   adminUpdateUserStatus: adminRouter.updateUserStatus,
+  adminUpgradeUserRole: adminRouter.upgradeUserRole,
 });
 
 export type AppRouter = typeof appRouter;

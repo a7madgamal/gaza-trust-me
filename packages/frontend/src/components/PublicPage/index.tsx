@@ -240,7 +240,7 @@ const PublicPage: React.FC = () => {
               {/* Join Date and Phone */}
               <Box mb={2}>
                 <Typography variant="body2" color="rgba(255,255,255,0.8)" mb={1}>
-                  Joined: {new Date(currentUser.created_at).toLocaleDateString()}
+                  Joined: {currentUser.created_at ? new Date(currentUser.created_at).toLocaleDateString() : 'N/A'}
                 </Typography>
                 {currentUser.phone_number && (
                   <Box display="flex" alignItems="center" gap={1}>

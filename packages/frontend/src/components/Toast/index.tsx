@@ -30,7 +30,7 @@ export const ToastProvider = ({ children }: ToastProviderProps) => {
         onClose={handleClose}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <Alert onClose={handleClose} severity={severity} sx={{ width: '100%' }}>
+        <Alert onClose={handleClose} severity={severity} sx={{ width: '100%' }} data-testid={`toast-${severity}`}>
           {message}
         </Alert>
       </Snackbar>

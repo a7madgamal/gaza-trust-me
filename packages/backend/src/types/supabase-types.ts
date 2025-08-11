@@ -98,6 +98,25 @@ export const AdminUserActionOutputSchema = z.object({
   remarks: z.string().optional(),
 });
 
+// Super admin schemas for user role management
+export const SuperAdminUpgradeUserInputSchema = z.object({
+  userId: z.string().min(1, 'User ID is required'),
+  newRole: z.enum(['admin', 'help_seeker']),
+  remarks: z.string().optional(),
+});
+
+export const SuperAdminUpgradeUserOutputSchema = z.object({
+  user: z.object({
+    id: z.string(),
+    email: z.string(),
+    full_name: z.string(),
+    role: z.enum(USER_ROLES),
+    updated_at: z.string().nullable(),
+  }),
+  action: z.enum(['upgrade_to_admin', 'downgrade_to_help_seeker']),
+  remarks: z.string().optional(),
+});
+
 // Profile router schemas
 export const UserProfileUpdateSchema = z.object({
   full_name: z.string().min(2, 'Full name must be at least 2 characters').optional(),
@@ -175,6 +194,9 @@ export type AdminUserListInput = z.infer<typeof AdminUserListInputSchema>;
 export type AdminUserListOutput = z.infer<typeof AdminUserListOutputSchema>;
 export type AdminUserActionInput = z.infer<typeof AdminUserActionInputSchema>;
 export type AdminUserActionOutput = z.infer<typeof AdminUserActionOutputSchema>;
+
+export type SuperAdminUpgradeUserInput = z.infer<typeof SuperAdminUpgradeUserInputSchema>;
+export type SuperAdminUpgradeUserOutput = z.infer<typeof SuperAdminUpgradeUserOutputSchema>;
 
 export type UserProfileUpdateInput = z.infer<typeof UserProfileUpdateSchema>;
 export type UserProfileOutput = z.infer<typeof UserProfileOutputSchema>;

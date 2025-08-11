@@ -8,6 +8,8 @@ import {
   AdminUserListOutputSchema,
   AdminUserActionInputSchema,
   AdminUserActionOutputSchema,
+  SuperAdminUpgradeUserInputSchema,
+  SuperAdminUpgradeUserOutputSchema,
 } from '../types/supabase-types';
 
 // Admin middleware - checks if user has admin role
@@ -38,6 +40,38 @@ const adminProcedure = protectedProcedure.use(async ({ ctx, next }) => {
     ctx: {
       ...ctx,
       adminUser: userData,
+    },
+  });
+});
+
+// Super admin middleware - checks if user has super_admin role
+const superAdminProcedure = protectedProcedure.use(async ({ ctx, next }) => {
+  logger.info('Super admin middleware called for user:', ctx.user.id);
+
+  // Check if user has super_admin role
+  const { data: userData, error } = await supabase.from('users').select('role').eq('id', ctx.user.id).single();
+
+  logger.info('Super admin middleware query result:', { userData, error });
+
+  if (error) {
+    logger.error('Super admin middleware query error:', error);
+    throw new Error(`Super admin role check failed: ${error.message}`);
+  }
+
+  if (!userData) {
+    logger.error('Super admin middleware: User not found');
+    throw new Error('User not found in database');
+  }
+
+  if (userData.role !== 'super_admin') {
+    logger.error('User does not have super admin role:', userData.role);
+    throw new Error('Super admin access required');
+  }
+
+  return next({
+    ctx: {
+      ...ctx,
+      superAdminUser: userData,
     },
   });
 });
@@ -131,6 +165,85 @@ export const adminRouter = t.router({
         return {
           success: false,
           error: error instanceof Error ? error.message : 'Failed to update user status',
+        };
+      }
+    }),
+
+  // Super admin: Upgrade user to admin role
+  upgradeUserRole: superAdminProcedure
+    .input(SuperAdminUpgradeUserInputSchema)
+    .output(ApiResponseSchema(SuperAdminUpgradeUserOutputSchema))
+    .mutation(async ({ input, ctx }) => {
+      try {
+        logger.info('Super admin upgradeUserRole called with input:', input);
+        logger.info('Super admin context user:', ctx.user);
+
+        // Prevent self-modification
+        if (input.userId === ctx.user.id) {
+          throw new Error('Cannot modify your own role');
+        }
+
+        // Get the target user to check current role
+        const { data: targetUser, error: fetchError } = await supabase
+          .from('users')
+          .select('id, email, full_name, role')
+          .eq('id', input.userId)
+          .single();
+
+        if (fetchError) {
+          logger.error('Error fetching target user:', fetchError);
+          throw new Error('User not found');
+        }
+
+        if (!targetUser) {
+          throw new Error('User not found');
+        }
+
+        // Prevent downgrading other super admins
+        if (targetUser.role === 'super_admin') {
+          throw new Error('Cannot modify super admin roles');
+        }
+
+        // Create update data using generated types
+        const updateData: Database['public']['Tables']['users']['Update'] = {
+          role: input.newRole,
+          updated_at: new Date().toISOString(),
+        };
+
+        logger.info('Update data:', updateData);
+
+        // Update user role
+        const { data, error } = await supabase
+          .from('users')
+          .update(updateData)
+          .eq('id', input.userId)
+          .select('id, email, full_name, role, updated_at')
+          .single();
+
+        if (error) {
+          logger.error('Supabase update error details:', error);
+          throw new Error(`Failed to update user role: ${error.message}`);
+        }
+
+        if (!data) {
+          throw new Error('User not found');
+        }
+
+        const action = input.newRole === 'admin' ? 'upgrade_to_admin' : 'downgrade_to_help_seeker';
+
+        return {
+          success: true,
+          data: {
+            user: data,
+            action,
+            remarks: input.remarks,
+          },
+        };
+      } catch (error) {
+        logger.error('Upgrade user role error:', error);
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Failed to update user role',
         };
       }
     }),

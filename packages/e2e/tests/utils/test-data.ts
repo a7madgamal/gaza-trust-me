@@ -64,6 +64,14 @@ const TEST_USERS = {
     role: 'admin' as const,
     status: 'verified' as const,
   },
+  superAdmin: {
+    email: 'superadmin@test.com',
+    password: 'testtest1',
+    fullName: 'Super Admin',
+    phoneNumber: '9999999',
+    role: 'super_admin' as const,
+    status: 'verified' as const,
+  },
   userWithLinkedinandcampaign: {
     email: 'liandcampaing@liandcampain.com',
     password: 'testtest1',

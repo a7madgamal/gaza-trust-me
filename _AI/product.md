@@ -100,6 +100,18 @@
 4.10. Can manage system settings
 4.11. Can delete user accounts
 
+**Implemented Features:**
+
+4.12. ✅ **User role management** - Upgrade help seekers to admin, downgrade admins to help seekers
+4.13. ✅ **Super admin middleware** - Secure role-based access control
+4.14. ✅ **Security checks** - Prevent self-modification and super admin downgrades
+4.15. ✅ **Admin dashboard integration** - Role management UI in existing admin interface
+4.16. ✅ **Confirmation dialogs** - Secure role change confirmations with remarks
+4.17. ❌ **Comprehensive audit logging** - Not yet implemented
+4.18. ❌ **System-wide settings management** - Not yet implemented
+4.19. ❌ **Database maintenance tools** - Not yet implemented
+4.20. ❌ **User account management** - Not yet implemented
+
 ## Core Features & Requirements
 
 ### Authentication & Security
@@ -191,6 +203,7 @@
 5.34. PUT /admin/profiles/:id/verify - Verify profile (admin only)
 5.35. PUT /admin/profiles/:id/flag - Flag profile (admin only)
 5.36. GET /admin/audit-logs - View audit logs (super admin only)
+5.37. PUT /admin/users/:id/role - Upgrade/downgrade user role (super admin only)
 
 #### Users
 

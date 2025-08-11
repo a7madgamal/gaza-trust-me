@@ -51,8 +51,8 @@ export async function loginWithCredentials(
   await page.click('[data-testid="login-button"]');
 
   // Wait for successful login - check for dashboard elements based on user type
-  if (userType === 'admin') {
-    // Admin users should be redirected to admin dashboard
+  if (userType === 'admin' || userType === 'superAdmin') {
+    // Admin and super admin users should be redirected to admin dashboard
     await page.waitForSelector('[data-testid="admin-dashboard-title"]');
     await expect(page.locator('[data-testid="admin-dashboard-title"]')).toBeVisible();
     await expect(page).toHaveURL('/admin/dashboard');
