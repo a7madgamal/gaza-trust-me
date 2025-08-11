@@ -1,6 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 import type { UserRole, SeekerStatus } from '../../../backend/src/types/supabase-types';
+import type { Database } from '../../../backend/src/types/GENERATED_database.types';
 import { env } from './env';
+import { testTRPC } from './trpc-client';
 
 /**
  * Test data utilities for E2E tests
@@ -96,12 +98,9 @@ export const PREDEFINED_TEST_USERS: Record<
  */
 export async function createTestUserViaAPI(userType: keyof typeof PREDEFINED_TEST_USERS): Promise<number> {
   const user = PREDEFINED_TEST_USERS[userType];
-  if (!user) {
-    throw new Error(`User type ${userType} not found in PREDEFINED_TEST_USERS`);
-  }
 
   // Create Supabase client for direct database access with service role key to bypass RLS
-  const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SECRET_KEY);
+  const supabase = createClient<Database>(env.SUPABASE_URL, env.SUPABASE_SECRET_KEY);
 
   // First check if user exists in users table
   const { data: existingUser, error: existingUserError } = await supabase
@@ -112,6 +111,7 @@ export async function createTestUserViaAPI(userType: keyof typeof PREDEFINED_TES
   if (existingUserError) {
     console.log({ existingUserError });
   }
+
   // If user doesn't exist in users table, create the profile manually
   if (!existingUser || existingUser.length === 0) {
     // Check if orphaned auth user exists (auth user without profile)
@@ -135,62 +135,25 @@ export async function createTestUserViaAPI(userType: keyof typeof PREDEFINED_TES
     }
 
     console.log('DEBUG: Attempting to register new user via API...');
-    const requestBody = {
-      email: user.email,
-      password: user.password,
-      fullName: user.fullName,
-      phoneNumber: user.phoneNumber,
-      description: `${user.fullName} test user - This is a test user created for automated testing purposes.`,
-      ...(user.linkedinUrl && { linkedinUrl: user.linkedinUrl }),
-      ...(user.campaignUrl && { campaignUrl: user.campaignUrl }),
-    };
+    try {
+      // Use typed tRPC client instead of raw fetch
+      const result = await testTRPC.register.mutate({
+        email: user.email,
+        password: user.password,
+        fullName: user.fullName,
+        phoneNumber: user.phoneNumber,
+        description: `${user.fullName} test user - This is a test user created for automated testing purposes.`,
+        linkedinUrl: user.linkedinUrl || '',
+        campaignUrl: user.campaignUrl || '',
+      });
 
-    const response = await fetch(`${env.BACKEND_URL}/api/trpc/register`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(requestBody),
-    });
-
-    if (!response.ok) {
-      const result = await response.json();
-      console.log('DEBUG: Error response body:', result);
-      throw new Error(`Failed to create test user: ${response.statusText}`);
-    }
-
-    const result = await response.json();
-    console.log('DEBUG: Success response body:', result);
-
-    const data = result.result.data;
-    console.log('DEBUG: Extracted data:', data);
-
-    // Handle nested response structure: data.data.userId
-    const userId = data.success && data.data ? data.data.userId : data.userId;
-
-    if (userId) {
-      // Update user role and status after creation
-      const { data: updatedUser, error: updateError } = await supabase
-        .from('users')
-        .update({
-          status: user.status,
-          role: user.role,
-        })
-        .eq('email', user.email)
-        .select('url_id')
-        .single();
-
-      if (updateError) {
-        throw new Error(`Failed to update user role/status: ${updateError.message}`);
+      // The result is wrapped in an ApiResponse structure
+      if (!result.success || !result.data) {
+        throw new Error(result.error || 'Registration failed');
       }
-
-      if (!updatedUser) {
-        throw new Error('Failed to get updated user data');
-      }
-
-      return updatedUser.url_id;
-    } else {
-      throw new Error('Failed to create test user');
+    } catch (error) {
+      console.error('DEBUG: Error creating test user via API:', error);
+      throw new Error(`Failed to create test user: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 

@@ -17,7 +17,7 @@ import playwright from 'eslint-plugin-playwright';
 // Common TypeScript rules for all packages with tsconfig - REVIEW: Fix strict rules later
 const TS_RULES = {
   ...tsPlugin.configs['recommended-requiring-type-checking'].rules,
-  '@typescript-eslint/no-unsafe-assignment': 'warn', // REVIEW: Fix unsafe 'any' assignments
+  '@typescript-eslint/no-unsafe-assignment': 'error', // REVIEW: Fix unsafe 'any' assignments
   '@typescript-eslint/no-unsafe-member-access': 'warn', // REVIEW: Fix unsafe member access
   '@typescript-eslint/no-unsafe-call': 'warn', // REVIEW: Fix unsafe function calls
   '@typescript-eslint/no-unsafe-return': 'warn', // REVIEW: Fix unsafe return types

@@ -51,7 +51,7 @@ export const authenticateUser = (logger: winston.Logger, supabase: typeof import
       req.user = {
         id: user.id,
         email: user.email,
-        role: userData.role as 'help_seeker' | 'admin' | 'super_admin',
+        role: userData.role,
       };
 
       next();
@@ -138,7 +138,7 @@ export const createAuthContext = (supabase: typeof import('../utils/supabase').s
       user: {
         id: user.id,
         email: user.email,
-        role: userData.role as 'help_seeker' | 'admin' | 'super_admin',
+        role: userData.role,
       },
     };
   };

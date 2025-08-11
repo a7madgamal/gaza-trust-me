@@ -175,7 +175,7 @@ export const authRouter = t.router({
             id: z.string(),
             email: z.string(),
             role: z.string(),
-            status: z.string(),
+            status: z.string().nullable(),
           }),
         })
       )

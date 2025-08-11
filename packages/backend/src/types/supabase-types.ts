@@ -73,9 +73,9 @@ export const AdminUserListOutputSchema = z.object({
       full_name: z.string(),
       description: z.string(),
       phone_number: z.string(),
-      status: z.enum(SEEKER_STATUSES),
+      status: z.enum(SEEKER_STATUSES).nullable(),
       role: z.enum(USER_ROLES),
-      created_at: z.string(),
+      created_at: z.string().nullable(),
     })
   ),
   total: z.number(),
@@ -90,7 +90,7 @@ export const AdminUserActionInputSchema = z.object({
 export const AdminUserActionOutputSchema = z.object({
   user: z.object({
     id: z.string(),
-    status: z.enum(SEEKER_STATUSES),
+    status: z.enum(SEEKER_STATUSES).nullable(),
     verified_at: z.string().nullable(),
     verified_by: z.string().nullable(),
   }),
@@ -148,9 +148,9 @@ export const PublicUserSchema = z.object({
   full_name: z.string(),
   description: z.string(),
   phone_number: z.string(),
-  status: z.enum(SEEKER_STATUSES),
+  status: z.enum(SEEKER_STATUSES).nullable(),
   role: z.enum(USER_ROLES),
-  created_at: z.string(),
+  created_at: z.string().nullable(),
   linkedin_url: z.string().nullable(),
   campaign_url: z.string().nullable(),
 });

@@ -37,6 +37,7 @@ export const publicRouter = t.router({
             'id, url_id, full_name, description, phone_number, status, role, created_at, linkedin_url, campaign_url'
           )
           .eq('role', 'help_seeker') // Only show help seekers
+          .not('status', 'is', null) // Ensure status is not null
           .eq('status', 'verified') // Only verified users
           .order('created_at', { ascending: false }) // Newest first
           .range(input.offset, input.offset + input.limit - 1);
@@ -64,6 +65,7 @@ export const publicRouter = t.router({
             'id, url_id, full_name, description, phone_number, status, role, created_at, linkedin_url, campaign_url'
           )
           .eq('role', 'help_seeker')
+          .not('status', 'is', null) // Ensure status is not null
           .eq('status', 'verified');
 
         // If we have a current user, get the next one after them
@@ -100,6 +102,7 @@ export const publicRouter = t.router({
         .from('users')
         .select('*', { count: 'exact', head: true })
         .eq('role', 'help_seeker')
+        .not('status', 'is', null) // Ensure status is not null
         .eq('status', 'verified');
 
       if (error) {
@@ -127,6 +130,7 @@ export const publicRouter = t.router({
           )
           .eq('url_id', input.urlId)
           .eq('role', 'help_seeker')
+          .not('status', 'is', null) // Ensure status is not null
           .eq('status', 'verified')
           .single();
 

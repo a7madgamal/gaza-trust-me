@@ -32,6 +32,7 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.54.0",
+    "@trpc/client": "^10.45.2",
     "dotenv": "^17.2.1"
   }
 }

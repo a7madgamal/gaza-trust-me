@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { test, expect } from './global-test-hook';
 import { env } from './utils/env';
 
@@ -136,6 +137,7 @@ test.describe('Public API Endpoints', () => {
     );
 
     expect(response.status()).toBe(200);
+
     const data = await response.json();
 
     // Always expect the response structure
