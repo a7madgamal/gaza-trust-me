@@ -17,7 +17,7 @@
     "clean": "rimraf dist",
     "format:sql": "prettier --write \"supabase/**/*.sql\"",
     "format:sql:check": "prettier --check \"supabase/**/*.sql\"",
-    "types:generate": "supabase gen types typescript --project-id sivaovkdxiluefuhlqoj --schema public > src/types/GENERATED_database.types.ts && prettier --write src/types/GENERATED_database.types.ts",
+    "types:gen": "supabase gen types typescript --project-id sivaovkdxiluefuhlqoj --schema public > src/types/GENERATED_database.types.ts && prettier --write src/types/GENERATED_database.types.ts",
     "db": "tsx scripts/db-migrate.ts"
   },
   "dependencies": {

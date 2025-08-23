@@ -135,6 +135,10 @@ export const UserProfileOutputSchema = z.object({
   status: z.enum(SEEKER_STATUSES).nullable(),
   verified_at: z.string().nullable(),
   verified_by: z.string().nullable(),
+  created_at: z.string().nullable(),
+  updated_at: z.string().nullable(),
+  linkedin_url: z.string().nullable(),
+  campaign_url: z.string().nullable(),
 });
 
 export const UserProfileUpdateOutputSchema = z.object({

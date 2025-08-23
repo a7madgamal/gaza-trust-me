@@ -14,9 +14,13 @@ export interface UserProfile {
   role: 'help_seeker' | 'admin' | 'super_admin';
   description: string;
   status: string;
+  url_id: number;
+  created_at: string | null;
+  updated_at: string | null;
+  linkedin_url: string | null;
+  campaign_url: string | null;
 
   verifiedAt?: string | null;
-
   verifiedBy?: string | null;
 }
 

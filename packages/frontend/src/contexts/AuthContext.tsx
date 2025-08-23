@@ -51,6 +51,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           role: profileData.data.role,
           description: profileData.data.description,
           status: profileData.data.status,
+          url_id: profileData.data.url_id,
+          created_at: profileData.data.created_at,
+          updated_at: profileData.data.updated_at,
+          linkedin_url: profileData.data.linkedin_url,
+          campaign_url: profileData.data.campaign_url,
           verifiedAt: profileData.data.verified_at,
           verifiedBy: profileData.data.verified_by,
         };

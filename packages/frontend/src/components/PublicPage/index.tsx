@@ -144,11 +144,31 @@ const PublicPage: React.FC = () => {
   return (
     <Box sx={{ maxWidth: 600, mx: 'auto', p: 3 }}>
       {/* Header */}
-      <Box textAlign="center" mb={4}>
-        <Typography variant="h3" gutterBottom>
-          Help Someone Today
+      <Box
+        textAlign="center"
+        mb={4}
+        sx={{
+          background: 'linear-gradient(135deg, rgba(211, 47, 47, 0.05) 0%, rgba(76, 175, 80, 0.05) 100%)',
+          borderRadius: 0,
+          p: 4,
+          border: '1px solid rgba(211, 47, 47, 0.1)',
+          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04)',
+        }}
+      >
+        <Typography
+          variant="h3"
+          gutterBottom
+          sx={{
+            background: 'linear-gradient(135deg, #d32f2f 0%, #4caf50 100%)',
+            backgroundClip: 'text',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            fontWeight: 700,
+          }}
+        >
+          Confirmed from Gaza
         </Typography>
-        <Typography variant="body1" color="text.secondary">
+        <Typography variant="body1" color="text.secondary" sx={{ fontSize: '1.1rem' }}>
           Browse verified users who need help
         </Typography>
       </Box>
@@ -169,8 +189,22 @@ const PublicPage: React.FC = () => {
           sx={{
             height: 500,
             position: 'relative',
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            background: 'linear-gradient(135deg, #d32f2f 0%, #b71c1c 50%, #8e0000 100%)',
             color: 'white',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            backdropFilter: 'blur(10px)',
+            '&::before': {
+              content: '""',
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background:
+                'linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(255,255,255,0.05) 100%)',
+              borderRadius: 'inherit',
+              pointerEvents: 'none',
+            },
           }}
         >
           <CardContent sx={{ p: 4, height: '100%', display: 'flex', flexDirection: 'column', position: 'relative' }}>
@@ -262,20 +296,21 @@ const PublicPage: React.FC = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                       sx={{
-                        color: 'rgba(255,255,255,0.9)',
+                        color: '#ffffff',
                         textDecoration: 'none',
-                        backgroundColor: 'rgba(255,255,255,0.15)',
+                        backgroundColor: '#25D366',
                         px: 1.5,
                         py: 0.75,
                         borderRadius: 1.5,
                         fontSize: '0.8rem',
                         fontWeight: 'medium',
-                        border: '1px solid rgba(255,255,255,0.2)',
+                        border: '1px solid #25D366',
                         display: 'flex',
                         alignItems: 'center',
                         gap: 0.5,
                         '&:hover': {
-                          backgroundColor: 'rgba(255,255,255,0.25)',
+                          backgroundColor: '#128C7E',
+                          borderColor: '#128C7E',
                           textDecoration: 'none',
                           transform: 'translateY(-1px)',
                         },
@@ -294,20 +329,21 @@ const PublicPage: React.FC = () => {
                       target="_blank"
                       rel="noopener noreferrer"
                       sx={{
-                        color: 'rgba(255,255,255,0.9)',
+                        color: '#ffffff',
                         textDecoration: 'none',
-                        backgroundColor: 'rgba(255,255,255,0.15)',
+                        backgroundColor: '#0077b5',
                         px: 1.5,
                         py: 0.75,
                         borderRadius: 1.5,
                         fontSize: '0.8rem',
                         fontWeight: 'medium',
-                        border: '1px solid rgba(255,255,255,0.2)',
+                        border: '1px solid #0077b5',
                         display: 'flex',
                         alignItems: 'center',
                         gap: 0.5,
                         '&:hover': {
-                          backgroundColor: 'rgba(255,255,255,0.25)',
+                          backgroundColor: '#005885',
+                          borderColor: '#005885',
                           textDecoration: 'none',
                           transform: 'translateY(-1px)',
                         },
@@ -363,17 +399,30 @@ const PublicPage: React.FC = () => {
             onClick={handlePrevious}
             disabled={currentUserIndex === 0}
             startIcon={<NavigateBefore />}
-            sx={{ minWidth: 120 }}
+            sx={{
+              minWidth: 120,
+              borderColor: '#4caf50',
+              color: '#4caf50',
+              '&:hover': {
+                borderColor: '#2e7d32',
+                backgroundColor: 'rgba(76, 175, 80, 0.08)',
+              },
+            }}
           >
             Previous
           </Button>
 
           <Button
             variant="contained"
-            color="success"
             onClick={handleAccept}
             startIcon={<Check />}
-            sx={{ minWidth: 120 }}
+            sx={{
+              minWidth: 120,
+              background: 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)',
+              '&:hover': {
+                background: 'linear-gradient(135deg, #45a049 0%, #3d8b40 100%)',
+              },
+            }}
           >
             I contacted
           </Button>
@@ -383,7 +432,15 @@ const PublicPage: React.FC = () => {
             onClick={handleNext}
             disabled={currentUserIndex === users.length - 1}
             endIcon={<NavigateNext />}
-            sx={{ minWidth: 120 }}
+            sx={{
+              minWidth: 120,
+              borderColor: '#4caf50',
+              color: '#4caf50',
+              '&:hover': {
+                borderColor: '#2e7d32',
+                backgroundColor: 'rgba(76, 175, 80, 0.08)',
+              },
+            }}
           >
             Next
           </Button>

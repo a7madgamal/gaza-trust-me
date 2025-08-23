@@ -280,7 +280,25 @@ const AdminDashboard: React.FC = () => {
                       )}
                     </TableCell>
                     <TableCell>{user.email}</TableCell>
-                    <TableCell>{user.phone_number}</TableCell>
+                    <TableCell>
+                      <Link
+                        href={`https://wa.me/${user.phone_number.replace(/\D/g, '')}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        sx={{
+                          textDecoration: 'none',
+                          color: '#25D366',
+                          fontWeight: 500,
+                          '&:hover': {
+                            textDecoration: 'underline',
+                            color: '#128C7E',
+                          },
+                        }}
+                        data-testid={`whatsapp-link-${user.id}`}
+                      >
+                        {user.phone_number}
+                      </Link>
+                    </TableCell>
                     <TableCell>
                       <Chip label={user.role} color={getRoleColor(user.role)} size="small" />
                     </TableCell>
@@ -307,10 +325,15 @@ const AdminDashboard: React.FC = () => {
                           <Button
                             size="small"
                             variant="contained"
-                            color="success"
                             onClick={() => handleAction(user, 'verify')}
                             disabled={updateUserStatusMutation.isPending}
                             data-testid={`verify-button-${user.id}`}
+                            sx={{
+                              background: 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)',
+                              '&:hover': {
+                                background: 'linear-gradient(135deg, #45a049 0%, #3d8b40 100%)',
+                              },
+                            }}
                           >
                             Verify
                           </Button>
@@ -416,9 +439,19 @@ const AdminDashboard: React.FC = () => {
           <Button
             onClick={() => void confirmAction()}
             variant="contained"
-            color={actionDialog.action === 'verify' ? 'success' : 'error'}
+            color={actionDialog.action === 'flag' ? 'error' : undefined}
             disabled={updateUserStatusMutation.isPending}
             data-testid="confirm-action-button"
+            sx={
+              actionDialog.action === 'verify'
+                ? {
+                    background: 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)',
+                    '&:hover': {
+                      background: 'linear-gradient(135deg, #45a049 0%, #3d8b40 100%)',
+                    },
+                  }
+                : undefined
+            }
           >
             {updateUserStatusMutation.isPending ? (
               <CircularProgress size={20} />

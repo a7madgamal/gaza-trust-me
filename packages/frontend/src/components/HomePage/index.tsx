@@ -78,7 +78,19 @@ const HomePage = () => {
       <Container maxWidth="md" sx={{ mt: 8, textAlign: 'center' }}>
         {user ? (
           <>
-            <Typography variant="h2" component="h1" gutterBottom data-testid="user-email">
+            <Typography
+              variant="h2"
+              component="h1"
+              gutterBottom
+              data-testid="user-email"
+              sx={{
+                background: 'linear-gradient(135deg, #d32f2f 0%, #4caf50 100%)',
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                fontWeight: 700,
+              }}
+            >
               Welcome back, {user?.email}!
             </Typography>
 
@@ -91,17 +103,53 @@ const HomePage = () => {
             </Typography>
 
             <Box sx={{ mt: 4 }}>
-              <Button variant="contained" size="large" component={RouterLink} to="/dashboard" sx={{ mr: 2 }}>
+              <Button
+                variant="contained"
+                size="large"
+                component={RouterLink}
+                to="/dashboard"
+                sx={{
+                  mr: 2,
+                  background: 'linear-gradient(135deg, #d32f2f 0%, #4caf50 100%)',
+                  '&:hover': {
+                    background: 'linear-gradient(135deg, #b71c1c 0%, #2e7d32 100%)',
+                  },
+                }}
+              >
                 Go to Dashboard
               </Button>
-              <Button variant="outlined" size="large" component={RouterLink} to="/profile">
+              <Button
+                variant="outlined"
+                size="large"
+                component={RouterLink}
+                to="/profile"
+                sx={{
+                  borderColor: '#4caf50',
+                  color: '#4caf50',
+                  '&:hover': {
+                    borderColor: '#2e7d32',
+                    backgroundColor: 'rgba(76, 175, 80, 0.08)',
+                  },
+                }}
+              >
                 View Profile
               </Button>
             </Box>
           </>
         ) : (
           <>
-            <Typography variant="h2" component="h1" gutterBottom>
+            <Typography
+              variant="h2"
+              component="h1"
+              gutterBottom
+              sx={{
+                background: 'linear-gradient(135deg, #d32f2f 0%, #4caf50 100%)',
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                fontWeight: 700,
+              }}
+            >
               Welcome to Gazaconfirm
             </Typography>
 
@@ -114,10 +162,35 @@ const HomePage = () => {
             </Typography>
 
             <Box sx={{ mt: 4 }}>
-              <Button variant="contained" size="large" component={RouterLink} to="/register" sx={{ mr: 2 }}>
+              <Button
+                variant="contained"
+                size="large"
+                component={RouterLink}
+                to="/register"
+                sx={{
+                  mr: 2,
+                  background: 'linear-gradient(135deg, #d32f2f 0%, #4caf50 100%)',
+                  '&:hover': {
+                    background: 'linear-gradient(135deg, #b71c1c 0%, #2e7d32 100%)',
+                  },
+                }}
+              >
                 Get Started
               </Button>
-              <Button variant="outlined" size="large" component={RouterLink} to="/login">
+              <Button
+                variant="outlined"
+                size="large"
+                component={RouterLink}
+                to="/login"
+                sx={{
+                  borderColor: '#4caf50',
+                  color: '#4caf50',
+                  '&:hover': {
+                    borderColor: '#2e7d32',
+                    backgroundColor: 'rgba(76, 175, 80, 0.08)',
+                  },
+                }}
+              >
                 Sign In
               </Button>
             </Box>

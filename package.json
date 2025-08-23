@@ -18,6 +18,8 @@
     "test": "npm run test --workspaces",
     "build": "npm run build --workspaces",
     "dev": "npm run dev --workspaces",
+    "db": "npm run db --workspace=@gazaconfirm/backend",
+    "types:gen": "npm run types:gen --workspace=@gazaconfirm/backend",
     "docker:dev": "docker-compose -f docker-compose.dev.yml up --build",
     "docker:dev:down": "docker-compose -f docker-compose.dev.yml down",
     "docker:prod": "docker-compose -f docker-compose.prod.yml up --build",

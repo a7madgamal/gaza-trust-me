@@ -10,7 +10,7 @@ test.describe('Home Page', () => {
     await page.waitForURL(/\/user\/\d+/);
 
     // Should show the public page title
-    await expect(page.getByRole('heading', { name: 'Help Someone Today' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Confirmed from Gaza' })).toBeVisible();
 
     // Should show the subtitle
     await expect(page.getByText('Browse verified users who need help')).toBeVisible();

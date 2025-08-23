@@ -21,7 +21,7 @@ const StatusChip = ({ status }: { status: string }) => {
         return {
           label: 'PENDING VERIFICATION',
           color: 'warning' as const,
-          bgColor: '#fff3cd',
+          bgColor: 'linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%)',
           textColor: '#856404',
           description: 'Your account is being reviewed by our team',
         };
@@ -29,7 +29,7 @@ const StatusChip = ({ status }: { status: string }) => {
         return {
           label: 'VERIFIED',
           color: 'success' as const,
-          bgColor: '#d4edda',
+          bgColor: 'linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%)',
           textColor: '#155724',
           description: 'Your account has been verified and approved',
         };
@@ -37,7 +37,7 @@ const StatusChip = ({ status }: { status: string }) => {
         return {
           label: 'FLAGGED',
           color: 'error' as const,
-          bgColor: '#f8d7da',
+          bgColor: 'linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%)',
           textColor: '#721c24',
           description: 'Your account has been flagged for review',
         };
@@ -45,7 +45,7 @@ const StatusChip = ({ status }: { status: string }) => {
         return {
           label: 'UNKNOWN',
           color: 'default' as const,
-          bgColor: '#f8f9fa',
+          bgColor: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
           textColor: '#6c757d',
           description: 'Status unknown',
         };
@@ -57,13 +57,14 @@ const StatusChip = ({ status }: { status: string }) => {
   return (
     <Box
       sx={{
-        backgroundColor: config.bgColor,
+        background: config.bgColor,
         color: config.textColor,
         padding: 3,
         borderRadius: 2,
         textAlign: 'center',
         border: `2px solid ${config.textColor}`,
         mb: 3,
+        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
       }}
     >
       <Typography
@@ -114,7 +115,19 @@ const Dashboard = () => {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Typography variant="h4" component="h1" gutterBottom data-testid="dashboard-title">
+      <Typography
+        variant="h4"
+        component="h1"
+        gutterBottom
+        data-testid="dashboard-title"
+        sx={{
+          background: 'linear-gradient(135deg, #d32f2f 0%, #4caf50 100%)',
+          backgroundClip: 'text',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          fontWeight: 700,
+        }}
+      >
         Dashboard
       </Typography>
 
