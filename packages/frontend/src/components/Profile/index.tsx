@@ -54,16 +54,16 @@ const Profile = () => {
           minHeight: '60vh',
         }}
       >
-        <CircularProgress size={60} />
+        <CircularProgress size={60} role="progressbar" />
       </Box>
     );
-  } else if (!userProfile) {
+  } else if (!loading && !userProfile) {
     return (
       <Container maxWidth="md" sx={{ mt: 4 }}>
         <Alert severity="error">Failed to load profile data</Alert>
       </Container>
     );
-  } else {
+  } else if (userProfile) {
     return (
       <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
         <Typography
@@ -245,6 +245,7 @@ const Profile = () => {
                     {userProfile.linkedin_url && (
                       <Grid item xs={12} sm={6}>
                         <Button
+                          component="a"
                           variant="outlined"
                           startIcon={<LinkedIn />}
                           endIcon={<Launch />}
@@ -269,6 +270,7 @@ const Profile = () => {
                     {userProfile.campaign_url && (
                       <Grid item xs={12} sm={6}>
                         <Button
+                          component="a"
                           variant="outlined"
                           startIcon={<Campaign />}
                           endIcon={<Launch />}
@@ -302,6 +304,7 @@ const Profile = () => {
                   </Typography>
                   <Divider sx={{ mb: 3 }} />
                   <Button
+                    component="a"
                     variant="contained"
                     startIcon={<Launch />}
                     href={`/user/${userProfile.url_id}`}

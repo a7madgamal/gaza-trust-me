@@ -183,15 +183,11 @@ test.describe('Home Page', () => {
     await page.getByRole('button', { name: 'account of current user' }).click();
     await page.getByRole('menuitem', { name: 'Logout' }).click();
 
-    // Should redirect to home and auto-redirect to user URL
-    await page.waitForURL(/\/user\/\d+/);
+    // Should redirect to login page
+    await expect(page).toHaveURL('/login');
 
-    // Should show login/register buttons again
-    await expect(page.getByRole('button', { name: 'Login' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Register' })).toBeVisible();
-
-    // Should not show user menu
-    await expect(page.getByRole('button', { name: 'account of current user' })).toBeHidden();
+    // Should show login form
+    await expect(page.getByRole('heading', { name: 'Sign In' })).toBeVisible();
   });
 
   test('should handle admin user header and responsive behavior', async ({ page }) => {

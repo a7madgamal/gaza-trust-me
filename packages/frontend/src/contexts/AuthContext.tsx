@@ -178,11 +178,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // Handle auth state changes
   useEffect(() => {
     // Get initial session
-    void supabase.auth.getSession().then(({ data: { session } }) => {
+    void supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (session?.user) {
         const user = convertSupabaseUser(session.user);
         setUser(user);
-        void fetchUserProfile(session);
+        await fetchUserProfile(session);
       }
       setLoading(false);
     });

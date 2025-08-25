@@ -18,7 +18,7 @@ const HomePage = () => {
 
   const handleLogout = () => {
     handleMenuClose();
-    void logout().then(() => navigate('/'));
+    void logout().then(() => navigate('/login'));
   };
 
   return (

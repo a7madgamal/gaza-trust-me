@@ -19,7 +19,7 @@ export const Header: React.FC = () => {
 
   const handleLogout = () => {
     handleClose();
-    void logout().then(() => navigate('/'));
+    void logout().then(() => navigate('/login'));
   };
 
   const handleProfile = () => {
