@@ -100,7 +100,24 @@ export const adminRouter = t.router({
           query = query.eq('status', input.status);
         }
 
-        // Add pagination
+        // Get total count first (without pagination)
+        const countQuery = supabase
+          .from('users')
+          .select('id', { count: 'exact', head: true })
+          .eq('role', 'help_seeker');
+
+        if (input.status) {
+          countQuery.eq('status', input.status);
+        }
+
+        const { count, error: countError } = await countQuery;
+
+        if (countError) {
+          logger.error('Get users count error:', countError);
+          throw new Error(`Failed to fetch users count: ${countError.message}`);
+        }
+
+        // Add pagination to the main query
         const { data, error } = await query.range(input.offset, input.offset + input.limit - 1);
 
         if (error) {
@@ -124,7 +141,7 @@ export const adminRouter = t.router({
         // Validate data structure before returning
         const responseData = {
           users: processedData,
-          total: processedData.length,
+          total: count || 0,
         };
 
         return {
