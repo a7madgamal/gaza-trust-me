@@ -95,9 +95,15 @@ export const adminRouter = t.router({
           .eq('role', 'help_seeker') // Only show help_seeker users by default
           .order('created_at', { ascending: false });
 
-        // Filter by status if provided
+        // Apply filters
         if (input.status) {
           query = query.eq('status', input.status);
+        }
+
+        // Apply search filter (search in name, email, description)
+        if (input.search && input.search.trim()) {
+          const searchTerm = input.search.trim();
+          query = query.or(`full_name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
         }
 
         // Get total count first (without pagination)
@@ -108,6 +114,11 @@ export const adminRouter = t.router({
 
         if (input.status) {
           countQuery.eq('status', input.status);
+        }
+
+        if (input.search && input.search.trim()) {
+          const searchTerm = input.search.trim();
+          countQuery.or(`full_name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
         }
 
         const { count, error: countError } = await countQuery;

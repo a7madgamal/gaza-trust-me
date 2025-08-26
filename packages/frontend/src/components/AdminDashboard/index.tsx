@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -29,6 +29,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import { trpc } from '../../utils/trpc';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../hooks/useToast';
+import { useDebounce } from '../../hooks/useDebounce';
 import { z } from 'zod';
 
 type UserStatus = 'pending' | 'verified' | 'flagged';
@@ -55,7 +56,14 @@ const AdminDashboard: React.FC = () => {
   const { userProfile } = useAuth();
   const { showToast } = useToast();
   const [statusFilter, setStatusFilter] = useState<UserStatus | ''>('');
+  const [searchFilter, setSearchFilter] = useState('');
+  const debouncedSearchFilter = useDebounce(searchFilter, 300);
   const [page, setPage] = useState(1);
+
+  // Reset page when filters change
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearchFilter, statusFilter]);
   const [actionDialog, setActionDialog] = useState<{
     open: boolean;
     user: User | null;
@@ -88,6 +96,7 @@ const AdminDashboard: React.FC = () => {
   } = trpc.adminGetUsers.useQuery(
     {
       status: statusFilter || undefined,
+      search: debouncedSearchFilter || undefined,
       limit,
       offset,
     },
@@ -210,6 +219,16 @@ const AdminDashboard: React.FC = () => {
 
       {/* Filters */}
       <Box mb={3} display="flex" gap={2} alignItems="center">
+        <TextField
+          label="Search"
+          placeholder="Search by name, email, or description..."
+          value={searchFilter}
+          onChange={e => {
+            setSearchFilter(e.target.value);
+          }}
+          sx={{ minWidth: 300 }}
+          data-testid="search-filter"
+        />
         <FormControl sx={{ minWidth: 200 }}>
           <InputLabel>Status Filter</InputLabel>
           <Select
@@ -221,7 +240,6 @@ const AdminDashboard: React.FC = () => {
               if (result.success) {
                 setStatusFilter(result.data);
               }
-              setPage(1);
             }}
           >
             <MenuItem value="">All Statuses</MenuItem>

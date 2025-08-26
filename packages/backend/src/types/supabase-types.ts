@@ -60,6 +60,7 @@ export const AuthLogoutOutputSchema = z.object({
 // Admin router schemas
 export const AdminUserListInputSchema = z.object({
   status: z.enum(SEEKER_STATUSES).optional(),
+  search: z.string().optional(), // Search in name, email, description
   limit: z.number().int().positive().max(100).default(20),
   offset: z.number().int().nonnegative().default(0),
 });
