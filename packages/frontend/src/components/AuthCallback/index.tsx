@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '../../hooks/useToast';
+import { useAuth } from '../../hooks/useAuth';
 import { Box, CircularProgress, Typography } from '@mui/material';
 import { supabase } from '../../lib/supabase';
 
 export const AuthCallback = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const { userProfile, loading } = useAuth();
   const [isProcessing, setIsProcessing] = useState(true);
 
   useEffect(() => {
@@ -25,7 +27,8 @@ export const AuthCallback = () => {
         if (data.session) {
           // Session is established, user is authenticated
           showToast('Authentication successful! Welcome', 'success');
-          setTimeout(() => navigate('/dashboard'), 2000);
+          // Let the auth context handle the profile loading and redirect
+          // We'll use a useEffect to watch for profile loading completion
         } else {
           // No session found, redirect to login
           showToast('Authentication failed. Please try again.', 'error');
@@ -42,6 +45,22 @@ export const AuthCallback = () => {
 
     void handleAuthCallback();
   }, [navigate, showToast]);
+
+  // Handle redirect after profile is loaded
+  useEffect(() => {
+    if (!loading) {
+      if (userProfile) {
+        if (isProcessing) {
+          // Profile is loaded, redirect based on role
+          if (userProfile.role === 'admin' || userProfile.role === 'super_admin') {
+            navigate('/admin/dashboard');
+          } else {
+            navigate('/dashboard');
+          }
+        }
+      }
+    }
+  }, [loading, userProfile, isProcessing, navigate]);
 
   if (!isProcessing) {
     return null; // Component will unmount after navigation

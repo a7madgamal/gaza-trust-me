@@ -13,6 +13,7 @@ import AdminDashboard from './components/AdminDashboard';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { AdminRoute } from './components/AdminRoute';
 import { AuthCallback } from './components/AuthCallback';
+import { RootRoute } from './components/RootRoute';
 
 function App() {
   return (
@@ -21,7 +22,7 @@ function App() {
         <ToastProvider>
           <Header />
           <Routes>
-            <Route path="/" element={<PublicPage />} />
+            <Route path="/" element={<RootRoute />} />
             <Route path="/user/:urlId" element={<PublicPage />} />
             <Route
               path="/home"
