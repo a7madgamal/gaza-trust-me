@@ -3,6 +3,7 @@ import logger from '../utils/logger';
 import { supabase } from '../utils/supabase';
 import { t, protectedProcedure } from './shared';
 import type { Database } from '../types/GENERATED_database.types';
+import { z } from 'zod';
 import {
   AdminUserListInputSchema,
   AdminUserListOutputSchema,
@@ -85,7 +86,13 @@ export const adminRouter = t.router({
       try {
         let query = supabase
           .from('users')
-          .select('id, url_id, email, full_name, description, phone_number, status, role, verified_by, created_at')
+          .select(
+            `
+            id, url_id, email, full_name, description, phone_number, status, role, verified_by, created_at,
+            verified_by_admin:users!verified_by(full_name)
+          `
+          )
+          .eq('role', 'help_seeker') // Only show help_seeker users by default
           .order('created_at', { ascending: false });
 
         // Filter by status if provided
@@ -101,12 +108,28 @@ export const adminRouter = t.router({
           throw new Error(`Failed to fetch users: ${error.message}`);
         }
 
+        // Fix the verified_by_admin field - Supabase returns arrays for foreign keys
+        const VerifiedByAdminSchema = z.object({ full_name: z.string() });
+        const getVerifiedByAdmin = (value: unknown): { full_name: string } | null => {
+          const result = z.array(VerifiedByAdminSchema).safeParse(value);
+          return result.success && result.data.length > 0 ? (result.data[0] ?? null) : null;
+        };
+
+        const processedData =
+          data?.map(user => ({
+            ...user,
+            verified_by_admin: getVerifiedByAdmin(user.verified_by_admin),
+          })) || [];
+
+        // Validate data structure before returning
+        const responseData = {
+          users: processedData,
+          total: processedData.length,
+        };
+
         return {
           success: true,
-          data: {
-            users: data || [],
-            total: data?.length || 0,
-          },
+          data: responseData,
         };
       } catch (error) {
         logger.error('Get users error:', error);

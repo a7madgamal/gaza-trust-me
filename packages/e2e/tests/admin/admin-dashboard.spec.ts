@@ -189,30 +189,41 @@ test.describe('Admin Dashboard', () => {
     // Wait for the table to load
     await expect(page.locator('[data-testid="users-table"]')).toBeVisible();
 
-    // Find a "Remove Admin" button (for users who are already admins)
-    const removeAdminButton = page.locator('[data-testid^="downgrade-to-help-seeker-"]').first();
-    await expect(removeAdminButton).toBeVisible();
-    await expect(removeAdminButton).toHaveText('Remove Admin');
+    // First, upgrade a help seeker to admin
+    const makeAdminButton = page.locator('[data-testid^="upgrade-to-admin-"]').first();
+    await expect(makeAdminButton).toBeVisible();
+    await expect(makeAdminButton).toHaveText('Make Admin');
 
-    // Click the remove admin button
-    await removeAdminButton.click();
+    // Get the user ID from the button's data-testid
+    const buttonTestId = await makeAdminButton.getAttribute('data-testid');
+    const userId = buttonTestId?.replace('upgrade-to-admin-', '');
+
+    // Click the upgrade button
+    await makeAdminButton.click();
 
     // Verify the role upgrade dialog appears
     await expect(page.locator('[data-testid="role-upgrade-dialog"]')).toBeVisible();
-    await expect(page.locator('[data-testid="role-upgrade-dialog-title"]')).toHaveText('Remove Admin Role');
+    await expect(page.locator('[data-testid="role-upgrade-dialog-title"]')).toHaveText('Upgrade to Admin');
 
     // Add remarks
-    const downgradeRemarksInput = page.locator('[data-testid="role-upgrade-remarks-input"] textarea').first();
-    await downgradeRemarksInput.fill('Removing admin privileges');
+    const remarksInput = page.locator('[data-testid="role-upgrade-remarks-input"] textarea').first();
+    await remarksInput.fill('Promoting to admin for testing');
 
-    // Confirm the removal
+    // Confirm the upgrade
     await page.locator('[data-testid="confirm-role-upgrade-button"]').click();
 
     // Wait for success message
-    await expect(page.locator('[data-testid="toast-success"]')).toContainText('downgraded to help seeker');
+    await expect(page.locator('[data-testid="toast-success"]')).toContainText('upgraded to admin');
 
     // Verify the dialog is closed
     await expect(page.locator('[data-testid="role-upgrade-dialog"]')).toBeHidden();
+
+    // Wait for the table to refresh and verify the user is no longer visible (since they're now admin)
+    await expect(page.locator('[data-testid="users-table"]')).toBeVisible();
+
+    // The upgraded user should no longer appear in the table since they're now an admin
+    // and the admin dashboard only shows help_seeker users
+    await expect(page.locator(`[data-testid="upgrade-to-admin-${userId}"]`)).toBeHidden();
   });
 
   test('should not show role upgrade buttons for regular admins', async ({ page }) => {

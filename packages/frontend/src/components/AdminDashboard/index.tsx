@@ -44,6 +44,10 @@ interface User {
   phone_number: string;
   status: UserStatus | null;
   role: 'help_seeker' | 'admin' | 'super_admin';
+  verified_by: string | null;
+  verified_by_admin?: {
+    full_name: string;
+  } | null;
   created_at: string | null;
 }
 

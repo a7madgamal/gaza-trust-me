@@ -9,8 +9,20 @@ interface VerificationBadgeProps {
 }
 
 const VerificationBadge: React.FC<VerificationBadgeProps> = ({ verifiedBy, status }) => {
+  // If status is verified but no verifiedBy, this is an invalid state
   if (status === 'verified' && !verifiedBy) {
-    throw new Error('Verified status requires verifiedBy field');
+    return (
+      <Chip
+        label="Invalid Verification"
+        color="error"
+        size="small"
+        sx={{
+          backgroundColor: 'rgba(255,0,0,0.2)',
+          color: 'white',
+          fontWeight: 'bold',
+        }}
+      />
+    );
   }
 
   const { data: adminData, isLoading } = trpc.getAdminProfile.useQuery(

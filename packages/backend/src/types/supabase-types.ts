@@ -76,6 +76,11 @@ export const AdminUserListOutputSchema = z.object({
       status: z.enum(SEEKER_STATUSES).nullable(),
       role: z.enum(USER_ROLES),
       verified_by: z.string().nullable(),
+      verified_by_admin: z
+        .object({
+          full_name: z.string(),
+        })
+        .nullable(),
       created_at: z.string().nullable(),
     })
   ),

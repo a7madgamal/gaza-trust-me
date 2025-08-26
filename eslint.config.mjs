@@ -33,6 +33,7 @@ const TS_RULES = {
   '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }], // REVIEW: Fix unbound methods
   '@typescript-eslint/no-explicit-any': 'error', // REVIEW: Avoid 'any' type
   '@typescript-eslint/no-unsafe-type-assertion': 'error', // REVIEW: Avoid unsafe type assertions
+  '@typescript-eslint/consistent-type-assertions': ['warn', { assertionStyle: 'never' }], // Warn about 'as' keyword usage
   '@typescript-eslint/no-non-null-assertion': 'error',
   ...eslintComments.configs.recommended.rules,
   'eslint-comments/disable-enable-pair': 'warn',

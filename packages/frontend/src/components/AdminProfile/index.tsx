@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, Card, CardContent, Chip, CircularProgress, Alert, Divider, Link } from '@mui/material';
+import { Box, Typography, Card, CardContent, Chip, CircularProgress, Alert, Link } from '@mui/material';
 import {
   Verified,
   AdminPanelSettings,
@@ -10,10 +10,6 @@ import {
   Language,
   CalendarToday,
   Update,
-  Twitter,
-  Facebook,
-  Instagram,
-  Public,
 } from '@mui/icons-material';
 import { useParams } from 'react-router-dom';
 import { trpc } from '../../utils/trpc';
