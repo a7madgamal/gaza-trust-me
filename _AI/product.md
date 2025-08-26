@@ -135,7 +135,8 @@
 5.8.1. Admin reviews submission
 5.8.2. Checks images and details
 5.8.3. Approves or flags with remarks
-5.8.4. System logs action with timestamp
+5.8.4. System logs action with timestamp and admin identification
+5.8.5. Verification transparency - shows which admin verified each profile
 5.9. Profile display:
 5.9.1. Public listing of verified profiles only
 5.9.2. Responsive card layout
@@ -143,7 +144,8 @@
 5.9.4. Contact information display
 5.9.5. LinkedIn profile links (when provided)
 5.9.6. Campaign/fundraising links (when provided)
-5.9.5. Search and filter functionality
+5.9.7. Verification badge showing "Verified by [Admin Name]" with link to admin profile
+5.9.8. Search and filter functionality
 
 ### Image Management
 
@@ -166,7 +168,7 @@
 #### Core Tables
 
 5.13. Users Table: Store user accounts with roles, authentication data, and profile information
-5.14. User Profiles Table: Store help requests with status, verification data, and contact information
+5.14. User Profiles Table: Store help requests with status, verification data, contact information, and verification details (verified_by, verified_at)
 5.15. User Images Table: Store uploaded images with metadata and file information
 5.16. Audit Logs Table: Track all system actions for security and compliance
 
@@ -196,21 +198,22 @@
 5.30. DELETE /profiles/:id - Delete profile (owner only)
 5.31. POST /profiles/:id/images - Upload profile images
 5.32. DELETE /profiles/:id/images/:imageId - Delete profile image
+5.33. GET /admins/:id - Get admin profile details (public)
 
 #### Admin
 
-5.33. GET /admin/profiles - List all profiles (admin only)
-5.34. PUT /admin/profiles/:id/verify - Verify profile (admin only)
-5.35. PUT /admin/profiles/:id/flag - Flag profile (admin only)
-5.36. GET /admin/audit-logs - View audit logs (super admin only)
-5.37. PUT /admin/users/:id/role - Upgrade/downgrade user role (super admin only)
+5.34. GET /admin/profiles - List all profiles (admin only)
+5.35. PUT /admin/profiles/:id/verify - Verify profile (admin only)
+5.36. PUT /admin/profiles/:id/flag - Flag profile (admin only)
+5.37. GET /admin/audit-logs - View audit logs (super admin only)
+5.38. PUT /admin/users/:id/role - Upgrade/downgrade user role (super admin only)
 
 #### Users
 
-5.37. GET /users/profile - Get user profile
-5.38. PUT /users/profile - Update user profile
-5.39. GET /admin/users - List all users (super admin only)
-5.40. PUT /admin/users/:id/role - Assign user role (super admin only)
+5.39. GET /users/profile - Get user profile
+5.40. PUT /users/profile - Update user profile
+5.41. GET /admin/users - List all users (super admin only)
+5.42. PUT /admin/users/:id/role - Assign user role (super admin only)
 
 ## UI/UX Requirements
 
@@ -229,16 +232,17 @@
 6.6. Home/Landing Page: Introduction, featured profiles, call-to-action
 6.7. Profiles Listing: Grid/list view of verified profiles with filters
 6.8. Profile Detail: Full profile information with images and contact details
-6.9. Registration: User registration form
-6.10. Login: Authentication form
+6.9. Admin Profile: Public admin profile page showing verification activity
+6.10. Registration: User registration form
+6.11. Login: Authentication form
 
 #### Authenticated Pages
 
-6.11. Dashboard: User's profiles and status
-6.12. Profile Submission: Multi-step form for creating profiles
-6.13. Profile Management: Edit personal information
-6.14. Admin Panel: Profile review interface
-6.15. Super Admin Panel: User and system management
+6.12. Dashboard: User's profiles and status
+6.13. Profile Submission: Multi-step form for creating profiles
+6.14. Profile Management: Edit personal information
+6.15. Admin Panel: Profile review interface
+6.16. Super Admin Panel: User and system management
 
 ### Responsive Breakpoints
 

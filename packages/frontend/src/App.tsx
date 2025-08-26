@@ -10,6 +10,7 @@ import Dashboard from './components/Dashboard';
 import Profile from './components/Profile';
 import PublicPage from './components/PublicPage';
 import AdminDashboard from './components/AdminDashboard';
+import AdminProfile from './components/AdminProfile';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { AdminRoute } from './components/AdminRoute';
 import { AuthCallback } from './components/AuthCallback';
@@ -24,6 +25,7 @@ function App() {
           <Routes>
             <Route path="/" element={<RootRoute />} />
             <Route path="/user/:urlId" element={<PublicPage />} />
+            <Route path="/admins/:adminId" element={<AdminProfile />} />
             <Route
               path="/home"
               element={

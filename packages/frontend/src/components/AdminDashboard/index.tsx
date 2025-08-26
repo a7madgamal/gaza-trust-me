@@ -304,6 +304,25 @@ const AdminDashboard: React.FC = () => {
                     </TableCell>
                     <TableCell>
                       <Chip label={user.status || 'N/A'} color={getStatusColor(user.status)} size="small" />
+                      {user.status === 'verified' && user.verified_by && (
+                        <Box mt={0.5}>
+                          <Link
+                            component={RouterLink}
+                            to={`/admins/${user.verified_by}`}
+                            target="_blank"
+                            sx={{
+                              textDecoration: 'none',
+                              color: 'text.secondary',
+                              fontSize: '0.75rem',
+                              '&:hover': {
+                                textDecoration: 'underline',
+                              },
+                            }}
+                          >
+                            Verified by admin
+                          </Link>
+                        </Box>
+                      )}
                     </TableCell>
                     <TableCell>
                       <Typography

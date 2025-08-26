@@ -19,6 +19,8 @@ export const appRouter = t.router({
   getUsersForCards: publicRouter.getUsersForCards,
   getNextUser: publicRouter.getNextUser,
   getVerifiedUserCount: publicRouter.getVerifiedUserCount,
+  getUserByUrlId: publicRouter.getUserByUrlId,
+  getAdminProfile: publicRouter.getAdminProfile,
 
   // Admin routes
   adminGetUsers: adminRouter.getUsers,

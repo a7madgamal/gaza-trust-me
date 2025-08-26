@@ -85,7 +85,7 @@ export const adminRouter = t.router({
       try {
         let query = supabase
           .from('users')
-          .select('id, url_id, email, full_name, description, phone_number, status, role, created_at')
+          .select('id, url_id, email, full_name, description, phone_number, status, role, verified_by, created_at')
           .order('created_at', { ascending: false });
 
         // Filter by status if provided

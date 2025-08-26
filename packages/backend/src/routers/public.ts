@@ -8,6 +8,7 @@ import {
   PublicHelloOutputSchema,
   PublicUsersForCardsInputSchema,
   PublicUserSchema,
+  AdminProfileSchema,
   CardStackNavigationInputSchema,
   GetUserByUrlIdInputSchema,
 } from '../types/supabase-types';
@@ -34,7 +35,7 @@ export const publicRouter = t.router({
         const { data, error } = await supabase
           .from('users')
           .select(
-            'id, url_id, full_name, description, phone_number, status, role, created_at, linkedin_url, campaign_url'
+            'id, url_id, full_name, description, phone_number, status, role, verified_at, verified_by, created_at, linkedin_url, campaign_url'
           )
           .eq('role', 'help_seeker') // Only show help seekers
           .not('status', 'is', null) // Ensure status is not null
@@ -62,7 +63,7 @@ export const publicRouter = t.router({
         let query = supabase
           .from('users')
           .select(
-            'id, url_id, full_name, description, phone_number, status, role, created_at, linkedin_url, campaign_url'
+            'id, url_id, full_name, description, phone_number, status, role, verified_at, verified_by, created_at, linkedin_url, campaign_url'
           )
           .eq('role', 'help_seeker')
           .not('status', 'is', null) // Ensure status is not null
@@ -126,7 +127,7 @@ export const publicRouter = t.router({
         const { data, error } = await supabase
           .from('users')
           .select(
-            'id, url_id, full_name, description, phone_number, status, role, created_at, linkedin_url, campaign_url'
+            'id, url_id, full_name, description, phone_number, status, role, verified_at, verified_by, created_at, linkedin_url, campaign_url'
           )
           .eq('url_id', input.urlId)
           .eq('role', 'help_seeker')
@@ -147,6 +148,74 @@ export const publicRouter = t.router({
       } catch (error) {
         logger.error('Error in getUserByUrlId:', error);
         throw new Error('Failed to fetch user');
+      }
+    }),
+
+  // Get admin profile by ID
+  getAdminProfile: publicProcedure
+    .input(z.object({ adminId: z.string().uuid().nullable() }))
+    .output(ApiResponseSchema(AdminProfileSchema.nullable()))
+    .query(async ({ input }) => {
+      try {
+        if (!input.adminId) {
+          return {
+            success: true,
+            data: null,
+          };
+        }
+
+        // Get admin basic info - only return if user is actually an admin
+        const { data: adminData, error: adminError } = await supabase
+          .from('users')
+          .select(
+            'id, full_name, email, role, created_at, updated_at, phone_number, description, linkedin_url, campaign_url'
+          )
+          .eq('id', input.adminId)
+          .in('role', ['admin', 'super_admin'])
+          .single();
+
+        if (adminError || !adminData) {
+          logger.error('Error fetching admin:', adminError);
+          return {
+            success: true,
+            data: null, // Admin not found or not an admin
+          };
+        }
+
+        // Get verification count
+        const { count: verificationCount, error: countError } = await supabase
+          .from('users')
+          .select('*', { count: 'exact', head: true })
+          .eq('verified_by', input.adminId)
+          .eq('status', 'verified');
+
+        if (countError) {
+          logger.error('Error counting verifications:', countError);
+          throw new Error('Failed to get verification count');
+        }
+
+        return {
+          success: true,
+          data: {
+            id: adminData.id,
+            full_name: adminData.full_name,
+            email: adminData.email,
+            role: adminData.role,
+            verification_count: verificationCount || 0,
+            created_at: adminData.created_at,
+            updated_at: adminData.updated_at,
+            phone_number: adminData.phone_number,
+            description: adminData.description,
+            linkedin_url: adminData.linkedin_url,
+            campaign_url: adminData.campaign_url,
+          },
+        };
+      } catch (error) {
+        logger.error('Error in getAdminProfile:', error);
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Failed to fetch admin profile',
+        };
       }
     }),
 });

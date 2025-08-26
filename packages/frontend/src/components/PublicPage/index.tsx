@@ -1,19 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Card, CardContent, Button, Stack, Chip, CircularProgress, Link } from '@mui/material';
-import {
-  WhatsApp,
-  LinkedIn,
-  Campaign,
-  Phone,
-  Verified,
-  NavigateBefore,
-  NavigateNext,
-  Check,
-} from '@mui/icons-material';
+import { Box, Typography, Card, CardContent, Button, Stack, CircularProgress, Link } from '@mui/material';
+import { WhatsApp, LinkedIn, Campaign, Phone, NavigateBefore, NavigateNext, Check } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
 import { trpc } from '../../utils/trpc';
 import { useToast } from '../../hooks/useToast';
 import type { RouterOutputs } from '../../utils/trpc';
+import VerificationBadge from '../VerificationBadge';
 
 // Utility function to format phone number for WhatsApp
 const formatPhoneForWhatsApp = (phone: string): string => {
@@ -213,21 +205,7 @@ const PublicPage: React.FC = () => {
               <Typography variant="h4" fontWeight="bold">
                 {currentUser.full_name}
               </Typography>
-              <Chip
-                icon={currentUser.status === 'verified' ? <Verified sx={{ color: 'white !important' }} /> : undefined}
-                label={currentUser.status === 'verified' ? 'Verified' : currentUser.status}
-                color={currentUser.status === 'verified' ? 'success' : 'default'}
-                size="small"
-                sx={{
-                  backgroundColor:
-                    currentUser.status === 'verified' ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)',
-                  color: 'white',
-                  fontWeight: 'bold',
-                  '& .MuiChip-icon': {
-                    color: 'white',
-                  },
-                }}
-              />
+              <VerificationBadge verifiedBy={currentUser.verified_by} status={currentUser.status} />
             </Box>
 
             {/* Description */}

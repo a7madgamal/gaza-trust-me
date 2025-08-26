@@ -38,11 +38,8 @@ test.describe('Registration Integration', () => {
     // Check for success - either redirect to login or success message
     await expect(page.locator('[data-testid="register-button"]')).toBeDisabled();
 
-    // Check for either success condition
-    const isLoginPage = page.url().includes('/login');
-    const hasSuccessMessage = page.locator('text=Registration successful').or(page.locator('text=Account created'));
-
-    expect(isLoginPage || hasSuccessMessage).toBeTruthy();
+    // Check for success - should redirect to login page
+    await expect(page).toHaveURL(/.*\/login/);
   });
 
   test('should handle registration with only LinkedIn URL', async ({ page }) => {
