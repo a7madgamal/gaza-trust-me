@@ -54,11 +54,9 @@ export const authRouter = t.router({
           };
         }
 
-        logger.info('SignUp options:', JSON.stringify(signUpOptions, null, 2));
         const { data: authData, error: authError } = await supabase.auth.signUp(signUpOptions);
 
         if (authError) {
-          logger.error('Auth signup error:', authError);
           throw new Error(authError.message);
         }
 

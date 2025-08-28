@@ -24,7 +24,10 @@ import {
   CircularProgress,
   Alert,
   Link,
+  IconButton,
+  Tooltip,
 } from '@mui/material';
+import { ArrowUpward, ArrowDownward } from '@mui/icons-material';
 import { Link as RouterLink } from 'react-router-dom';
 import { trpc } from '../../utils/trpc';
 import { useAuth } from '../../hooks/useAuth';
@@ -56,14 +59,17 @@ const AdminDashboard: React.FC = () => {
   const { userProfile } = useAuth();
   const { showToast } = useToast();
   const [statusFilter, setStatusFilter] = useState<UserStatus | ''>('');
+  const [roleFilter, setRoleFilter] = useState<'help_seeker' | 'admin' | 'super_admin' | ''>('');
   const [searchFilter, setSearchFilter] = useState('');
   const debouncedSearchFilter = useDebounce(searchFilter, 300);
+  const [sortBy, setSortBy] = useState<'full_name' | 'role' | 'status' | 'created_at'>('created_at');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [page, setPage] = useState(1);
 
   // Reset page when filters change
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearchFilter, statusFilter]);
+  }, [debouncedSearchFilter, statusFilter, roleFilter, sortBy, sortOrder]);
   const [actionDialog, setActionDialog] = useState<{
     open: boolean;
     user: User | null;
@@ -96,7 +102,10 @@ const AdminDashboard: React.FC = () => {
   } = trpc.adminGetUsers.useQuery(
     {
       status: statusFilter || undefined,
+      role: roleFilter || undefined,
       search: debouncedSearchFilter || undefined,
+      sortBy,
+      sortOrder,
       limit,
       offset,
     },
@@ -192,6 +201,20 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
+  const handleSort = (field: 'full_name' | 'role' | 'status' | 'created_at') => {
+    if (sortBy === field) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(field);
+      setSortOrder('asc');
+    }
+  };
+
+  const getSortIcon = (field: 'full_name' | 'role' | 'status' | 'created_at') => {
+    if (sortBy !== field) return null;
+    return sortOrder === 'asc' ? <ArrowUpward fontSize="small" /> : <ArrowDownward fontSize="small" />;
+  };
+
   if (!userProfile) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
@@ -248,6 +271,27 @@ const AdminDashboard: React.FC = () => {
             <MenuItem value="flagged">Flagged</MenuItem>
           </Select>
         </FormControl>
+        {userProfile?.role === 'super_admin' && (
+          <FormControl sx={{ minWidth: 200 }}>
+            <InputLabel>Role Filter</InputLabel>
+            <Select
+              value={roleFilter}
+              label="Role Filter"
+              data-testid="role-filter"
+              onChange={e => {
+                const value = e.target.value;
+                if (value === '' || value === 'help_seeker' || value === 'admin' || value === 'super_admin') {
+                  setRoleFilter(value);
+                }
+              }}
+            >
+              <MenuItem value="">All Roles</MenuItem>
+              <MenuItem value="help_seeker">Help Seeker</MenuItem>
+              <MenuItem value="admin">Admin</MenuItem>
+              <MenuItem value="super_admin">Super Admin</MenuItem>
+            </Select>
+          </FormControl>
+        )}
       </Box>
 
       {/* Users Table */}
@@ -256,13 +300,60 @@ const AdminDashboard: React.FC = () => {
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Name</TableCell>
+                <TableCell>
+                  <Box display="flex" alignItems="center" gap={1}>
+                    <Tooltip title="Sort by name">
+                      <IconButton
+                        size="small"
+                        onClick={() => handleSort('full_name')}
+                        sx={{ p: 0 }}
+                        data-testid="sort-name"
+                      >
+                        Name {getSortIcon('full_name')}
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
+                </TableCell>
                 <TableCell>Email</TableCell>
                 <TableCell>Phone</TableCell>
-                <TableCell>Role</TableCell>
-                <TableCell>Status</TableCell>
+                <TableCell>
+                  <Box display="flex" alignItems="center" gap={1}>
+                    <Tooltip title="Sort by role">
+                      <IconButton size="small" onClick={() => handleSort('role')} sx={{ p: 0 }} data-testid="sort-role">
+                        Role {getSortIcon('role')}
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
+                </TableCell>
+                <TableCell>
+                  <Box display="flex" alignItems="center" gap={1}>
+                    <Tooltip title="Sort by status">
+                      <IconButton
+                        size="small"
+                        onClick={() => handleSort('status')}
+                        sx={{ p: 0 }}
+                        data-testid="sort-status"
+                      >
+                        Status {getSortIcon('status')}
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
+                </TableCell>
                 <TableCell>Description</TableCell>
-                <TableCell>Created</TableCell>
+                <TableCell>
+                  <Box display="flex" alignItems="center" gap={1}>
+                    <Tooltip title="Sort by created date">
+                      <IconButton
+                        size="small"
+                        onClick={() => handleSort('created_at')}
+                        sx={{ p: 0 }}
+                        data-testid="sort-created"
+                      >
+                        Created {getSortIcon('created_at')}
+                      </IconButton>
+                    </Tooltip>
+                  </Box>
+                </TableCell>
                 <TableCell>Actions</TableCell>
               </TableRow>
             </TableHead>
@@ -283,7 +374,21 @@ const AdminDashboard: React.FC = () => {
                 usersData.data.users.map((user: User) => (
                   <TableRow key={user.id}>
                     <TableCell>
-                      {user.status === 'verified' ? (
+                      {user.role === 'admin' || user.role === 'super_admin' ? (
+                        <Link
+                          component={RouterLink}
+                          to={`/admins/${user.id}`}
+                          sx={{
+                            textDecoration: 'none',
+                            color: 'primary.main',
+                            '&:hover': {
+                              textDecoration: 'underline',
+                            },
+                          }}
+                        >
+                          {user.full_name}
+                        </Link>
+                      ) : user.status === 'verified' ? (
                         <Link
                           component={RouterLink}
                           to={`/user/${user.url_id}`}

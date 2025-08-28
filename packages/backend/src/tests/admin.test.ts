@@ -15,7 +15,10 @@ describe('Admin System', () => {
       };
 
       const result = AdminUserListInputSchema.parse(validInput);
-      expect(result).toEqual(validInput);
+      expect(result).toEqual({
+        ...validInput,
+        sortOrder: 'desc', // Default value from schema
+      });
     });
 
     it('should validate admin user list input with status filter', () => {
@@ -26,7 +29,10 @@ describe('Admin System', () => {
       };
 
       const result = AdminUserListInputSchema.parse(validInput);
-      expect(result).toEqual(validInput);
+      expect(result).toEqual({
+        ...validInput,
+        sortOrder: 'desc', // Default value from schema
+      });
     });
 
     it('should reject invalid status in admin user list input', () => {

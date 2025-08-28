@@ -9,80 +9,16 @@ interface VerificationBadgeProps {
 }
 
 const VerificationBadge: React.FC<VerificationBadgeProps> = ({ verifiedBy, status }) => {
-  // If status is verified but no verifiedBy, this is an invalid state
-  if (status === 'verified' && !verifiedBy) {
-    return (
-      <Chip
-        label="Invalid Verification"
-        color="error"
-        size="small"
-        sx={{
-          backgroundColor: 'rgba(255,0,0,0.2)',
-          color: 'white',
-          fontWeight: 'bold',
-        }}
-      />
-    );
-  }
-
-  const { data: adminData, isLoading } = trpc.getAdminProfile.useQuery(
+  const { data: adminData } = trpc.getAdminProfile.useQuery(
     { adminId: verifiedBy },
     {
       enabled: !!verifiedBy && status === 'verified',
     }
   );
 
-  if (status !== 'verified') {
-    return (
-      <Chip
-        label={status || 'Unknown'}
-        color="default"
-        size="small"
-        sx={{
-          backgroundColor: 'rgba(255,255,255,0.1)',
-          color: 'white',
-          fontWeight: 'bold',
-        }}
-      />
-    );
-  }
-
-  if (isLoading) {
-    return (
-      <Chip
-        icon={<Verified sx={{ color: 'white !important' }} />}
-        label="Verified"
-        color="success"
-        size="small"
-        sx={{
-          backgroundColor: 'rgba(255,255,255,0.2)',
-          color: 'white',
-          fontWeight: 'bold',
-          '& .MuiChip-icon': {
-            color: 'white',
-          },
-        }}
-      />
-    );
-  }
-
-  if (!adminData?.data) {
-    return (
-      <Chip
-        icon={<Verified sx={{ color: 'white !important' }} />}
-        label="Verified"
-        color="success"
-        size="small"
-        sx={{
-          backgroundColor: 'rgba(255,255,255,0.2)',
-          color: 'white',
-          fontWeight: 'bold',
-          '& .MuiChip-icon': {
-            color: 'white',
-          },
-        }}
-      />
-    );
+  // Only show badge if status is verified and we have admin data
+  if (status !== 'verified' || !verifiedBy || !adminData?.data) {
+    return null;
   }
 
   const admin = adminData.data;
@@ -109,6 +45,7 @@ const VerificationBadge: React.FC<VerificationBadgeProps> = ({ verifiedBy, statu
       }
       color="success"
       size="small"
+      data-testid="verification-badge"
       sx={{
         backgroundColor: 'rgba(255,255,255,0.2)',
         color: 'white',

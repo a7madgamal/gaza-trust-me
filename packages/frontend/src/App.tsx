@@ -27,6 +27,14 @@ function App() {
             <Route path="/user/:urlId" element={<PublicPage />} />
             <Route path="/admins/:adminId" element={<AdminProfile />} />
             <Route
+              path="/browse"
+              element={
+                <ProtectedRoute>
+                  <PublicPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/home"
               element={
                 <ProtectedRoute>

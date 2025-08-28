@@ -60,7 +60,10 @@ export const AuthLogoutOutputSchema = z.object({
 // Admin router schemas
 export const AdminUserListInputSchema = z.object({
   status: z.enum(SEEKER_STATUSES).optional(),
+  role: z.enum(USER_ROLES).optional(), // Filter by role (super admin only)
   search: z.string().optional(), // Search in name, email, description
+  sortBy: z.enum(['full_name', 'role', 'status', 'created_at']).optional(),
+  sortOrder: z.enum(['asc', 'desc']).optional().default('desc'),
   limit: z.number().int().positive().max(100).default(20),
   offset: z.number().int().nonnegative().default(0),
 });

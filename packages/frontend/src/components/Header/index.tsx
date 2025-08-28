@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AppBar, Toolbar, Typography, Button, Menu, MenuItem, Box, IconButton } from '@mui/material';
-import { AccountCircle, Logout, Person } from '@mui/icons-material';
+import { AccountCircle, Logout, Person, People } from '@mui/icons-material';
 import { useAuth } from '../../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 
@@ -34,6 +34,11 @@ export const Header: React.FC = () => {
     } else {
       navigate('/dashboard');
     }
+  };
+
+  const handleBrowseUsers = () => {
+    handleClose();
+    navigate('/browse');
   };
 
   const handleHomeClick = () => {
@@ -118,6 +123,10 @@ export const Header: React.FC = () => {
               <MenuItem onClick={handleProfile}>
                 <Person sx={{ mr: 1 }} />
                 Profile
+              </MenuItem>
+              <MenuItem onClick={handleBrowseUsers}>
+                <People sx={{ mr: 1 }} />
+                Browse Users
               </MenuItem>
               <MenuItem onClick={handleDashboard}>Dashboard</MenuItem>
               <MenuItem onClick={handleLogout}>

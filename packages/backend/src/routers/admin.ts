@@ -82,43 +82,64 @@ export const adminRouter = t.router({
   getUsers: adminProcedure
     .input(AdminUserListInputSchema)
     .output(ApiResponseSchema(AdminUserListOutputSchema))
-    .query(async ({ input }) => {
+    .query(async ({ input, ctx }) => {
       try {
-        let query = supabase
-          .from('users')
-          .select(
-            `
+        let query = supabase.from('users').select(
+          `
             id, url_id, email, full_name, description, phone_number, status, role, verified_by, created_at,
             verified_by_admin:users!verified_by(full_name)
           `
-          )
-          .eq('role', 'help_seeker') // Only show help_seeker users by default
-          .order('created_at', { ascending: false });
+        );
+
+        // Super admins can see all roles, regular admins only see help_seeker users
+        if (ctx.adminUser.role !== 'super_admin') {
+          query = query.eq('role', 'help_seeker');
+        }
+
+        // Apply sorting
+        const sortField = input.sortBy || 'created_at';
+        const sortOrder = input.sortOrder || 'desc';
+        query = query.order(sortField, { ascending: sortOrder === 'asc' });
 
         // Apply filters
         if (input.status) {
           query = query.eq('status', input.status);
         }
 
+        // Apply role filter (super admin only)
+        if (input.role && ctx.adminUser.role === 'super_admin') {
+          query = query.eq('role', input.role);
+        }
+
         // Apply search filter (search in name, email, description)
         if (input.search && input.search.trim()) {
           const searchTerm = input.search.trim();
-          query = query.or(`full_name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
+          query = query.or(
+            `full_name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`
+          );
         }
 
         // Get total count first (without pagination)
-        const countQuery = supabase
-          .from('users')
-          .select('id', { count: 'exact', head: true })
-          .eq('role', 'help_seeker');
+        const countQuery = supabase.from('users').select('id', { count: 'exact', head: true });
+
+        // Apply the same role filter to count query
+        if (ctx.adminUser.role !== 'super_admin') {
+          countQuery.eq('role', 'help_seeker');
+        }
 
         if (input.status) {
           countQuery.eq('status', input.status);
         }
 
+        if (input.role && ctx.adminUser.role === 'super_admin') {
+          countQuery.eq('role', input.role);
+        }
+
         if (input.search && input.search.trim()) {
           const searchTerm = input.search.trim();
-          countQuery.or(`full_name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
+          countQuery.or(
+            `full_name.ilike.%${searchTerm}%,email.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`
+          );
         }
 
         const { count, error: countError } = await countQuery;
