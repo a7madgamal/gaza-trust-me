@@ -1,5 +1,6 @@
 import { test, expect } from './global-test-hook';
 import { loginAsUser, clearBrowserState } from './utils/auth-helpers';
+import { createTestUserViaAPI } from './utils/test-data';
 import { env } from './utils/env';
 
 test.describe('Enhanced Admin Dashboard', () => {
@@ -140,6 +141,9 @@ test.describe('Enhanced Admin Dashboard', () => {
   });
 
   test('should display verified users as clickable links', async ({ page }) => {
+    // Create a verified user first to ensure we have test data
+    await createTestUserViaAPI('helpSeeker');
+
     // Login as admin
     await loginAsUser(page, 'admin');
 
@@ -152,10 +156,13 @@ test.describe('Enhanced Admin Dashboard', () => {
     // Wait for users table to load
     await expect(page.getByTestId('users-table')).toBeVisible();
 
-    // Check that verified user names are clickable links
-    // Look for any link that has a user URL pattern
+    // Filter to show only verified users
+    const statusFilter = page.getByTestId('status-filter');
+    await statusFilter.click();
+    await page.getByRole('option', { name: 'Verified' }).click();
+
+    // Now check that user links have correct format
     const userLinks = page.locator('a[href*="/user/"]');
-    await expect(userLinks.first()).toBeVisible();
     await expect(userLinks.first()).toHaveAttribute('href', /\/user\/\d+/);
   });
 });

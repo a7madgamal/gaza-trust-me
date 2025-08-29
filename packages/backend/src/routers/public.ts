@@ -78,6 +78,8 @@ export const publicRouter = t.router({
             .single();
 
           if (currentUser) {
+            // Since we order by created_at DESC (newest first),
+            // "next" means finding users with OLDER created_at dates
             query = query.lt('created_at', currentUser.created_at);
           }
         }
@@ -88,6 +90,28 @@ export const publicRouter = t.router({
           // PGRST116 = no rows returned
           logger.error('Error fetching next user:', error);
           throw new Error('Failed to fetch next user');
+        }
+
+        // If no next user found and we have a current user, start from the beginning
+        if (!data && input.currentUserId) {
+          const { data: firstUser, error: firstUserError } = await supabase
+            .from('users')
+            .select(
+              'id, url_id, full_name, description, phone_number, status, role, verified_at, verified_by, created_at, linkedin_url, campaign_url'
+            )
+            .eq('role', 'help_seeker')
+            .not('status', 'is', null)
+            .eq('status', 'verified')
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .single();
+
+          if (firstUserError && firstUserError.code !== 'PGRST116') {
+            logger.error('Error fetching first user:', firstUserError);
+            throw new Error('Failed to fetch first user');
+          }
+
+          return firstUser;
         }
 
         return data;

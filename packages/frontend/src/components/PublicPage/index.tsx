@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, Card, CardContent, Button, Stack, CircularProgress, Link } from '@mui/material';
-import { WhatsApp, LinkedIn, Campaign, Phone, NavigateBefore, NavigateNext, Check } from '@mui/icons-material';
+import { WhatsApp, LinkedIn, Campaign, Phone, NavigateBefore, NavigateNext } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
 import { trpc } from '../../utils/trpc';
 import { useToast } from '../../hooks/useToast';
@@ -91,12 +91,6 @@ const PublicPage: React.FC = () => {
     }
   };
 
-  const handleAccept = () => {
-    // TODO: Implement accept functionality
-    console.log('Accept user:', users[currentUserIndex]);
-    handleNext();
-  };
-
   if (loading || usersLoading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
@@ -135,45 +129,8 @@ const PublicPage: React.FC = () => {
 
   return (
     <Box sx={{ maxWidth: 600, mx: 'auto', p: 3 }}>
-      {/* Header */}
-      <Box
-        textAlign="center"
-        mb={4}
-        sx={{
-          background: 'linear-gradient(135deg, rgba(211, 47, 47, 0.05) 0%, rgba(76, 175, 80, 0.05) 100%)',
-          borderRadius: 0,
-          p: 4,
-          border: '1px solid rgba(211, 47, 47, 0.1)',
-          boxShadow: '0 4px 16px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04)',
-        }}
-      >
-        <Typography
-          variant="h3"
-          gutterBottom
-          sx={{
-            background: 'linear-gradient(135deg, #d32f2f 0%, #4caf50 100%)',
-            backgroundClip: 'text',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            fontWeight: 700,
-          }}
-        >
-          Confirmed from Gaza
-        </Typography>
-        <Typography variant="body1" color="text.secondary" sx={{ fontSize: '1.1rem' }}>
-          Browse verified users who need help
-        </Typography>
-      </Box>
-
       {/* Card Stack */}
       <Box position="relative" mb={4}>
-        {/* Progress indicator */}
-        <Box display="flex" justifyContent="center" mb={2} data-testid="progress-indicator">
-          <Typography variant="body2" color="text.secondary">
-            {currentUserIndex + 1} of {users.length}
-          </Typography>
-        </Box>
-
         {/* Main Card */}
         <Card
           elevation={8}
@@ -210,9 +167,6 @@ const PublicPage: React.FC = () => {
 
             {/* Description */}
             <Box flex={1} sx={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-              <Typography variant="h6" gutterBottom>
-                Needs Help With:
-              </Typography>
               <Box
                 sx={{
                   flex: 1,
@@ -391,21 +345,6 @@ const PublicPage: React.FC = () => {
           </Button>
 
           <Button
-            variant="contained"
-            onClick={handleAccept}
-            startIcon={<Check />}
-            sx={{
-              minWidth: 120,
-              background: 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)',
-              '&:hover': {
-                background: 'linear-gradient(135deg, #45a049 0%, #3d8b40 100%)',
-              },
-            }}
-          >
-            I contacted
-          </Button>
-
-          <Button
             variant="outlined"
             onClick={handleNext}
             disabled={currentUserIndex === users.length - 1}
@@ -423,13 +362,6 @@ const PublicPage: React.FC = () => {
             Next
           </Button>
         </Stack>
-      </Box>
-
-      {/* Instructions */}
-      <Box textAlign="center">
-        <Typography variant="body2" color="text.secondary">
-          Click "I contacted" when you've reached out to help this person
-        </Typography>
       </Box>
     </Box>
   );

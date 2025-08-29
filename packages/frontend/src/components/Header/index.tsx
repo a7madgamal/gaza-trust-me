@@ -82,7 +82,7 @@ export const Header: React.FC = () => {
     <AppBar position="static" elevation={1}>
       <Toolbar>
         <Typography variant="h6" component="div" sx={{ flexGrow: 1, cursor: 'pointer' }} onClick={handleHomeClick}>
-          Help-Seeking Platform
+          Confirmed in Gaza
         </Typography>
 
         {user ? (

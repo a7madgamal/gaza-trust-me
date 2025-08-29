@@ -1,4 +1,4 @@
-# Help-Seeking Platform - Product Requirements Document
+# Confirmed in Gaza - Product Requirements Document
 
 ## Document Update Guidelines
 
@@ -12,7 +12,7 @@
 
 ## Project Overview
 
-**Product Name:** Help-Seeking Platform  
+**Product Name:** Confirmed in Gaza  
 **Type:** Production-ready web application  
 **Purpose:** Connect people in need with potential helpers through a human verified, secure platform
 

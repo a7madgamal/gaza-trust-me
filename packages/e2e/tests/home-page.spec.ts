@@ -9,15 +9,6 @@ test.describe('Home Page', () => {
     // Wait for auto-redirect to user URL
     await page.waitForURL(/\/user\/\d+/);
 
-    // Should show the public page title
-    await expect(page.getByRole('heading', { name: 'Confirmed from Gaza' })).toBeVisible();
-
-    // Should show the subtitle
-    await expect(page.getByText('Browse verified users who need help')).toBeVisible();
-
-    // Should show progress indicator
-    await expect(page.getByText(/1 of/)).toBeVisible();
-
     // Should show main card
     await expect(page.locator('[data-testid="user-card"]')).toBeVisible();
 
@@ -52,17 +43,10 @@ test.describe('Home Page', () => {
 
     // Should show all navigation buttons
     await expect(page.getByRole('button', { name: 'Previous' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'I contacted' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Next' })).toBeVisible();
 
     // Previous button should be disabled initially (first card)
     await expect(page.getByRole('button', { name: 'Previous' })).toBeDisabled();
-
-    // I contacted button should be enabled
-    await expect(page.getByRole('button', { name: 'I contacted' })).toBeEnabled();
-
-    // Should show instructions
-    await expect(page.getByText(/Click "I contacted" when you've reached out to help this person/)).toBeVisible();
   });
 
   test('should handle API errors and loading states', async ({ page }) => {
@@ -115,7 +99,7 @@ test.describe('Home Page', () => {
     await page.goto(env.FRONTEND_URL);
 
     // Check title is visible and clickable
-    const title = page.getByText('Help-Seeking Platform');
+    const title = page.getByText('Confirmed in Gaza');
     await expect(title).toBeVisible();
 
     // Check login and register buttons are visible
@@ -129,7 +113,7 @@ test.describe('Home Page', () => {
     await page.goto(`${env.FRONTEND_URL}/login`);
 
     // Click the title
-    void page.getByText('Help-Seeking Platform').click();
+    void page.getByText('Confirmed in Gaza').click();
 
     // Should navigate back to home and auto-redirect to user URL
     await page.waitForURL(/\/user\/\d+/);
@@ -215,7 +199,7 @@ test.describe('Home Page', () => {
     await page.setViewportSize({ width: 375, height: 667 });
 
     // Check title is still visible
-    await expect(page.getByText('Help-Seeking Platform')).toBeVisible();
+    await expect(page.getByText('Confirmed in Gaza')).toBeVisible();
 
     // When logged in as admin, should show user menu, not login/register buttons
     await expect(page.getByRole('button', { name: 'account of current user' })).toBeVisible();
@@ -226,7 +210,7 @@ test.describe('Home Page', () => {
     await page.setViewportSize({ width: 768, height: 1024 });
 
     // Check all elements are visible
-    await expect(page.getByText('Help-Seeking Platform')).toBeVisible();
+    await expect(page.getByText('Confirmed in Gaza')).toBeVisible();
     await expect(page.getByRole('button', { name: 'account of current user' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Login' })).toBeHidden();
     await expect(page.getByRole('button', { name: 'Register' })).toBeHidden();
