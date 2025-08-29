@@ -39,6 +39,20 @@ test.describe('Card Links', () => {
     await expect(campaignLink).toHaveAttribute('target', '_blank');
     await expect(campaignLink).toHaveAttribute('rel', 'noopener noreferrer');
     await expect(campaignLink).toHaveAttribute('href', 'https://gofundme.com/userWithLinkedinandcampaign');
+
+    // Verify Facebook link is displayed with correct attributes
+    const facebookLink = page.getByRole('link', { name: 'Facebook Profile' });
+    await expect(facebookLink).toBeVisible();
+    await expect(facebookLink).toHaveAttribute('target', '_blank');
+    await expect(facebookLink).toHaveAttribute('rel', 'noopener noreferrer');
+    await expect(facebookLink).toHaveAttribute('href', 'https://facebook.com/userWithLinkedinandcampaign');
+
+    // Verify Telegram link is displayed with correct attributes
+    const telegramLink = page.getByRole('link', { name: 'Telegram Profile' });
+    await expect(telegramLink).toBeVisible();
+    await expect(telegramLink).toHaveAttribute('target', '_blank');
+    await expect(telegramLink).toHaveAttribute('rel', 'noopener noreferrer');
+    await expect(telegramLink).toHaveAttribute('href', 'https://t.me/userWithLinkedinandcampaign');
   });
 
   test('should display WhatsApp link for users with phone numbers and handle navigation between users', async ({

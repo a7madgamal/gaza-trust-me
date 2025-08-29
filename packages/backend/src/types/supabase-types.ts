@@ -32,6 +32,8 @@ export const AuthRegistrationInputSchema = z.object({
     .max(2000, 'Description must be less than 2000 characters'),
   linkedinUrl: z.string().url('Invalid LinkedIn URL').or(z.literal('')).optional(),
   campaignUrl: z.string().url('Invalid campaign URL').or(z.literal('')).optional(),
+  facebookUrl: z.string().url('Invalid Facebook URL').or(z.literal('')).optional(),
+  telegramUrl: z.string().url('Invalid Telegram URL').or(z.literal('')).optional(),
 });
 
 export const AuthLoginInputSchema = z.object({
@@ -134,6 +136,8 @@ export const UserProfileUpdateSchema = z.object({
   description: z.string().min(10, 'Description must be at least 10 characters').optional(),
   linkedin_url: z.string().url('Invalid LinkedIn URL').optional(),
   campaign_url: z.string().url('Invalid campaign URL').optional(),
+  facebook_url: z.string().url('Invalid Facebook URL').optional(),
+  telegram_url: z.string().url('Invalid Telegram URL').optional(),
 });
 
 export const UserProfileOutputSchema = z.object({
@@ -151,6 +155,8 @@ export const UserProfileOutputSchema = z.object({
   updated_at: z.string().nullable(),
   linkedin_url: z.string().nullable(),
   campaign_url: z.string().nullable(),
+  facebook_url: z.string().nullable(),
+  telegram_url: z.string().nullable(),
 });
 
 export const UserProfileUpdateOutputSchema = z.object({
@@ -161,6 +167,8 @@ export const UserProfileUpdateOutputSchema = z.object({
     description: z.string(),
     linkedin_url: z.string().nullable(),
     campaign_url: z.string().nullable(),
+    facebook_url: z.string().nullable(),
+    telegram_url: z.string().nullable(),
     updated_at: z.string().nullable(),
     status: z.enum(SEEKER_STATUSES).nullable(),
   }),
@@ -193,6 +201,8 @@ export const PublicUserSchema = z.object({
   created_at: z.string().nullable(),
   linkedin_url: z.string().nullable(),
   campaign_url: z.string().nullable(),
+  facebook_url: z.string().nullable(),
+  telegram_url: z.string().nullable(),
 });
 
 export const AdminProfileSchema = z.object({
@@ -207,6 +217,8 @@ export const AdminProfileSchema = z.object({
   description: z.string().nullable(),
   linkedin_url: z.string().nullable(),
   campaign_url: z.string().nullable(),
+  facebook_url: z.string().nullable(),
+  telegram_url: z.string().nullable(),
 });
 
 export const CardStackNavigationInputSchema = z.object({

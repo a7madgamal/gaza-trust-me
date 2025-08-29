@@ -16,6 +16,8 @@ export const useRegistrationForm = () => {
     description: '',
     linkedinUrl: '',
     campaignUrl: '',
+    facebookUrl: '',
+    telegramUrl: '',
   });
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [loading, setLoading] = useState(false);
@@ -65,6 +67,8 @@ export const useRegistrationForm = () => {
         description: formData.description,
         linkedin_url: formData.linkedinUrl,
         campaign_url: formData.campaignUrl,
+        facebook_url: formData.facebookUrl,
+        telegram_url: formData.telegramUrl,
       })
         .then(result => {
           console.log('Backend signup response:', result);

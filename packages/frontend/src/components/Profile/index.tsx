@@ -17,7 +17,7 @@ import {
   DialogActions,
   DialogContentText,
 } from '@mui/material';
-import { LinkedIn, Campaign, Launch, Edit, Save, Cancel, Warning } from '@mui/icons-material';
+import { LinkedIn, Campaign, Launch, Edit, Save, Cancel, Warning, Facebook, Telegram } from '@mui/icons-material';
 import { useAuth } from '../../hooks/useAuth';
 import { useState } from 'react';
 import { trpc } from '../../utils/trpc';
@@ -34,6 +34,8 @@ const Profile = () => {
     description: '',
     linkedin_url: '',
     campaign_url: '',
+    facebook_url: '',
+    telegram_url: '',
   });
 
   const updateProfileMutation = trpc.updateProfile.useMutation({
@@ -95,9 +97,16 @@ const Profile = () => {
       description: userProfile?.description || '',
       linkedin_url: userProfile?.linkedin_url || '',
       campaign_url: userProfile?.campaign_url || '',
+      facebook_url: userProfile?.facebook_url || '',
+      telegram_url: userProfile?.telegram_url || '',
     });
     setIsEditMode(true);
     setShowWarningDialog(false);
+  };
+
+  // Helper function to normalize URL values for comparison
+  const normalizeUrlValue = (value: string | null | undefined): string => {
+    return value || '';
   };
 
   const handleSave = () => {
@@ -107,6 +116,8 @@ const Profile = () => {
       description?: string;
       linkedin_url?: string;
       campaign_url?: string;
+      facebook_url?: string;
+      telegram_url?: string;
     } = {};
 
     // Only include fields that have changed
@@ -119,11 +130,17 @@ const Profile = () => {
     if (formData.description !== userProfile?.description) {
       updateData.description = formData.description;
     }
-    if (formData.linkedin_url !== userProfile?.linkedin_url) {
+    if (normalizeUrlValue(formData.linkedin_url) !== normalizeUrlValue(userProfile?.linkedin_url)) {
       updateData.linkedin_url = formData.linkedin_url || undefined;
     }
-    if (formData.campaign_url !== userProfile?.campaign_url) {
+    if (normalizeUrlValue(formData.campaign_url) !== normalizeUrlValue(userProfile?.campaign_url)) {
       updateData.campaign_url = formData.campaign_url || undefined;
+    }
+    if (normalizeUrlValue(formData.facebook_url) !== normalizeUrlValue(userProfile?.facebook_url)) {
+      updateData.facebook_url = formData.facebook_url || undefined;
+    }
+    if (normalizeUrlValue(formData.telegram_url) !== normalizeUrlValue(userProfile?.telegram_url)) {
+      updateData.telegram_url = formData.telegram_url || undefined;
     }
 
     if (Object.keys(updateData).length === 0) {
@@ -136,6 +153,16 @@ const Profile = () => {
   };
 
   const handleCancel = () => {
+    // Reset form data to original values
+    setFormData({
+      full_name: userProfile?.full_name || '',
+      phone_number: userProfile?.phone_number || '',
+      description: userProfile?.description || '',
+      linkedin_url: userProfile?.linkedin_url || '',
+      campaign_url: userProfile?.campaign_url || '',
+      facebook_url: userProfile?.facebook_url || '',
+      telegram_url: userProfile?.telegram_url || '',
+    });
     setIsEditMode(false);
     setShowWarningDialog(false);
   };
@@ -352,6 +379,28 @@ const Profile = () => {
                 <Grid item xs={12} sm={6}>
                   <TextField
                     fullWidth
+                    label="Facebook Profile URL"
+                    value={isEditMode ? formData.facebook_url : userProfile.facebook_url || 'Not provided'}
+                    onChange={e => handleInputChange('facebook_url', e.target.value)}
+                    disabled={!isEditMode}
+                    placeholder="https://facebook.com/yourprofile"
+                    inputProps={{ 'data-testid': 'profile-facebook-url' }}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Telegram Profile URL"
+                    value={isEditMode ? formData.telegram_url : userProfile.telegram_url || 'Not provided'}
+                    onChange={e => handleInputChange('telegram_url', e.target.value)}
+                    disabled={!isEditMode}
+                    placeholder="https://t.me/yourusername"
+                    inputProps={{ 'data-testid': 'profile-telegram-url' }}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
                     label="Public Profile ID"
                     value={userProfile.url_id || 'Not assigned'}
                     disabled
@@ -393,7 +442,10 @@ const Profile = () => {
               </Grid>
 
               {/* Links Section */}
-              {(userProfile.linkedin_url || userProfile.campaign_url) && (
+              {(userProfile.linkedin_url ||
+                userProfile.campaign_url ||
+                userProfile.facebook_url ||
+                userProfile.telegram_url) && (
                 <Box sx={{ mt: 4 }}>
                   <Typography variant="h6" gutterBottom>
                     External Links
@@ -450,6 +502,56 @@ const Profile = () => {
                         </Button>
                       </Grid>
                     )}
+                    {userProfile.facebook_url && (
+                      <Grid item xs={12} sm={6}>
+                        <Button
+                          component="a"
+                          variant="outlined"
+                          startIcon={<Facebook />}
+                          endIcon={<Launch />}
+                          href={userProfile.facebook_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          fullWidth
+                          sx={{
+                            borderColor: '#1877f2',
+                            color: '#1877f2',
+                            '&:hover': {
+                              borderColor: '#0d5aa7',
+                              backgroundColor: 'rgba(24, 119, 242, 0.08)',
+                            },
+                          }}
+                          data-testid="profile-facebook-button"
+                        >
+                          View Facebook Profile
+                        </Button>
+                      </Grid>
+                    )}
+                    {userProfile.telegram_url && (
+                      <Grid item xs={12} sm={6}>
+                        <Button
+                          component="a"
+                          variant="outlined"
+                          startIcon={<Telegram />}
+                          endIcon={<Launch />}
+                          href={userProfile.telegram_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          fullWidth
+                          sx={{
+                            borderColor: '#0088cc',
+                            color: '#0088cc',
+                            '&:hover': {
+                              borderColor: '#006699',
+                              backgroundColor: 'rgba(0, 136, 204, 0.08)',
+                            },
+                          }}
+                          data-testid="profile-telegram-button"
+                        >
+                          View Telegram Profile
+                        </Button>
+                      </Grid>
+                    )}
                   </Grid>
                 </Box>
               )}
@@ -478,15 +580,6 @@ const Profile = () => {
                   >
                     View Public Profile
                   </Button>
-                </Box>
-              )}
-
-              {!isEditMode && (
-                <Box sx={{ mt: 4 }}>
-                  <Alert severity="info">
-                    Profile information is collected during registration and cannot be edited. Contact support if you
-                    need to update your information.
-                  </Alert>
                 </Box>
               )}
             </Grid>

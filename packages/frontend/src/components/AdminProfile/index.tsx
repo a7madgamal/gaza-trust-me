@@ -10,6 +10,8 @@ import {
   Language,
   CalendarToday,
   Update,
+  Facebook,
+  Telegram,
 } from '@mui/icons-material';
 import { useParams } from 'react-router-dom';
 import { trpc } from '../../utils/trpc';
@@ -194,7 +196,7 @@ const AdminProfile: React.FC = () => {
       )}
 
       {/* Contact & Links */}
-      {(admin.linkedin_url || admin.campaign_url) && (
+      {(admin.linkedin_url || admin.campaign_url || admin.facebook_url || admin.telegram_url) && (
         <Card elevation={2} sx={{ mb: 3 }}>
           <CardContent sx={{ p: 3 }}>
             <Typography variant="h6" gutterBottom>
@@ -215,6 +217,24 @@ const AdminProfile: React.FC = () => {
                   <Language color="primary" />
                   <Link href={admin.campaign_url} target="_blank" rel="noopener noreferrer">
                     Campaign Page
+                  </Link>
+                </Box>
+              )}
+
+              {admin.facebook_url && (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Facebook color="primary" />
+                  <Link href={admin.facebook_url} target="_blank" rel="noopener noreferrer">
+                    Facebook Profile
+                  </Link>
+                </Box>
+              )}
+
+              {admin.telegram_url && (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Telegram color="primary" />
+                  <Link href={admin.telegram_url} target="_blank" rel="noopener noreferrer">
+                    Telegram Profile
                   </Link>
                 </Box>
               )}

@@ -141,6 +141,16 @@ export const validateRegistrationForm = (formData: RegistrationFormData): Valida
     errors.campaignUrl = campaignUrlError;
   }
 
+  const facebookUrlError = validateUrl(formData.facebookUrl, 'Facebook');
+  if (facebookUrlError) {
+    errors.facebookUrl = facebookUrlError;
+  }
+
+  const telegramUrlError = validateUrl(formData.telegramUrl, 'Telegram');
+  if (telegramUrlError) {
+    errors.telegramUrl = telegramUrlError;
+  }
+
   return errors;
 };
 
@@ -167,6 +177,8 @@ export const SessionDataSchema = z.object({
         description: z.string().optional(),
         linkedin_url: z.string().optional(),
         campaign_url: z.string().optional(),
+        facebook_url: z.string().optional(),
+        telegram_url: z.string().optional(),
       })
       .optional(),
   }),

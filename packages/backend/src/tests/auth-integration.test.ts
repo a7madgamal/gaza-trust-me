@@ -23,7 +23,7 @@ describe('Auth Router Integration', () => {
     vi.clearAllMocks();
   });
 
-  it('should pass LinkedIn and campaign URLs to Supabase Auth metadata', async () => {
+  it('should pass all optional URLs to Supabase Auth metadata', async () => {
     const mockSignUp = vi.mocked(supabase.auth.signUp);
     mockSignUp.mockResolvedValue({
       data: {
@@ -47,6 +47,8 @@ describe('Auth Router Integration', () => {
       description: 'This is a detailed description of the help I need',
       linkedinUrl: 'https://linkedin.com/in/test-user',
       campaignUrl: 'https://gofundme.com/test-campaign',
+      facebookUrl: 'https://facebook.com/test-user',
+      telegramUrl: 'https://t.me/testuser',
     };
 
     await caller({}).register(input);
@@ -61,6 +63,8 @@ describe('Auth Router Integration', () => {
           description: 'This is a detailed description of the help I need',
           linkedin_url: 'https://linkedin.com/in/test-user',
           campaign_url: 'https://gofundme.com/test-campaign',
+          facebook_url: 'https://facebook.com/test-user',
+          telegram_url: 'https://t.me/testuser',
         },
         emailRedirectTo: 'http://localhost:3000/auth/callback',
       },

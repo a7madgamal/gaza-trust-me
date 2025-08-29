@@ -56,6 +56,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           updated_at: profileData.data.updated_at,
           linkedin_url: profileData.data.linkedin_url,
           campaign_url: profileData.data.campaign_url,
+          facebook_url: profileData.data.facebook_url,
+          telegram_url: profileData.data.telegram_url,
           verifiedAt: profileData.data.verified_at,
           verifiedBy: profileData.data.verified_by,
         };

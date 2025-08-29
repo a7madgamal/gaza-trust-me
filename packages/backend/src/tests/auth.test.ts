@@ -15,7 +15,7 @@ describe('Authentication', () => {
     expect(result).toEqual(validInput);
   });
 
-  it('should validate registration input with LinkedIn and campaign URLs', () => {
+  it('should validate registration input with all optional URLs', () => {
     const validInput = {
       email: 'test@example.com',
       password: 'password123',
@@ -24,12 +24,16 @@ describe('Authentication', () => {
       description: 'This is a detailed description of the help I need',
       linkedinUrl: 'https://linkedin.com/in/test-user',
       campaignUrl: 'https://gofundme.com/test-campaign',
+      facebookUrl: 'https://facebook.com/test-user',
+      telegramUrl: 'https://t.me/testuser',
     };
 
     const result = AuthRegistrationInputSchema.parse(validInput);
     expect(result).toEqual(validInput);
     expect(result.linkedinUrl).toBe('https://linkedin.com/in/test-user');
     expect(result.campaignUrl).toBe('https://gofundme.com/test-campaign');
+    expect(result.facebookUrl).toBe('https://facebook.com/test-user');
+    expect(result.telegramUrl).toBe('https://t.me/testuser');
   });
 
   it('should validate registration input with only LinkedIn URL', () => {
@@ -87,6 +91,36 @@ describe('Authentication', () => {
       phoneNumber: '+1234567890',
       description: 'This is a detailed description of the help I need',
       campaignUrl: 'invalid-url-format',
+    };
+
+    expect(() => {
+      AuthRegistrationInputSchema.parse(invalidInput);
+    }).toThrow();
+  });
+
+  it('should reject invalid Facebook URL in registration', () => {
+    const invalidInput = {
+      email: 'test@example.com',
+      password: 'password123',
+      fullName: 'Test User',
+      phoneNumber: '+1234567890',
+      description: 'This is a detailed description of the help I need',
+      facebookUrl: 'not-a-valid-facebook-url',
+    };
+
+    expect(() => {
+      AuthRegistrationInputSchema.parse(invalidInput);
+    }).toThrow();
+  });
+
+  it('should reject invalid Telegram URL in registration', () => {
+    const invalidInput = {
+      email: 'test@example.com',
+      password: 'password123',
+      fullName: 'Test User',
+      phoneNumber: '+1234567890',
+      description: 'This is a detailed description of the help I need',
+      telegramUrl: 'invalid-telegram-format',
     };
 
     expect(() => {

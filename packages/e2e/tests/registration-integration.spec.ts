@@ -18,9 +18,11 @@ test.describe('Registration Integration', () => {
       `Test description for ${testUser.fullName}. This is a test user created for E2E testing.`
     );
 
-    // Fill LinkedIn and campaign URLs
+    // Fill LinkedIn, campaign, Facebook, and Telegram URLs
     await page.fill('[data-testid="linkedinUrl"]', testUser.linkedinUrl ?? '');
     await page.fill('[data-testid="campaignUrl"]', testUser.campaignUrl ?? '');
+    await page.fill('[data-testid="facebookUrl"]', testUser.facebookUrl ?? '');
+    await page.fill('[data-testid="telegramUrl"]', testUser.telegramUrl ?? '');
 
     // Verify all fields are filled correctly
     await expect(page.locator('[data-testid="email"]')).toHaveValue(testUser.email);
@@ -28,6 +30,8 @@ test.describe('Registration Integration', () => {
     await expect(page.locator('[data-testid="phoneNumber"]')).toHaveValue(testUser.phoneNumber);
     await expect(page.locator('[data-testid="linkedinUrl"]')).toHaveValue(testUser.linkedinUrl ?? '');
     await expect(page.locator('[data-testid="campaignUrl"]')).toHaveValue(testUser.campaignUrl ?? '');
+    await expect(page.locator('[data-testid="facebookUrl"]')).toHaveValue(testUser.facebookUrl ?? '');
+    await expect(page.locator('[data-testid="telegramUrl"]')).toHaveValue(testUser.telegramUrl ?? '');
 
     // Submit form
     await page.click('[data-testid="register-button"]');
@@ -120,7 +124,7 @@ test.describe('Registration Integration', () => {
     await expect(page.locator('[data-testid="register-button"]')).toBeDisabled();
   });
 
-  test('should validate URL formats for LinkedIn and campaign URLs', async ({ page }) => {
+  test('should validate URL formats for all optional URLs', async ({ page }) => {
     await page.goto('/register');
 
     // Fill required fields
@@ -157,5 +161,41 @@ test.describe('Registration Integration', () => {
 
     // Should show validation error for campaign URL
     await expect(page.locator('[data-testid="campaignUrl"]')).toHaveAttribute('aria-invalid', 'true');
+
+    // Test invalid Facebook URL
+    await page.goto('/register');
+    await page.fill('[data-testid="email"]', 'test3@example.com');
+    await page.fill('[data-testid="password"]', 'Password123!');
+    await page.fill('[data-testid="confirmPassword"]', 'Password123!');
+    await page.fill('[data-testid="fullName"]', 'Test User 3');
+    await page.fill('[data-testid="phoneNumber"]', '+1234567890');
+    await page.fill('[data-testid="description"]', 'This is a detailed description of the help I need.');
+
+    // Fill invalid Facebook URL
+    await page.fill('[data-testid="facebookUrl"]', 'not-a-valid-facebook-url');
+
+    // Submit form
+    await page.click('[data-testid="register-button"]');
+
+    // Should show validation error for Facebook URL
+    await expect(page.locator('[data-testid="facebookUrl"]')).toHaveAttribute('aria-invalid', 'true');
+
+    // Test invalid Telegram URL
+    await page.goto('/register');
+    await page.fill('[data-testid="email"]', 'test4@example.com');
+    await page.fill('[data-testid="password"]', 'Password123!');
+    await page.fill('[data-testid="confirmPassword"]', 'Password123!');
+    await page.fill('[data-testid="fullName"]', 'Test User 4');
+    await page.fill('[data-testid="phoneNumber"]', '+1234567890');
+    await page.fill('[data-testid="description"]', 'This is a detailed description of the help I need.');
+
+    // Fill invalid Telegram URL
+    await page.fill('[data-testid="telegramUrl"]', 'invalid-telegram-format');
+
+    // Submit form
+    await page.click('[data-testid="register-button"]');
+
+    // Should show validation error for Telegram URL
+    await expect(page.locator('[data-testid="telegramUrl"]')).toHaveAttribute('aria-invalid', 'true');
   });
 });

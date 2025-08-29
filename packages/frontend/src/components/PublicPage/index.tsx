@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Typography, Card, CardContent, Button, Stack, CircularProgress, Link } from '@mui/material';
-import { WhatsApp, LinkedIn, Campaign, Phone, NavigateBefore, NavigateNext } from '@mui/icons-material';
+import {
+  WhatsApp,
+  LinkedIn,
+  Campaign,
+  Phone,
+  NavigateBefore,
+  NavigateNext,
+  Facebook,
+  Telegram,
+} from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
 import { trpc } from '../../utils/trpc';
 import { useToast } from '../../hooks/useToast';
@@ -361,6 +370,72 @@ const PublicPage: React.FC = () => {
                           >
                             <Campaign sx={{ fontSize: '1rem' }} />
                             Campaign/Fundraising
+                          </Link>
+                        )}
+
+                        {/* Facebook Profile */}
+                        {currentUser.facebook_url && (
+                          <Link
+                            href={currentUser.facebook_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            sx={{
+                              color: '#ffffff',
+                              textDecoration: 'none',
+                              backgroundColor: '#1877f2',
+                              px: 1.5,
+                              py: 0.75,
+                              borderRadius: 1.5,
+                              fontSize: '0.8rem',
+                              fontWeight: 'medium',
+                              border: '1px solid #1877f2',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 0.5,
+                              '&:hover': {
+                                backgroundColor: '#0d5aa7',
+                                borderColor: '#0d5aa7',
+                                textDecoration: 'none',
+                                transform: 'translateY(-1px)',
+                              },
+                              transition: 'all 0.2s ease-in-out',
+                            }}
+                          >
+                            <Facebook sx={{ fontSize: '1rem' }} />
+                            Facebook Profile
+                          </Link>
+                        )}
+
+                        {/* Telegram Profile */}
+                        {currentUser.telegram_url && (
+                          <Link
+                            href={currentUser.telegram_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            sx={{
+                              color: '#ffffff',
+                              textDecoration: 'none',
+                              backgroundColor: '#0088cc',
+                              px: 1.5,
+                              py: 0.75,
+                              borderRadius: 1.5,
+                              fontSize: '0.8rem',
+                              fontWeight: 'medium',
+                              border: '1px solid #0088cc',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 0.5,
+                              '&:hover': {
+                                backgroundColor: '#006699',
+                                borderColor: '#006699',
+                                textDecoration: 'none',
+                                transform: 'translateY(-1px)',
+                              },
+                              transition: 'all 0.2s ease-in-out',
+                            }}
+                          >
+                            <Telegram sx={{ fontSize: '1rem' }} />
+                            Telegram Profile
                           </Link>
                         )}
                       </Stack>

@@ -7,6 +7,8 @@ export interface RegistrationFormData {
   description: string;
   linkedinUrl: string;
   campaignUrl: string;
+  facebookUrl: string;
+  telegramUrl: string;
 }
 
 export interface LoginFormData {
@@ -39,4 +41,8 @@ export interface ValidationErrors {
   linkedinUrl?: string;
 
   campaignUrl?: string;
+
+  facebookUrl?: string;
+
+  telegramUrl?: string;
 }

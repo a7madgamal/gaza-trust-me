@@ -19,6 +19,8 @@ export interface UserProfile {
   updated_at: string | null;
   linkedin_url: string | null;
   campaign_url: string | null;
+  facebook_url: string | null;
+  telegram_url: string | null;
 
   verifiedAt?: string | null;
   verifiedBy?: string | null;

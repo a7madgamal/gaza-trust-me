@@ -51,11 +51,6 @@ test.describe('Profile Editing - Help Seeker Users', () => {
     // Should exit edit mode
     await expect(page.locator('[data-testid="profile-edit-button"]')).toBeVisible();
     await expect(page.locator('[data-testid="profile-save-button"]')).toBeHidden();
-
-    // Check that the info message shows the correct text
-    await expect(
-      page.locator('text=Profile information is collected during registration and cannot be edited')
-    ).toBeVisible();
   });
 
   test('should handle edit mode cancellation and no-changes scenarios', async ({ page }) => {

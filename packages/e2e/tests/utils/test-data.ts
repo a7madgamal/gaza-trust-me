@@ -16,6 +16,8 @@ export interface TestUser {
   readonly phoneNumber: string;
   readonly linkedinUrl?: string;
   readonly campaignUrl?: string;
+  readonly facebookUrl?: string;
+  readonly telegramUrl?: string;
 }
 
 /**
@@ -41,6 +43,8 @@ export function generateTestUser(): TestUser {
     phoneNumber: `+1${Math.floor(Math.random() * 9000000000) + 1000000000}`,
     linkedinUrl: 'https://linkedin.com/in/test-user',
     campaignUrl: 'https://gofundme.com/test-campaign',
+    facebookUrl: 'https://facebook.com/test-user',
+    telegramUrl: 'https://t.me/testuser',
   };
 }
 
@@ -99,6 +103,8 @@ const TEST_USERS = {
     phoneNumber: '9999999',
     linkedinUrl: 'https://linkedin.com/in/userWithLinkedinandcampaign',
     campaignUrl: 'https://gofundme.com/userWithLinkedinandcampaign',
+    facebookUrl: 'https://facebook.com/userWithLinkedinandcampaign',
+    telegramUrl: 'https://t.me/userWithLinkedinandcampaign',
     role: 'help_seeker' as const,
     status: 'verified' as const,
   },
@@ -116,6 +122,8 @@ export const PREDEFINED_TEST_USERS: Record<
     phoneNumber: string;
     linkedinUrl?: string;
     campaignUrl?: string;
+    facebookUrl?: string;
+    telegramUrl?: string;
     role: UserRole;
     status: SeekerStatus;
   }
@@ -173,6 +181,8 @@ export async function createTestUserViaAPI(userType: keyof typeof PREDEFINED_TES
         description: `${user.fullName} test user - This is a test user created for automated testing purposes.`,
         linkedinUrl: user.linkedinUrl || '',
         campaignUrl: user.campaignUrl || '',
+        facebookUrl: user.facebookUrl || '',
+        telegramUrl: user.telegramUrl || '',
       });
 
       // The result is wrapped in an ApiResponse structure
@@ -193,6 +203,8 @@ export async function createTestUserViaAPI(userType: keyof typeof PREDEFINED_TES
       phone_number: user.phoneNumber,
       linkedin_url: user.linkedinUrl || null,
       campaign_url: user.campaignUrl || null,
+      facebook_url: user.facebookUrl || null,
+      telegram_url: user.telegramUrl || null,
       status: user.status,
       role: user.role,
     })

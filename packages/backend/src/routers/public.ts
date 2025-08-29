@@ -35,7 +35,7 @@ export const publicRouter = t.router({
         const { data, error } = await supabase
           .from('users')
           .select(
-            'id, url_id, full_name, description, phone_number, status, role, verified_at, verified_by, created_at, linkedin_url, campaign_url'
+            'id, url_id, full_name, description, phone_number, status, role, verified_at, verified_by, created_at, linkedin_url, campaign_url, facebook_url, telegram_url'
           )
           .eq('role', 'help_seeker') // Only show help seekers
           .not('status', 'is', null) // Ensure status is not null
@@ -63,7 +63,7 @@ export const publicRouter = t.router({
         let query = supabase
           .from('users')
           .select(
-            'id, url_id, full_name, description, phone_number, status, role, verified_at, verified_by, created_at, linkedin_url, campaign_url'
+            'id, url_id, full_name, description, phone_number, status, role, verified_at, verified_by, created_at, linkedin_url, campaign_url, facebook_url, telegram_url'
           )
           .eq('role', 'help_seeker')
           .not('status', 'is', null) // Ensure status is not null
@@ -97,7 +97,7 @@ export const publicRouter = t.router({
           const { data: firstUser, error: firstUserError } = await supabase
             .from('users')
             .select(
-              'id, url_id, full_name, description, phone_number, status, role, verified_at, verified_by, created_at, linkedin_url, campaign_url'
+              'id, url_id, full_name, description, phone_number, status, role, verified_at, verified_by, created_at, linkedin_url, campaign_url, facebook_url, telegram_url'
             )
             .eq('role', 'help_seeker')
             .not('status', 'is', null)
@@ -151,7 +151,7 @@ export const publicRouter = t.router({
         const { data, error } = await supabase
           .from('users')
           .select(
-            'id, url_id, full_name, description, phone_number, status, role, verified_at, verified_by, created_at, linkedin_url, campaign_url'
+            'id, url_id, full_name, description, phone_number, status, role, verified_at, verified_by, created_at, linkedin_url, campaign_url, facebook_url, telegram_url'
           )
           .eq('url_id', input.urlId)
           .eq('role', 'help_seeker')
@@ -192,7 +192,7 @@ export const publicRouter = t.router({
         const { data: adminData, error: adminError } = await supabase
           .from('users')
           .select(
-            'id, full_name, email, role, created_at, updated_at, phone_number, description, linkedin_url, campaign_url'
+            'id, full_name, email, role, created_at, updated_at, phone_number, description, linkedin_url, campaign_url, facebook_url, telegram_url'
           )
           .eq('id', input.adminId)
           .in('role', ['admin', 'super_admin'])
@@ -232,6 +232,8 @@ export const publicRouter = t.router({
             description: adminData.description,
             linkedin_url: adminData.linkedin_url,
             campaign_url: adminData.campaign_url,
+            facebook_url: adminData.facebook_url,
+            telegram_url: adminData.telegram_url,
           },
         };
       } catch (error) {

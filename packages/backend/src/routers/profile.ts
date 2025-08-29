@@ -16,7 +16,7 @@ export const profileRouter = t.router({
       const { data: userData, error } = await supabase
         .from('users')
         .select(
-          'id, url_id, email, full_name, phone_number, role, description, status, verified_at, verified_by, created_at, updated_at, linkedin_url, campaign_url'
+          'id, url_id, email, full_name, phone_number, role, description, status, verified_at, verified_by, created_at, updated_at, linkedin_url, campaign_url, facebook_url, telegram_url'
         )
         .eq('id', ctx.user.id)
         .single();
@@ -44,6 +44,8 @@ export const profileRouter = t.router({
           updated_at: userData.updated_at,
           linkedin_url: userData.linkedin_url,
           campaign_url: userData.campaign_url,
+          facebook_url: userData.facebook_url,
+          telegram_url: userData.telegram_url,
         },
       };
     } catch (error) {
@@ -84,13 +86,21 @@ export const profileRouter = t.router({
         if (input.campaign_url !== undefined) {
           updateData.campaign_url = input.campaign_url;
         }
+        if (input.facebook_url !== undefined) {
+          updateData.facebook_url = input.facebook_url;
+        }
+        if (input.telegram_url !== undefined) {
+          updateData.telegram_url = input.telegram_url;
+        }
 
         // Update user profile in database
         const { data, error } = await supabase
           .from('users')
           .update(updateData)
           .eq('id', ctx.user.id)
-          .select('id, full_name, phone_number, description, linkedin_url, campaign_url, updated_at, status')
+          .select(
+            'id, full_name, phone_number, description, linkedin_url, campaign_url, facebook_url, telegram_url, updated_at, status'
+          )
           .single();
 
         if (error) {

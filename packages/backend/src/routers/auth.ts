@@ -30,6 +30,8 @@ export const authRouter = t.router({
               description: string;
               linkedin_url?: string;
               campaign_url?: string;
+              facebook_url?: string;
+              telegram_url?: string;
             };
           };
         } = {
@@ -42,6 +44,8 @@ export const authRouter = t.router({
               description: input.description,
               ...(input.linkedinUrl && { linkedin_url: input.linkedinUrl }),
               ...(input.campaignUrl && { campaign_url: input.campaignUrl }),
+              ...(input.facebookUrl && { facebook_url: input.facebookUrl }),
+              ...(input.telegramUrl && { telegram_url: input.telegramUrl }),
             },
           },
         };

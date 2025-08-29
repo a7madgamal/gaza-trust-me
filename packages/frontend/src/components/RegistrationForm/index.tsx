@@ -161,6 +161,34 @@ const RegistrationForm = () => {
             inputProps={{ 'data-testid': 'campaignUrl' }}
           />
 
+          <TextField
+            fullWidth
+            label="Facebook Profile URL (Optional)"
+            type="url"
+            margin="normal"
+            error={!!errors.facebookUrl}
+            helperText={errors.facebookUrl || 'Share your Facebook profile to help build trust'}
+            value={formData.facebookUrl}
+            onChange={handleChange('facebookUrl')}
+            disabled={loading}
+            autoComplete="url"
+            inputProps={{ 'data-testid': 'facebookUrl' }}
+          />
+
+          <TextField
+            fullWidth
+            label="Telegram Profile URL (Optional)"
+            type="url"
+            margin="normal"
+            error={!!errors.telegramUrl}
+            helperText={errors.telegramUrl || 'Share your Telegram profile for direct contact'}
+            value={formData.telegramUrl}
+            onChange={handleChange('telegramUrl')}
+            disabled={loading}
+            autoComplete="url"
+            inputProps={{ 'data-testid': 'telegramUrl' }}
+          />
+
           <Button
             type="submit"
             fullWidth
