@@ -59,7 +59,7 @@ test.describe('Public API Endpoints', () => {
     ).rejects.toThrow();
   });
 
-  test('should return only verified help_seeker users ordered by creation date', async () => {
+  test('should return only verified help_seeker and admin users ordered by creation date', async () => {
     const users = await testTRPC.getUsersForCards.query({
       limit: 50,
       offset: 0,
@@ -67,10 +67,11 @@ test.describe('Public API Endpoints', () => {
 
     expect(Array.isArray(users)).toBe(true);
 
-    // All returned users should be verified help_seekers
+    // All returned users should be verified help_seekers or admins (but not super admins)
     users.forEach(user => {
       expect(user.status).toBe('verified');
-      expect(user.role).toBe('help_seeker');
+      expect(['help_seeker', 'admin']).toContain(user.role);
+      expect(user.role).not.toBe('super_admin'); // Super admins should not appear
     });
 
     // Require at least one user for ordering test
@@ -104,5 +105,29 @@ test.describe('Public API Endpoints', () => {
 
       expect(currentDate.getTime()).toBeGreaterThanOrEqual(nextDate.getTime());
     }
+  });
+
+  test('should include admin users in card view', async () => {
+    const users = await testTRPC.getUsersForCards.query({
+      limit: 50,
+      offset: 0,
+    });
+
+    expect(Array.isArray(users)).toBe(true);
+    expect(users.length).toBeGreaterThan(0);
+
+    // Check that at least one admin user is included
+    const adminUsers = users.filter(user => user.role === 'admin');
+    expect(adminUsers.length).toBeGreaterThan(0);
+
+    // Verify that admin users have the correct status
+    adminUsers.forEach(adminUser => {
+      expect(adminUser.status).toBe('verified');
+      expect(adminUser.role).toBe('admin');
+    });
+
+    // Verify that super admin users are NOT included
+    const superAdminUsers = users.filter(user => user.role === 'super_admin');
+    expect(superAdminUsers.length).toBe(0);
   });
 });

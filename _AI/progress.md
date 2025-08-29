@@ -19,7 +19,7 @@
 - ✅ **tRPC middleware for public/protected endpoints**
 - ✅ **Comprehensive E2E test coverage (46 tests passing)**
 - ✅ **Complete tRPC type integration with generated Supabase types**
-- ✅ **LinkedIn and Campaign URL fields added to user profiles**
+- ✅ **LinkedIn, Campaign, Facebook, and Telegram URL fields added to user profiles**
 - ✅ **E2E test type safety with generated Supabase types**
 - ✅ **RLS bypass for E2E tests using service role key**
 
@@ -89,7 +89,7 @@
 - ✅ User role and status information
 - ✅ Authentication required middleware
 - ✅ **Profile update endpoint** - updateProfile procedure with verification reset
-- ✅ **LinkedIn and Campaign URL support** - Added to update schema and backend
+- ✅ **LinkedIn, Campaign, Facebook, and Telegram URL support** - Added to update schema and backend
 - ✅ **Verification status reset** - Profile edits reset status to 'pending'
 
 **Frontend:**
@@ -97,7 +97,7 @@
 - ✅ Profile display component
 - ✅ **Profile edit functionality** - Edit mode with form validation
 - ✅ **Verification reset warning** - Dialog for verified users before editing
-- ✅ **LinkedIn and Campaign URL editing** - Form fields for external links
+- ✅ **LinkedIn, Campaign, Facebook, and Telegram URL editing** - Form fields for external links
 - ✅ User role display
 - ✅ Account status indicators
 - ✅ **Toast notifications** - Success/error feedback using existing toast system
@@ -153,10 +153,10 @@
 
 - ✅ Priority based on verification status (verified users only)
 - ✅ Time-based ordering (newest first)
-- ✅ User type priority (help_seeker only)
+- ✅ User type priority (help_seeker and admin users, excluding super admins)
 - ✅ Pagination support (limit/offset)
 
-**Success:** Users can browse verified help seekers with a beautiful card stack interface
+**Success:** Users can browse verified help seekers and admins with a beautiful card stack interface (super admins excluded from public view)
 
 ---
 
@@ -245,7 +245,7 @@
 
 **Test Coverage:**
 
-- ✅ Card links display (LinkedIn, campaign URLs)
+- ✅ Card links display (LinkedIn, campaign, Facebook, Telegram URLs)
 - ✅ WhatsApp contact integration
 - ✅ User card navigation
 - ✅ URL routing functionality
@@ -453,15 +453,14 @@
 
 - ✅ **Complete profile editing system** - Users can edit their own profiles with form validation
 - ✅ **Verification reset warning** - Verified users see warning dialog before editing
-- ✅ **LinkedIn and Campaign URL support** - Added editing capabilities for external links
+- ✅ **LinkedIn, Campaign, Facebook, and Telegram URL support** - Added editing capabilities for external links
 - ✅ **Backend verification reset** - Profile edits automatically reset status to 'pending'
 - ✅ **Toast integration** - Uses existing toast system for success/error feedback
 - ✅ **E2E test coverage** - Comprehensive tests for all profile editing scenarios (14 tests passing)
 - ✅ **Form validation** - Only saves changed fields, prevents empty submissions
 - ✅ **Role-based behavior** - Super admins skip warning dialog, admins/super admins don't see verification badges
 - ✅ **Warning dialog handling** - Tests properly handle verification reset warnings for verified users
-
-**Test Infrastructure Improvements:**
+  **Test Infrastructure Improvements:**
 
 - ✅ **Fixed admin login redirect** - Admin users now properly redirected to `/admin/dashboard` after login
 - ✅ **Fixed AuthContext callback issue** - `fetchUserProfile` now returns profile data for proper login redirects
@@ -481,6 +480,14 @@
 - ✅ **Role upgrade dialogs** - Confirmation dialogs with remarks and security warnings
 - ✅ **tRPC integration** - Proper procedure exports and type safety
 - ✅ **E2E test coverage** - Comprehensive tests for super admin functionality
+
+**Admin Visibility in Card View:**
+
+- ✅ **Admin users in public card view** - Admin users now appear in the public card stack interface
+- ✅ **Super admin exclusion** - Super admins remain hidden from public view (system administrators only)
+- ✅ **Backend query updates** - Modified getUsersForCards, getNextUser, getVerifiedUserCount, and getUserByUrlId to include admin users
+- ✅ **E2E test coverage** - Added tests to verify admin users appear and super admins are excluded
+- ✅ **UI text unchanged** - Kept "help seeker" terminology in UI as requested
 
 ---
 

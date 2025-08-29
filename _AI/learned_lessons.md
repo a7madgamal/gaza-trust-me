@@ -59,6 +59,14 @@
 - **Command:** `npm run types:gen` in backend package
 - **Lesson:** Database changes require type regeneration to maintain type safety
 
+### 🔄 **Migration Number Conflicts**
+
+- **Problem:** Created migration files with numbers that already exist
+- **Rule:** Always check existing migration numbers before creating new ones
+- **Command:** `Get-ChildItem packages/backend/supabase/migrations/ | Sort-Object Name` to list existing migrations
+- **Lesson:** Migration conflicts cause `supabase db push` to fail with "column already exists" errors
+- **Fix:** Rename migration files to next available sequence numbers and update internal headers
+
 ### ❌ **Don't Run Dev Servers**
 
 - **Problem:** Tried to run dev servers automatically
@@ -147,7 +155,7 @@
   - Admin profile verification counts
   - Error handling for non-existent admins
   - Admin contact information display
-  - Admin links display (LinkedIn, campaign URLs)
+  - Admin links display (LinkedIn, campaign, Facebook, Telegram URLs)
   - Verification summary explanations
 - **Lesson:** When you find fake tests, replace them with tests that validate real business logic
 - **Result:** 8 meaningful tests that actually test verification transparency functionality

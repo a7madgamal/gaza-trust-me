@@ -39,6 +39,8 @@
 1.10. Profile description
 1.11. LinkedIn profile URL (optional)
 1.12. Campaign/fundraising URL (optional)
+1.13. Facebook profile URL (optional)
+1.14. Telegram profile URL (optional)
 
 ### 2. Help Providers (Optional Registration)
 
@@ -144,7 +146,9 @@
 5.9.4. Contact information display
 5.9.5. LinkedIn profile links (when provided)
 5.9.6. Campaign/fundraising links (when provided)
-5.9.7. Verification badge showing "Verified by [Admin Name]" with link to admin profile
+5.9.7. Facebook profile links (when provided)
+5.9.8. Telegram profile links (when provided)
+5.9.9. Verification badge showing "Verified by [Admin Name]" with link to admin profile
 5.9.8. Search and filter functionality
 
 ### Image Management
@@ -334,7 +338,7 @@
 10.10. Type-safe test utilities with generated Supabase types
 10.11. Service role key authentication for test database access
 10.12. RLS policy bypass for test isolation
-10.13. Card interface testing (LinkedIn/campaign links, WhatsApp integration)
+10.13. Card interface testing (LinkedIn/campaign/Facebook/Telegram links, WhatsApp integration)
 10.14. URL routing and navigation testing
 
 ## Success Metrics

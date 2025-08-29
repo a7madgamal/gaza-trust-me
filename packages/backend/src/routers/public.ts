@@ -37,7 +37,7 @@ export const publicRouter = t.router({
           .select(
             'id, url_id, full_name, description, phone_number, status, role, verified_at, verified_by, created_at, linkedin_url, campaign_url, facebook_url, telegram_url'
           )
-          .eq('role', 'help_seeker') // Only show help seekers
+          .in('role', ['help_seeker', 'admin']) // Show help seekers and admins (but not super admins)
           .not('status', 'is', null) // Ensure status is not null
           .eq('status', 'verified') // Only verified users
           .order('created_at', { ascending: false }) // Newest first
@@ -65,7 +65,7 @@ export const publicRouter = t.router({
           .select(
             'id, url_id, full_name, description, phone_number, status, role, verified_at, verified_by, created_at, linkedin_url, campaign_url, facebook_url, telegram_url'
           )
-          .eq('role', 'help_seeker')
+          .in('role', ['help_seeker', 'admin']) // Show help seekers and admins (but not super admins)
           .not('status', 'is', null) // Ensure status is not null
           .eq('status', 'verified');
 
@@ -99,7 +99,7 @@ export const publicRouter = t.router({
             .select(
               'id, url_id, full_name, description, phone_number, status, role, verified_at, verified_by, created_at, linkedin_url, campaign_url, facebook_url, telegram_url'
             )
-            .eq('role', 'help_seeker')
+            .in('role', ['help_seeker', 'admin']) // Show help seekers and admins (but not super admins)
             .not('status', 'is', null)
             .eq('status', 'verified')
             .order('created_at', { ascending: false })
@@ -126,7 +126,7 @@ export const publicRouter = t.router({
       const { count, error } = await supabase
         .from('users')
         .select('*', { count: 'exact', head: true })
-        .eq('role', 'help_seeker')
+        .in('role', ['help_seeker', 'admin']) // Show help seekers and admins (but not super admins)
         .not('status', 'is', null) // Ensure status is not null
         .eq('status', 'verified');
 
@@ -154,7 +154,7 @@ export const publicRouter = t.router({
             'id, url_id, full_name, description, phone_number, status, role, verified_at, verified_by, created_at, linkedin_url, campaign_url, facebook_url, telegram_url'
           )
           .eq('url_id', input.urlId)
-          .eq('role', 'help_seeker')
+          .in('role', ['help_seeker', 'admin']) // Show help seekers and admins (but not super admins)
           .not('status', 'is', null) // Ensure status is not null
           .eq('status', 'verified')
           .single();
