@@ -11,12 +11,47 @@ import {
   CircularProgress,
   Chip,
   Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  DialogContentText,
 } from '@mui/material';
-import { LinkedIn, Campaign, Launch } from '@mui/icons-material';
+import { LinkedIn, Campaign, Launch, Edit, Save, Cancel, Warning } from '@mui/icons-material';
 import { useAuth } from '../../hooks/useAuth';
+import { useState } from 'react';
+import { trpc } from '../../utils/trpc';
+import { useToast } from '../../hooks/useToast';
 
 const Profile = () => {
-  const { userProfile, loading } = useAuth();
+  const { userProfile, loading, refetchProfile } = useAuth();
+  const { showToast } = useToast();
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [showWarningDialog, setShowWarningDialog] = useState(false);
+  const [formData, setFormData] = useState({
+    full_name: '',
+    phone_number: '',
+    description: '',
+    linkedin_url: '',
+    campaign_url: '',
+  });
+
+  const updateProfileMutation = trpc.updateProfile.useMutation({
+    onSuccess: data => {
+      if (data.success) {
+        showToast('Profile updated successfully! Your profile will need to be verified again.', 'success');
+        setIsEditMode(false);
+        if (refetchProfile) {
+          void refetchProfile();
+        }
+      } else {
+        showToast(data.error || 'Failed to update profile', 'error');
+      }
+    },
+    onError: error => {
+      showToast(error.message || 'Failed to update profile', 'error');
+    },
+  });
 
   const getStatusColor = (status: string): 'warning' | 'success' | 'error' | 'default' => {
     switch (status) {
@@ -44,6 +79,74 @@ const Profile = () => {
     }
   };
 
+  const handleEditClick = () => {
+    // Super admins don't need the warning since they have elevated privileges
+    if (userProfile?.status === 'verified' && userProfile?.role !== 'super_admin') {
+      setShowWarningDialog(true);
+    } else {
+      startEditMode();
+    }
+  };
+
+  const startEditMode = () => {
+    setFormData({
+      full_name: userProfile?.full_name || '',
+      phone_number: userProfile?.phone_number || '',
+      description: userProfile?.description || '',
+      linkedin_url: userProfile?.linkedin_url || '',
+      campaign_url: userProfile?.campaign_url || '',
+    });
+    setIsEditMode(true);
+    setShowWarningDialog(false);
+  };
+
+  const handleSave = () => {
+    const updateData: {
+      full_name?: string;
+      phone_number?: string;
+      description?: string;
+      linkedin_url?: string;
+      campaign_url?: string;
+    } = {};
+
+    // Only include fields that have changed
+    if (formData.full_name !== userProfile?.full_name) {
+      updateData.full_name = formData.full_name;
+    }
+    if (formData.phone_number !== userProfile?.phone_number) {
+      updateData.phone_number = formData.phone_number;
+    }
+    if (formData.description !== userProfile?.description) {
+      updateData.description = formData.description;
+    }
+    if (formData.linkedin_url !== userProfile?.linkedin_url) {
+      updateData.linkedin_url = formData.linkedin_url || undefined;
+    }
+    if (formData.campaign_url !== userProfile?.campaign_url) {
+      updateData.campaign_url = formData.campaign_url || undefined;
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      showToast('No changes to save', 'info');
+      setIsEditMode(false);
+      return;
+    }
+
+    updateProfileMutation.mutate(updateData);
+  };
+
+  const handleCancel = () => {
+    setIsEditMode(false);
+    setShowWarningDialog(false);
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
   if (loading) {
     return (
       <Box
@@ -66,20 +169,38 @@ const Profile = () => {
   } else if (userProfile) {
     return (
       <Container maxWidth="md" sx={{ mt: 4, mb: 4 }}>
-        <Typography
-          variant="h4"
-          component="h1"
-          gutterBottom
-          sx={{
-            background: 'linear-gradient(135deg, #d32f2f 0%, #4caf50 100%)',
-            backgroundClip: 'text',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            fontWeight: 700,
-          }}
-        >
-          My Profile
-        </Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+          <Typography
+            variant="h4"
+            component="h1"
+            sx={{
+              background: 'linear-gradient(135deg, #d32f2f 0%, #4caf50 100%)',
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              fontWeight: 700,
+            }}
+          >
+            My Profile
+          </Typography>
+
+          {!isEditMode && (
+            <Button
+              variant="contained"
+              startIcon={<Edit />}
+              onClick={handleEditClick}
+              sx={{
+                background: 'linear-gradient(135deg, #1976d2 0%, #42a5f5 100%)',
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #1565c0 0%, #1e88e5 100%)',
+                },
+              }}
+              data-testid="profile-edit-button"
+            >
+              Edit Profile
+            </Button>
+          )}
+        </Box>
 
         <Paper elevation={3} sx={{ p: 4, mt: 3 }}>
           <Grid container spacing={4}>
@@ -105,22 +226,52 @@ const Profile = () => {
                 {userProfile.role.replace('_', ' ').toUpperCase()}
               </Typography>
 
-              {/* Status Chip */}
+              {/* Status Chip - Only show for help seekers */}
               <Box sx={{ mt: 2 }}>
-                <Chip
-                  label={getStatusLabel(userProfile.status)}
-                  color={getStatusColor(userProfile.status)}
-                  size="medium"
-                  data-testid="profile-status"
-                />
+                {userProfile.role === 'help_seeker' && (
+                  <Chip
+                    label={getStatusLabel(userProfile.status)}
+                    color={getStatusColor(userProfile.status)}
+                    size="medium"
+                    data-testid="profile-status"
+                  />
+                )}
               </Box>
             </Grid>
 
             {/* Profile Details */}
             <Grid item xs={12} md={9}>
-              <Typography variant="h6" gutterBottom>
-                Profile Information
-              </Typography>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                <Typography variant="h6">Profile Information</Typography>
+                {isEditMode && (
+                  <Box>
+                    <Button
+                      variant="outlined"
+                      startIcon={<Cancel />}
+                      onClick={handleCancel}
+                      sx={{ mr: 1 }}
+                      data-testid="profile-cancel-button"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      variant="contained"
+                      startIcon={<Save />}
+                      onClick={handleSave}
+                      disabled={updateProfileMutation.isLoading}
+                      sx={{
+                        background: 'linear-gradient(135deg, #4caf50 0%, #66bb6a 100%)',
+                        '&:hover': {
+                          background: 'linear-gradient(135deg, #388e3c 0%, #43a047 100%)',
+                        },
+                      }}
+                      data-testid="profile-save-button"
+                    >
+                      {updateProfileMutation.isLoading ? 'Saving...' : 'Save Changes'}
+                    </Button>
+                  </Box>
+                )}
+              </Box>
               <Divider sx={{ mb: 3 }} />
 
               <Grid container spacing={3}>
@@ -148,8 +299,9 @@ const Profile = () => {
                   <TextField
                     fullWidth
                     label="Full Name"
-                    value={userProfile.full_name}
-                    disabled
+                    value={isEditMode ? formData.full_name : userProfile.full_name}
+                    onChange={e => handleInputChange('full_name', e.target.value)}
+                    disabled={!isEditMode}
                     inputProps={{ 'data-testid': 'profile-fullName-input' }}
                   />
                 </Grid>
@@ -157,8 +309,9 @@ const Profile = () => {
                   <TextField
                     fullWidth
                     label="Phone Number"
-                    value={userProfile.phone_number || ''}
-                    disabled
+                    value={isEditMode ? formData.phone_number : userProfile.phone_number || 'Not provided'}
+                    onChange={e => handleInputChange('phone_number', e.target.value)}
+                    disabled={!isEditMode}
                     inputProps={{ 'data-testid': 'profile-phoneNumber-input' }}
                   />
                 </Grid>
@@ -166,10 +319,11 @@ const Profile = () => {
                   <TextField
                     fullWidth
                     label="Description"
-                    value={userProfile.description}
+                    value={isEditMode ? formData.description : userProfile.description || 'Not provided'}
+                    onChange={e => handleInputChange('description', e.target.value)}
                     multiline
                     rows={4}
-                    disabled
+                    disabled={!isEditMode}
                     inputProps={{ 'data-testid': 'profile-description' }}
                   />
                 </Grid>
@@ -177,8 +331,10 @@ const Profile = () => {
                   <TextField
                     fullWidth
                     label="LinkedIn Profile URL"
-                    value={userProfile.linkedin_url || 'Not provided'}
-                    disabled
+                    value={isEditMode ? formData.linkedin_url : userProfile.linkedin_url || 'Not provided'}
+                    onChange={e => handleInputChange('linkedin_url', e.target.value)}
+                    disabled={!isEditMode}
+                    placeholder="https://linkedin.com/in/yourprofile"
                     inputProps={{ 'data-testid': 'profile-linkedin-url' }}
                   />
                 </Grid>
@@ -186,8 +342,10 @@ const Profile = () => {
                   <TextField
                     fullWidth
                     label="Campaign/Fundraising URL"
-                    value={userProfile.campaign_url || 'Not provided'}
-                    disabled
+                    value={isEditMode ? formData.campaign_url : userProfile.campaign_url || 'Not provided'}
+                    onChange={e => handleInputChange('campaign_url', e.target.value)}
+                    disabled={!isEditMode}
+                    placeholder="https://your-campaign-url.com"
                     inputProps={{ 'data-testid': 'profile-campaign-url' }}
                   />
                 </Grid>
@@ -323,15 +481,40 @@ const Profile = () => {
                 </Box>
               )}
 
-              <Box sx={{ mt: 4 }}>
-                <Alert severity="info">
-                  Profile information is collected during registration and cannot be edited. Contact support if you need
-                  to update your information.
-                </Alert>
-              </Box>
+              {!isEditMode && (
+                <Box sx={{ mt: 4 }}>
+                  <Alert severity="info">
+                    Profile information is collected during registration and cannot be edited. Contact support if you
+                    need to update your information.
+                  </Alert>
+                </Box>
+              )}
             </Grid>
           </Grid>
         </Paper>
+
+        {/* Warning Dialog for Verified Users */}
+        <Dialog open={showWarningDialog} onClose={() => setShowWarningDialog(false)} maxWidth="sm" fullWidth>
+          <DialogTitle sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Warning color="warning" />
+            Verification Reset Warning
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Editing your profile will reset your verification status to "Pending" and you will need to be verified
+              again by an administrator. This ensures the accuracy of your updated information.
+            </DialogContentText>
+            <DialogContentText sx={{ mt: 2, fontWeight: 'bold' }}>Are you sure you want to continue?</DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setShowWarningDialog(false)} data-testid="warning-dialog-cancel">
+              Cancel
+            </Button>
+            <Button onClick={startEditMode} variant="contained" color="warning" data-testid="warning-dialog-continue">
+              Continue Editing
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Container>
     );
   }

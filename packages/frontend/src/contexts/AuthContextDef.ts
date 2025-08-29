@@ -41,6 +41,7 @@ interface AuthContextType {
   ) => Promise<{ user: AuthContextUser } | { user: null; requiresEmailVerification: true } | null>;
   logout: () => Promise<void>;
   fetchUserProfile: () => Promise<void>;
+  refetchProfile: () => Promise<void>;
   setUser: (user: AuthContextUser | null) => void;
 }
 

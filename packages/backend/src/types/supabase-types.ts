@@ -132,6 +132,8 @@ export const UserProfileUpdateSchema = z.object({
   full_name: z.string().min(2, 'Full name must be at least 2 characters').optional(),
   phone_number: z.string().min(1, 'Phone number is required').optional(),
   description: z.string().min(10, 'Description must be at least 10 characters').optional(),
+  linkedin_url: z.string().url('Invalid LinkedIn URL').optional(),
+  campaign_url: z.string().url('Invalid campaign URL').optional(),
 });
 
 export const UserProfileOutputSchema = z.object({
@@ -157,7 +159,10 @@ export const UserProfileUpdateOutputSchema = z.object({
     full_name: z.string(),
     phone_number: z.string(),
     description: z.string(),
+    linkedin_url: z.string().nullable(),
+    campaign_url: z.string().nullable(),
     updated_at: z.string().nullable(),
+    status: z.enum(SEEKER_STATUSES).nullable(),
   }),
 });
 

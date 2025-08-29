@@ -224,6 +224,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             await fetchUserProfile(session);
           }
         },
+        refetchProfile: async () => {
+          const {
+            data: { session },
+          } = await supabase.auth.getSession();
+          if (session) {
+            await fetchUserProfile(session);
+          }
+        },
         setUser,
       }}
     >

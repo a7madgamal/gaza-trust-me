@@ -63,6 +63,10 @@ export const profileRouter = t.router({
         // Only update fields that are provided
         const updateData: Database['public']['Tables']['users']['Update'] = {
           updated_at: new Date().toISOString(),
+          // Reset verification status when profile is edited
+          status: 'pending',
+          verified_at: null,
+          verified_by: null,
         };
 
         if (input.full_name !== undefined) {
@@ -74,13 +78,19 @@ export const profileRouter = t.router({
         if (input.description !== undefined) {
           updateData.description = input.description;
         }
+        if (input.linkedin_url !== undefined) {
+          updateData.linkedin_url = input.linkedin_url;
+        }
+        if (input.campaign_url !== undefined) {
+          updateData.campaign_url = input.campaign_url;
+        }
 
         // Update user profile in database
         const { data, error } = await supabase
           .from('users')
           .update(updateData)
           .eq('id', ctx.user.id)
-          .select('id, full_name, phone_number, description, updated_at')
+          .select('id, full_name, phone_number, description, linkedin_url, campaign_url, updated_at, status')
           .single();
 
         if (error) {

@@ -23,3 +23,5 @@
 - **The user prefers that the assistant never disable ESLint rules without first confirming with them.** (ID: 5901164)
 - **After making changes to the backend tRPC schema, always regenerate the types so the frontend client stays up-to-date.** (ID: 5900774)
 - **The user prefers that the assistant never test servers.** (ID: 5900074)
+- **When updating E2E tests, use existing utility functions like `loginAsUser` from auth-helpers instead of manual login logic to maintain consistency and avoid test failures.** (ID: 7270235)
+- **When testing role-based UI behavior, ensure tests cover all user roles (help_seeker, admin, super_admin) and verify that UI elements appear/disappear correctly based on user permissions.** (ID: 7270236)

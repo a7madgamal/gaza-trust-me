@@ -98,6 +98,27 @@
 - **Rule:**
   - **Playwright E2E** for UI components, user interactions, and full user flows
   - **Unit tests** for backend API endpoints, utility functions, and non-React business logic
+
+### 🎭 **E2E Test Dialog Handling**
+
+- **Problem:** Tests failed when warning dialogs appeared unexpectedly
+- **Rule:** Always check for conditional UI elements (dialogs, modals) and handle them appropriately
+- **Lesson:** For profile editing with verification warnings, tests must detect dialog presence and click "Continue" to proceed
+- **Pattern:** Check `isVisible()` before interacting with conditional elements
+
+### 🔧 **E2E Test Utility Functions**
+
+- **Problem:** Manual login logic caused test failures and inconsistencies
+- **Rule:** Use existing utility functions like `loginAsUser` from auth-helpers instead of manual login
+- **Lesson:** Existing utilities handle edge cases and maintain consistency across tests
+- **Pattern:** Import and use `loginAsUser(page, 'userType')` instead of manual form filling
+
+### 👥 **Role-Based UI Testing**
+
+- **Problem:** Tests didn't cover all user roles and their different UI behaviors
+- **Rule:** Test all user roles (help_seeker, admin, super_admin) and verify role-specific UI elements
+- **Lesson:** Different roles see different UI elements (verification badges, warning dialogs, etc.)
+- **Pattern:** Create separate test suites for each role and verify role-specific behavior
 - **Lesson:** Don't waste time on React component unit tests when Playwright covers real user behavior better
 - **Focus:** Backend validation, auth logic, database operations, and critical utility functions
 
