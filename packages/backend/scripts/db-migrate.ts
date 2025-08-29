@@ -21,7 +21,7 @@ const COMMANDS: Command[] = [
 
 const ENVIRONMENTS = [
   { name: '🟢 Development', message: 'Development', value: 'dev', envFile: '.env-development' },
-  { name: '🔴 Production', message: 'Production', value: 'prod', envFile: '.env-prod' },
+  { name: '🔴 Production', message: 'Production', value: 'prod', envFile: '.env-production' },
 ];
 
 function clearScreen(): void {

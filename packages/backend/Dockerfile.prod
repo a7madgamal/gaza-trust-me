@@ -31,10 +31,10 @@ COPY packages/backend ./
 WORKDIR /app/packages/backend
 
 # Copy env file and build backend
-COPY packages/backend/.env-prod .env-prod
+COPY packages/backend/.env-production .env-production
 # NOTE: This build requires network access for Supabase CLI commands
 # Build with: docker build --network=host -f packages/backend/Dockerfile .
-RUN set -a && . ./.env-prod && set +a && \
+RUN set -a && . ./.env-production && set +a && \
     echo "🔍 Verifying all required environment variables..." && \
     echo "Checking SUPABASE_ACCESS_TOKEN: ${SUPABASE_ACCESS_TOKEN:0:10}..." && \
     test -n "$SUPABASE_ACCESS_TOKEN" || (echo "❌ SUPABASE_ACCESS_TOKEN not set!" && exit 1) && \

@@ -19,8 +19,8 @@ RUN HUSKY=0 npm install --ignore-scripts
 
 COPY packages/backend ./
 # Copy env file and generate types
-COPY packages/backend/.env-prod .env-prod
-RUN set -a && . ./.env-prod && set +a && \
+COPY packages/backend/.env-production .env-production
+RUN set -a && . ./.env-production && set +a && \
     echo "🔍 Verifying backend environment variables for type generation..." && \
     echo "Checking SUPABASE_ACCESS_TOKEN: ${SUPABASE_ACCESS_TOKEN:0:10}..." && \
     test -n "$SUPABASE_ACCESS_TOKEN" || (echo "❌ SUPABASE_ACCESS_TOKEN not set!" && exit 1) && \
