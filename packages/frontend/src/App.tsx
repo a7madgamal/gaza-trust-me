@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
+
 import { ToastProvider } from './components/Toast';
 import { AuthProvider } from './contexts/AuthContext';
 import { TRPCProvider } from './utils/trpc-provider';

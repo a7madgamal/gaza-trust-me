@@ -81,20 +81,44 @@ export const Header: React.FC = () => {
   return (
     <AppBar position="static" elevation={1}>
       <Toolbar>
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1, cursor: 'pointer' }} onClick={handleHomeClick}>
-          Confirmed in Gaza
-        </Typography>
+        <Box
+          sx={{ display: 'flex', alignItems: 'center', gap: 2, flexGrow: 1, cursor: 'pointer' }}
+          onClick={handleHomeClick}
+        >
+          <Box
+            component="img"
+            src="/icon.svg"
+            alt="Confirmed in Gaza"
+            sx={{
+              width: 32,
+              height: 32,
+              filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))',
+            }}
+          />
+          <Typography variant="h6" component="div">
+            Confirmed in Gaza
+          </Typography>
+        </Box>
 
         {user ? (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography variant="body2" color="inherit" sx={{ mr: 1 }}>
-              {getDisplayName()}
-            </Typography>
-            {userProfile?.role && (
-              <Typography variant="caption" color="inherit" sx={{ mr: 1 }}>
-                ({getRoleDisplay()})
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: { xs: 'column', sm: 'row' },
+                alignItems: { xs: 'center', sm: 'center' },
+                gap: { xs: 0, sm: 1 },
+              }}
+            >
+              <Typography variant="body2" color="inherit" sx={{ mr: { xs: 0, sm: 1 } }}>
+                {getDisplayName()}
               </Typography>
-            )}
+              {userProfile?.role && (
+                <Typography variant="caption" color="inherit" sx={{ mr: { xs: 0, sm: 1 } }}>
+                  ({getRoleDisplay()})
+                </Typography>
+              )}
+            </Box>
             <IconButton
               size="large"
               aria-label="account of current user"

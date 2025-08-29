@@ -31,6 +31,6 @@
     },
     "types": ["node", "@playwright/test"]
   },
-  "include": ["tests/**/*", "playwright.config.ts"],
+  "include": ["tests/**/*", "tests/types/**/*", "playwright.config.ts"],
   "exclude": ["node_modules", "dist", "build"]
 }

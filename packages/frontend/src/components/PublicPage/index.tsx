@@ -4,8 +4,10 @@ import { WhatsApp, LinkedIn, Campaign, Phone, NavigateBefore, NavigateNext } fro
 import { useParams, useNavigate } from 'react-router-dom';
 import { trpc } from '../../utils/trpc';
 import { useToast } from '../../hooks/useToast';
+import { useMetaTags } from '../../hooks/useMetaTags';
 import type { RouterOutputs } from '../../utils/trpc';
 import VerificationBadge from '../VerificationBadge';
+import SharingWidget from '../SharingWidget';
 
 // Utility function to format phone number for WhatsApp
 const formatPhoneForWhatsApp = (phone: string): string => {
@@ -30,6 +32,21 @@ const PublicPage: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const { showToast } = useToast();
+
+  // Generate sharing data with fallbacks
+  const currentUser = users[currentUserIndex];
+  const shareUrl = currentUser ? `${window.location.origin}/user/${currentUser.url_id}` : '';
+  const shareTitle = currentUser ? `${currentUser.full_name} - Verified Help Seeker` : 'Confirmed in Gaza';
+  const shareDescription = currentUser?.description || 'A verified help seeker on Confirmed in Gaza platform.';
+  const ogImageUrl = `${window.location.origin}/icon.svg`;
+
+  // Set meta tags for social sharing
+  useMetaTags({
+    title: shareTitle,
+    description: shareDescription,
+    url: shareUrl,
+    imageUrl: ogImageUrl,
+  });
 
   // Fetch users for the card stack
   const {
@@ -125,245 +142,288 @@ const PublicPage: React.FC = () => {
     );
   }
 
-  const currentUser = users[currentUserIndex];
-
   return (
-    <Box sx={{ maxWidth: 600, mx: 'auto', p: 3 }}>
-      {/* Card Stack */}
-      <Box position="relative" mb={4}>
-        {/* Main Card */}
-        <Card
-          elevation={8}
-          data-testid="user-card"
+    <>
+      <Box sx={{ maxWidth: 800, mx: 'auto', p: 3 }}>
+        {/* Card Stack with Sharing Widget */}
+        <Box
           sx={{
-            height: 500,
-            position: 'relative',
-            background: 'linear-gradient(135deg, #d32f2f 0%, #b71c1c 50%, #8e0000 100%)',
-            color: 'white',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
-            backdropFilter: 'blur(10px)',
-            '&::before': {
-              content: '""',
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background:
-                'linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(255,255,255,0.05) 100%)',
-              borderRadius: 'inherit',
-              pointerEvents: 'none',
-            },
+            display: 'flex',
+            gap: 2,
+            alignItems: 'flex-start',
+            flexDirection: { xs: 'column', md: 'row' },
           }}
         >
-          <CardContent sx={{ p: 4, height: '100%', display: 'flex', flexDirection: 'column', position: 'relative' }}>
-            {/* User Name with Badge */}
-            <Box display="flex" alignItems="center" gap={1} mb={2}>
-              <Typography variant="h4" fontWeight="bold">
-                {currentUser.full_name}
-              </Typography>
-              <VerificationBadge verifiedBy={currentUser.verified_by} status={currentUser.status} />
-            </Box>
-
-            {/* Description */}
-            <Box flex={1} sx={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-              <Box
+          {/* Main Card */}
+          <Box sx={{ flex: 1 }}>
+            <Box position="relative" mb={{ xs: 2, md: 4 }}>
+              {/* Main Card */}
+              <Card
+                elevation={8}
+                data-testid="user-card"
                 sx={{
-                  flex: 1,
-                  overflowY: 'auto',
-                  maxHeight: '200px',
-                  pr: 1,
-                  '&::-webkit-scrollbar': {
-                    width: '6px',
-                  },
-                  '&::-webkit-scrollbar-track': {
-                    background: 'rgba(255,255,255,0.1)',
-                    borderRadius: '3px',
-                  },
-                  '&::-webkit-scrollbar-thumb': {
-                    background: 'rgba(255,255,255,0.3)',
-                    borderRadius: '3px',
-                    '&:hover': {
-                      background: 'rgba(255,255,255,0.5)',
-                    },
+                  height: { xs: 400, md: 500 },
+                  position: 'relative',
+                  background: 'linear-gradient(135deg, #d32f2f 0%, #b71c1c 50%, #8e0000 100%)',
+                  color: 'white',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  backdropFilter: 'blur(10px)',
+                  '&::before': {
+                    content: '""',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background:
+                      'linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 50%, rgba(255,255,255,0.05) 100%)',
+                    borderRadius: 'inherit',
+                    pointerEvents: 'none',
                   },
                 }}
               >
-                <Typography variant="body1" sx={{ lineHeight: 1.6 }}>
-                  {currentUser.description || 'No description provided.'}
-                </Typography>
-              </Box>
-            </Box>
+                <CardContent
+                  sx={{ p: 4, height: '100%', display: 'flex', flexDirection: 'column', position: 'relative' }}
+                >
+                  {/* User Name with Badge */}
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      flexDirection: { xs: 'column', md: 'row' },
+                      alignItems: { xs: 'flex-start', md: 'center' },
+                      gap: { xs: 0.5, md: 1 },
+                      mb: 2,
+                    }}
+                  >
+                    <Typography
+                      variant="h4"
+                      fontWeight="bold"
+                      sx={{
+                        fontSize: { xs: '1.5rem', md: '2.125rem' },
+                        lineHeight: { xs: 1.2, md: 1.4 },
+                      }}
+                    >
+                      {currentUser.full_name}
+                    </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: { xs: 'flex-start', md: 'center' } }}>
+                      <VerificationBadge verifiedBy={currentUser.verified_by} status={currentUser.status} />
+                    </Box>
+                  </Box>
 
-            {/* Details Section - All info below the line */}
+                  {/* Description */}
+                  <Box flex={1} sx={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+                    <Box
+                      sx={{
+                        flex: 1,
+                        overflowY: 'auto',
+                        maxHeight: '200px',
+                        pr: 1,
+                        '&::-webkit-scrollbar': {
+                          width: '6px',
+                        },
+                        '&::-webkit-scrollbar-track': {
+                          background: 'rgba(255,255,255,0.1)',
+                          borderRadius: '3px',
+                        },
+                        '&::-webkit-scrollbar-thumb': {
+                          background: 'rgba(255,255,255,0.3)',
+                          borderRadius: '3px',
+                          '&:hover': {
+                            background: 'rgba(255,255,255,0.5)',
+                          },
+                        },
+                      }}
+                    >
+                      <Typography variant="body1" sx={{ lineHeight: 1.6 }}>
+                        {currentUser.description || 'No description provided.'}
+                      </Typography>
+                    </Box>
+                  </Box>
+
+                  {/* Details Section - All info below the line */}
+                  <Box
+                    sx={{
+                      mt: 'auto',
+                      pt: 2,
+                      borderTop: '1px solid rgba(255,255,255,0.2)',
+                    }}
+                  >
+                    {/* Join Date and Phone */}
+                    <Box mb={2}>
+                      <Typography variant="body2" color="rgba(255,255,255,0.8)" mb={1}>
+                        Joined: {currentUser.created_at ? new Date(currentUser.created_at).toLocaleDateString() : 'N/A'}
+                      </Typography>
+                      {currentUser.phone_number && (
+                        <Box display="flex" alignItems="center" gap={1}>
+                          <Phone sx={{ fontSize: '1rem', color: 'rgba(255,255,255,0.8)' }} />
+                          <Typography variant="body2" color="rgba(255,255,255,0.8)">
+                            {currentUser.phone_number}
+                          </Typography>
+                        </Box>
+                      )}
+                    </Box>
+
+                    {/* Links Section */}
+                    {(currentUser.phone_number || currentUser.linkedin_url || currentUser.campaign_url) && (
+                      <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                        {/* WhatsApp Link */}
+                        {currentUser.phone_number && (
+                          <Link
+                            href={createWhatsAppLink(currentUser.phone_number)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            sx={{
+                              color: '#ffffff',
+                              textDecoration: 'none',
+                              backgroundColor: '#25D366',
+                              px: 1.5,
+                              py: 0.75,
+                              borderRadius: 1.5,
+                              fontSize: '0.8rem',
+                              fontWeight: 'medium',
+                              border: '1px solid #25D366',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 0.5,
+                              '&:hover': {
+                                backgroundColor: '#128C7E',
+                                borderColor: '#128C7E',
+                                textDecoration: 'none',
+                                transform: 'translateY(-1px)',
+                              },
+                              transition: 'all 0.2s ease-in-out',
+                            }}
+                          >
+                            <WhatsApp sx={{ fontSize: '1rem' }} />
+                            WhatsApp
+                          </Link>
+                        )}
+
+                        {/* LinkedIn Profile */}
+                        {currentUser.linkedin_url && (
+                          <Link
+                            href={currentUser.linkedin_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            sx={{
+                              color: '#ffffff',
+                              textDecoration: 'none',
+                              backgroundColor: '#0077b5',
+                              px: 1.5,
+                              py: 0.75,
+                              borderRadius: 1.5,
+                              fontSize: '0.8rem',
+                              fontWeight: 'medium',
+                              border: '1px solid #0077b5',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 0.5,
+                              '&:hover': {
+                                backgroundColor: '#005885',
+                                borderColor: '#005885',
+                                textDecoration: 'none',
+                                transform: 'translateY(-1px)',
+                              },
+                              transition: 'all 0.2s ease-in-out',
+                            }}
+                          >
+                            <LinkedIn sx={{ fontSize: '1rem' }} />
+                            LinkedIn Profile
+                          </Link>
+                        )}
+
+                        {/* Campaign/Fundraising Link */}
+                        {currentUser.campaign_url && (
+                          <Link
+                            href={currentUser.campaign_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            sx={{
+                              color: 'rgba(255,255,255,0.9)',
+                              textDecoration: 'none',
+                              backgroundColor: 'rgba(255,255,255,0.15)',
+                              px: 1.5,
+                              py: 0.75,
+                              borderRadius: 1.5,
+                              fontSize: '0.8rem',
+                              fontWeight: 'medium',
+                              border: '1px solid rgba(255,255,255,0.2)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 0.5,
+                              '&:hover': {
+                                backgroundColor: 'rgba(255,255,255,0.25)',
+                                textDecoration: 'none',
+                                transform: 'translateY(-1px)',
+                              },
+                              transition: 'all 0.2s ease-in-out',
+                            }}
+                          >
+                            <Campaign sx={{ fontSize: '1rem' }} />
+                            Campaign/Fundraising
+                          </Link>
+                        )}
+                      </Stack>
+                    )}
+                  </Box>
+                </CardContent>
+              </Card>
+
+              {/* Navigation Buttons */}
+              <Stack direction="row" spacing={2} justifyContent="center" mt={3}>
+                <Button
+                  variant="outlined"
+                  onClick={handlePrevious}
+                  disabled={currentUserIndex === 0}
+                  startIcon={<NavigateBefore />}
+                  sx={{
+                    minWidth: 120,
+                    borderColor: '#4caf50',
+                    color: '#4caf50',
+                    '&:hover': {
+                      borderColor: '#2e7d32',
+                      backgroundColor: 'rgba(76, 175, 80, 0.08)',
+                    },
+                  }}
+                >
+                  Previous
+                </Button>
+
+                <Button
+                  variant="outlined"
+                  onClick={handleNext}
+                  disabled={currentUserIndex === users.length - 1}
+                  endIcon={<NavigateNext />}
+                  sx={{
+                    minWidth: 120,
+                    borderColor: '#4caf50',
+                    color: '#4caf50',
+                    '&:hover': {
+                      borderColor: '#2e7d32',
+                      backgroundColor: 'rgba(76, 175, 80, 0.08)',
+                    },
+                  }}
+                >
+                  Next
+                </Button>
+              </Stack>
+            </Box>
+          </Box>
+
+          {/* Sharing Widget */}
+          {currentUser && (
             <Box
               sx={{
-                mt: 'auto',
-                pt: 2,
-                borderTop: '1px solid rgba(255,255,255,0.2)',
+                flexShrink: 0,
+                width: { xs: '100%', md: 'auto' },
               }}
             >
-              {/* Join Date and Phone */}
-              <Box mb={2}>
-                <Typography variant="body2" color="rgba(255,255,255,0.8)" mb={1}>
-                  Joined: {currentUser.created_at ? new Date(currentUser.created_at).toLocaleDateString() : 'N/A'}
-                </Typography>
-                {currentUser.phone_number && (
-                  <Box display="flex" alignItems="center" gap={1}>
-                    <Phone sx={{ fontSize: '1rem', color: 'rgba(255,255,255,0.8)' }} />
-                    <Typography variant="body2" color="rgba(255,255,255,0.8)">
-                      {currentUser.phone_number}
-                    </Typography>
-                  </Box>
-                )}
-              </Box>
-
-              {/* Links Section */}
-              {(currentUser.phone_number || currentUser.linkedin_url || currentUser.campaign_url) && (
-                <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-                  {/* WhatsApp Link */}
-                  {currentUser.phone_number && (
-                    <Link
-                      href={createWhatsAppLink(currentUser.phone_number)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      sx={{
-                        color: '#ffffff',
-                        textDecoration: 'none',
-                        backgroundColor: '#25D366',
-                        px: 1.5,
-                        py: 0.75,
-                        borderRadius: 1.5,
-                        fontSize: '0.8rem',
-                        fontWeight: 'medium',
-                        border: '1px solid #25D366',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 0.5,
-                        '&:hover': {
-                          backgroundColor: '#128C7E',
-                          borderColor: '#128C7E',
-                          textDecoration: 'none',
-                          transform: 'translateY(-1px)',
-                        },
-                        transition: 'all 0.2s ease-in-out',
-                      }}
-                    >
-                      <WhatsApp sx={{ fontSize: '1rem' }} />
-                      WhatsApp
-                    </Link>
-                  )}
-
-                  {/* LinkedIn Profile */}
-                  {currentUser.linkedin_url && (
-                    <Link
-                      href={currentUser.linkedin_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      sx={{
-                        color: '#ffffff',
-                        textDecoration: 'none',
-                        backgroundColor: '#0077b5',
-                        px: 1.5,
-                        py: 0.75,
-                        borderRadius: 1.5,
-                        fontSize: '0.8rem',
-                        fontWeight: 'medium',
-                        border: '1px solid #0077b5',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 0.5,
-                        '&:hover': {
-                          backgroundColor: '#005885',
-                          borderColor: '#005885',
-                          textDecoration: 'none',
-                          transform: 'translateY(-1px)',
-                        },
-                        transition: 'all 0.2s ease-in-out',
-                      }}
-                    >
-                      <LinkedIn sx={{ fontSize: '1rem' }} />
-                      LinkedIn Profile
-                    </Link>
-                  )}
-
-                  {/* Campaign/Fundraising Link */}
-                  {currentUser.campaign_url && (
-                    <Link
-                      href={currentUser.campaign_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      sx={{
-                        color: 'rgba(255,255,255,0.9)',
-                        textDecoration: 'none',
-                        backgroundColor: 'rgba(255,255,255,0.15)',
-                        px: 1.5,
-                        py: 0.75,
-                        borderRadius: 1.5,
-                        fontSize: '0.8rem',
-                        fontWeight: 'medium',
-                        border: '1px solid rgba(255,255,255,0.2)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 0.5,
-                        '&:hover': {
-                          backgroundColor: 'rgba(255,255,255,0.25)',
-                          textDecoration: 'none',
-                          transform: 'translateY(-1px)',
-                        },
-                        transition: 'all 0.2s ease-in-out',
-                      }}
-                    >
-                      <Campaign sx={{ fontSize: '1rem' }} />
-                      Campaign/Fundraising
-                    </Link>
-                  )}
-                </Stack>
-              )}
+              <SharingWidget url={shareUrl} title={shareTitle} description={shareDescription} />
             </Box>
-          </CardContent>
-        </Card>
-
-        {/* Navigation Buttons */}
-        <Stack direction="row" spacing={2} justifyContent="center" mt={3}>
-          <Button
-            variant="outlined"
-            onClick={handlePrevious}
-            disabled={currentUserIndex === 0}
-            startIcon={<NavigateBefore />}
-            sx={{
-              minWidth: 120,
-              borderColor: '#4caf50',
-              color: '#4caf50',
-              '&:hover': {
-                borderColor: '#2e7d32',
-                backgroundColor: 'rgba(76, 175, 80, 0.08)',
-              },
-            }}
-          >
-            Previous
-          </Button>
-
-          <Button
-            variant="outlined"
-            onClick={handleNext}
-            disabled={currentUserIndex === users.length - 1}
-            endIcon={<NavigateNext />}
-            sx={{
-              minWidth: 120,
-              borderColor: '#4caf50',
-              color: '#4caf50',
-              '&:hover': {
-                borderColor: '#2e7d32',
-                backgroundColor: 'rgba(76, 175, 80, 0.08)',
-              },
-            }}
-          >
-            Next
-          </Button>
-        </Stack>
+          )}
+        </Box>
       </Box>
-    </Box>
+    </>
   );
 };
 
