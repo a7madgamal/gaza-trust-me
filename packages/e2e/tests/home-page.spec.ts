@@ -3,7 +3,7 @@ import { loginAsUser, clearBrowserState } from './utils/auth-helpers';
 import { env } from './utils/env';
 
 test.describe('Home Page', () => {
-  test('should load public page and display card stack interface', async ({ page }) => {
+  test('should load public page and handle navigation interactions', async ({ page }) => {
     await page.goto('/');
 
     // Wait for auto-redirect to user URL
@@ -33,13 +33,6 @@ test.describe('Home Page', () => {
     // Check that the link has the correct format
     const href = await whatsappLink.getAttribute('href');
     expect(href).toMatch(/^https:\/\/wa\.me\/\d+$/);
-  });
-
-  test('should have navigation buttons and handle interactions', async ({ page }) => {
-    await page.goto('/');
-
-    // Wait for auto-redirect to user URL
-    await page.waitForURL(/\/user\/\d+/);
 
     // Should show all navigation buttons
     await expect(page.getByRole('button', { name: 'Previous' })).toBeVisible();
@@ -95,7 +88,8 @@ test.describe('Home Page', () => {
     await expect(page.locator('[role="progressbar"]')).toBeVisible();
   });
 
-  test('should display header and handle navigation when not logged in', async ({ page }) => {
+  test('should handle header navigation for all user types and responsive behavior', async ({ page }) => {
+    // Test header navigation when not logged in
     await page.goto(env.FRONTEND_URL);
 
     // Check title is visible and clickable
@@ -125,12 +119,9 @@ test.describe('Home Page', () => {
     await page.goto(`${env.FRONTEND_URL}/`);
     void page.getByRole('button', { name: 'Register' }).click();
     await expect(page).toHaveURL(`${env.FRONTEND_URL}/register`);
-  });
-
-  test('should handle header navigation for logged in users', async ({ page }) => {
-    await page.goto(env.FRONTEND_URL);
 
     // Test help seeker login
+    await page.goto(env.FRONTEND_URL);
     await loginAsUser(page, 'helpSeeker');
 
     // Check user info is displayed - target the header specifically
@@ -172,12 +163,9 @@ test.describe('Home Page', () => {
 
     // Should show login form
     await expect(page.getByRole('heading', { name: 'Sign In' })).toBeVisible();
-  });
 
-  test('should handle admin user header and responsive behavior', async ({ page }) => {
+    // Test admin user header
     await page.goto(env.FRONTEND_URL);
-
-    // Test admin login
     await loginAsUser(page, 'admin');
 
     // Check user info is displayed - target the header specifically
@@ -214,9 +202,8 @@ test.describe('Home Page', () => {
     await expect(page.getByRole('button', { name: 'account of current user' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Login' })).toBeHidden();
     await expect(page.getByRole('button', { name: 'Register' })).toBeHidden();
-  });
 
-  test('should handle menu interactions and basic navigation', async ({ page }) => {
+    // Test menu interactions and basic navigation
     await page.goto(env.FRONTEND_URL);
 
     // Test menu close behavior

@@ -8,7 +8,7 @@ test.describe('URL Routing Tests', () => {
     await page.context().clearPermissions();
   });
 
-  test('should redirect home to user URL pattern', async ({ page }) => {
+  test('should handle complete navigation flow with home redirect and user data changes', async ({ page }) => {
     // Navigate to the home page
     await page.goto(env.FRONTEND_URL);
 
@@ -20,13 +20,6 @@ test.describe('URL Routing Tests', () => {
 
     // Verify the URL follows the expected pattern
     expect(page.url()).toMatch(/\/user\/\d+$/);
-  });
-
-  test('should change user data when navigating Next', async ({ page }) => {
-    // Navigate to home and wait for initial load
-    await page.goto(env.FRONTEND_URL);
-    await expect(page.locator('[data-testid="user-card"]')).toBeVisible();
-    await page.waitForURL(/\/user\/\d+/);
 
     // Get initial user data
     const initialUrl = page.url();
@@ -61,7 +54,7 @@ test.describe('URL Routing Tests', () => {
     }
   });
 
-  test('should change user data when navigating Previous', async ({ page }) => {
+  test('should handle Previous navigation and direct URL access to specific users', async ({ page }) => {
     // Navigate to home and wait for initial load
     await page.goto(env.FRONTEND_URL);
     await expect(page.locator('[data-testid="user-card"]')).toBeVisible();
@@ -106,10 +99,8 @@ test.describe('URL Routing Tests', () => {
       await expect(previousButton).toBeDisabled();
       console.log('Both Next and Previous buttons are disabled - likely only one user in the system');
     }
-  });
 
-  test('should handle direct URL access to specific users', async ({ page }) => {
-    // Navigate directly to a specific user URL
+    // Test direct URL access to specific users
     await page.goto(`${env.FRONTEND_URL}/user/1`);
 
     // Wait for the card to load

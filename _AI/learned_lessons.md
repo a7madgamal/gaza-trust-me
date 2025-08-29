@@ -214,3 +214,14 @@
 - Avoid fallback to generic types - let validation errors surface for debugging
 - Prefer reusing generated types from external libraries (like Supabase) when they describe the same thing exactly
 - Don't duplicate type definitions when the external library already provides the correct types
+
+### 🎯 **Use Assert Functions for Type Narrowing**
+
+- **Problem:** Used `as` keyword and `!` non-null assertions which are hacks
+- **Rule:** Always use proper assert functions: `assertNotNull`, `assertNotUndefined`, `assertNotEmptyString`
+- **Why:** Assert functions properly narrow TypeScript types and provide runtime validation
+- **Examples:**
+  - ❌ `const user = users[0]!` → ✅ `const user = users[0]; assertNotNull(user);`
+  - ❌ `const text = value as string` → ✅ `const text = value; assertNotEmptyString(text);`
+- **Lesson:** Assert functions are safer than type assertions and help TypeScript understand your intent
+- **Result:** Better type safety and clearer code intent

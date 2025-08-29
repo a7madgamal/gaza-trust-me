@@ -2,7 +2,7 @@ import { test, expect } from './global-test-hook';
 import { generateTestUser } from './utils/test-data';
 
 test.describe('Registration Integration', () => {
-  test('should successfully register user with LinkedIn and campaign URLs', async ({ page }) => {
+  test('should handle complete registration workflow with all optional URLs', async ({ page }) => {
     const testUser = generateTestUser();
 
     await page.goto('/register');
@@ -42,7 +42,7 @@ test.describe('Registration Integration', () => {
     await expect(page).toHaveURL(/.*\/dashboard/);
   });
 
-  test('should handle registration with only LinkedIn URL', async ({ page }) => {
+  test('should handle registration with partial optional URLs and validation', async ({ page }) => {
     const testUser = generateTestUser();
 
     await page.goto('/register');
@@ -70,15 +70,10 @@ test.describe('Registration Integration', () => {
 
     // Should succeed even with only LinkedIn URL
     await expect(page.locator('[data-testid="register-button"]')).toBeDisabled();
-  });
 
-  test('should handle registration with only campaign URL', async ({ page }) => {
-    const testUser = generateTestUser();
-
+    // Test registration with only campaign URL
     await page.goto('/register');
-
-    // Fill all required fields
-    await page.fill('[data-testid="email"]', testUser.email);
+    await page.fill('[data-testid="email"]', generateTestUser().email);
     await page.fill('[data-testid="password"]', testUser.password);
     await page.fill('[data-testid="confirmPassword"]', testUser.password);
     await page.fill('[data-testid="fullName"]', testUser.fullName);
@@ -100,15 +95,10 @@ test.describe('Registration Integration', () => {
 
     // Should succeed even with only campaign URL
     await expect(page.locator('[data-testid="register-button"]')).toBeDisabled();
-  });
 
-  test('should handle registration without LinkedIn or campaign URLs', async ({ page }) => {
-    const testUser = generateTestUser();
-
+    // Test registration without any optional URLs
     await page.goto('/register');
-
-    // Fill all required fields only
-    await page.fill('[data-testid="email"]', testUser.email);
+    await page.fill('[data-testid="email"]', generateTestUser().email);
     await page.fill('[data-testid="password"]', testUser.password);
     await page.fill('[data-testid="confirmPassword"]', testUser.password);
     await page.fill('[data-testid="fullName"]', testUser.fullName);
@@ -130,7 +120,7 @@ test.describe('Registration Integration', () => {
     await expect(page.locator('[data-testid="register-button"]')).toBeDisabled();
   });
 
-  test('should validate LinkedIn URL format', async ({ page }) => {
+  test('should validate URL formats for LinkedIn and campaign URLs', async ({ page }) => {
     await page.goto('/register');
 
     // Fill required fields
@@ -149,16 +139,13 @@ test.describe('Registration Integration', () => {
 
     // Should show validation error for LinkedIn URL
     await expect(page.locator('[data-testid="linkedinUrl"]')).toHaveAttribute('aria-invalid', 'true');
-  });
 
-  test('should validate campaign URL format', async ({ page }) => {
+    // Test invalid campaign URL
     await page.goto('/register');
-
-    // Fill required fields
-    await page.fill('[data-testid="email"]', 'test@example.com');
+    await page.fill('[data-testid="email"]', 'test2@example.com');
     await page.fill('[data-testid="password"]', 'Password123!');
     await page.fill('[data-testid="confirmPassword"]', 'Password123!');
-    await page.fill('[data-testid="fullName"]', 'Test User');
+    await page.fill('[data-testid="fullName"]', 'Test User 2');
     await page.fill('[data-testid="phoneNumber"]', '+1234567890');
     await page.fill('[data-testid="description"]', 'This is a detailed description of the help I need.');
 

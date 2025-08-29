@@ -2,38 +2,27 @@ import { test, expect } from './global-test-hook';
 import { createTestUserViaAPI } from './utils/test-data';
 import { loginAsUser } from './utils/auth-helpers';
 
-test.describe('Profile Editing', () => {
+test.describe('Profile Editing - Help Seeker Users', () => {
   test.beforeEach(async ({ page }) => {
     // Create a test user for each test
     await createTestUserViaAPI('helpSeeker');
-
     // Login with the test user
     await loginAsUser(page, 'helpSeeker');
   });
 
-  test('should show edit button on profile page', async ({ page }) => {
+  test('should handle complete profile editing workflow for help seekers', async ({ page }) => {
     await page.goto('/profile');
 
-    // Check that edit button is visible
+    // Check that edit button and verification status are visible
     await expect(page.locator('[data-testid="profile-edit-button"]')).toBeVisible();
     await expect(page.locator('[data-testid="profile-edit-button"]')).toHaveText('Edit Profile');
-  });
-
-  test('should show verification status chip for help seekers', async ({ page }) => {
-    await page.goto('/profile');
-
-    // Help seekers should see verification status chip
     await expect(page.locator('[data-testid="profile-status"]')).toBeVisible();
-  });
 
-  test('should enter edit mode when edit button is clicked', async ({ page }) => {
-    await page.goto('/profile');
-
-    // Click edit button
+    // Click edit button and handle warning dialog
     await page.click('[data-testid="profile-edit-button"]');
-
-    // Help seekers may see warning dialog - click continue if it appears
-    await page.locator('[data-testid="warning-dialog-continue"]').click();
+    await expect(page.locator('[data-testid="warning-dialog-cancel"]')).toBeVisible();
+    await expect(page.locator('[data-testid="warning-dialog-continue"]')).toBeVisible();
+    await page.click('[data-testid="warning-dialog-continue"]');
 
     // Wait for edit mode to be activated
     await expect(page.locator('[data-testid="profile-save-button"]')).toBeVisible();
@@ -44,38 +33,6 @@ test.describe('Profile Editing', () => {
     await expect(page.locator('[data-testid="profile-description"]')).toBeEnabled();
     await expect(page.locator('[data-testid="profile-linkedin-url"]')).toBeEnabled();
     await expect(page.locator('[data-testid="profile-campaign-url"]')).toBeEnabled();
-
-    // Check that save and cancel buttons are visible
-    await expect(page.locator('[data-testid="profile-save-button"]')).toBeVisible();
-    await expect(page.locator('[data-testid="profile-cancel-button"]')).toBeVisible();
-  });
-
-  test('should show warning dialog for verified help seekers', async ({ page }) => {
-    await page.goto('/profile');
-
-    // Click edit button
-    await page.click('[data-testid="profile-edit-button"]');
-
-    // Help seekers should see warning dialog and click continue
-    await expect(page.locator('[data-testid="warning-dialog-cancel"]')).toBeVisible();
-    await expect(page.locator('[data-testid="warning-dialog-continue"]')).toBeVisible();
-    await page.click('[data-testid="warning-dialog-continue"]');
-
-    // Should now be in edit mode
-    await expect(page.locator('[data-testid="profile-save-button"]')).toBeVisible();
-  });
-
-  test('should save profile changes successfully', async ({ page }) => {
-    await page.goto('/profile');
-
-    // Click edit button
-    await page.click('[data-testid="profile-edit-button"]');
-
-    // Help seekers may see warning dialog - click continue if it appears
-    await page.locator('[data-testid="warning-dialog-continue"]').click();
-
-    // Wait for edit mode to be activated
-    await expect(page.locator('[data-testid="profile-save-button"]')).toBeVisible();
 
     // Update profile information
     await page.fill('[data-testid="profile-fullName-input"]', 'Updated Test User');
@@ -94,15 +51,18 @@ test.describe('Profile Editing', () => {
     // Should exit edit mode
     await expect(page.locator('[data-testid="profile-edit-button"]')).toBeVisible();
     await expect(page.locator('[data-testid="profile-save-button"]')).toBeHidden();
+
+    // Check that the info message shows the correct text
+    await expect(
+      page.locator('text=Profile information is collected during registration and cannot be edited')
+    ).toBeVisible();
   });
 
-  test('should cancel edit mode without saving', async ({ page }) => {
+  test('should handle edit mode cancellation and no-changes scenarios', async ({ page }) => {
     await page.goto('/profile');
 
-    // Click edit button
+    // Click edit button and handle warning dialog
     await page.click('[data-testid="profile-edit-button"]');
-
-    // Help seekers may see warning dialog - click continue if it appears
     await page.locator('[data-testid="warning-dialog-continue"]').click();
 
     // Wait for edit mode to be activated
@@ -120,18 +80,10 @@ test.describe('Profile Editing', () => {
 
     // Changes should not be saved
     await expect(page.locator('[data-testid="profile-fullName-input"]')).toHaveValue('Help Seeker');
-  });
 
-  test('should show no changes message when saving without changes', async ({ page }) => {
-    await page.goto('/profile');
-
-    // Click edit button
+    // Enter edit mode again and try to save without changes
     await page.click('[data-testid="profile-edit-button"]');
-
-    // Help seekers may see warning dialog - click continue if it appears
     await page.locator('[data-testid="warning-dialog-continue"]').click();
-
-    // Wait for edit mode to be activated
     await expect(page.locator('[data-testid="profile-save-button"]')).toBeVisible();
 
     // Try to save without making changes
@@ -144,19 +96,10 @@ test.describe('Profile Editing', () => {
     // Should exit edit mode
     await expect(page.locator('[data-testid="profile-edit-button"]')).toBeVisible();
   });
-
-  test('should show correct info message for all users', async ({ page }) => {
-    await page.goto('/profile');
-
-    // Check that the info message shows the correct text
-    await expect(
-      page.locator('text=Profile information is collected during registration and cannot be edited')
-    ).toBeVisible();
-  });
 });
 
 test.describe('Profile Editing - Admin Users', () => {
-  test('should not show verification status chip for admin users', async ({ page }) => {
+  test('should handle profile editing workflow for admin users', async ({ page }) => {
     // Create an admin user and login
     await createTestUserViaAPI('admin');
     await loginAsUser(page, 'admin');
@@ -165,14 +108,6 @@ test.describe('Profile Editing - Admin Users', () => {
 
     // Admin users should not see verification status chip
     await expect(page.locator('[data-testid="profile-status"]')).toBeHidden();
-  });
-
-  test('should skip warning dialog for admin users', async ({ page }) => {
-    // Create an admin user and login
-    await createTestUserViaAPI('admin');
-    await loginAsUser(page, 'admin');
-
-    await page.goto('/profile');
 
     // Click edit button - admin users may see warning dialog if verified
     await page.click('[data-testid="profile-edit-button"]');
@@ -187,23 +122,10 @@ test.describe('Profile Editing - Admin Users', () => {
     await expect(page.locator('[data-testid="profile-save-button"]')).toBeVisible();
     await expect(page.locator('[data-testid="warning-dialog-cancel"]')).toBeHidden();
   });
-
-  test('should show correct info message for admin users', async ({ page }) => {
-    // Create an admin user and login
-    await createTestUserViaAPI('admin');
-    await loginAsUser(page, 'admin');
-
-    await page.goto('/profile');
-
-    // Check that the info message shows the correct text
-    await expect(
-      page.locator('text=Profile information is collected during registration and cannot be edited')
-    ).toBeVisible();
-  });
 });
 
 test.describe('Profile Editing - Super Admin Users', () => {
-  test('should not show verification status chip for super admin users', async ({ page }) => {
+  test('should handle profile editing workflow for super admin users', async ({ page }) => {
     // Create a super admin user and login
     await createTestUserViaAPI('superAdmin');
     await loginAsUser(page, 'superAdmin');
@@ -212,14 +134,6 @@ test.describe('Profile Editing - Super Admin Users', () => {
 
     // Super admin users should not see verification status chip
     await expect(page.locator('[data-testid="profile-status"]')).toBeHidden();
-  });
-
-  test('should skip warning dialog for super admin users', async ({ page }) => {
-    // Create a super admin user and login
-    await createTestUserViaAPI('superAdmin');
-    await loginAsUser(page, 'superAdmin');
-
-    await page.goto('/profile');
 
     // Click edit button - super admin users should go directly to edit mode
     await page.click('[data-testid="profile-edit-button"]');
@@ -230,18 +144,5 @@ test.describe('Profile Editing - Super Admin Users', () => {
     // Should be in edit mode
     await expect(page.locator('[data-testid="profile-save-button"]')).toBeVisible();
     await expect(page.locator('[data-testid="warning-dialog-cancel"]')).toBeHidden();
-  });
-
-  test('should show correct info message for super admin users', async ({ page }) => {
-    // Create a super admin user and login
-    await createTestUserViaAPI('superAdmin');
-    await loginAsUser(page, 'superAdmin');
-
-    await page.goto('/profile');
-
-    // Check that the info message shows the correct text
-    await expect(
-      page.locator('text=Profile information is collected during registration and cannot be edited')
-    ).toBeVisible();
   });
 });

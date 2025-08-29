@@ -2,7 +2,7 @@ import { test, expect } from './global-test-hook';
 import { generateTestUser } from './utils/test-data';
 
 test.describe('Auth Pages', () => {
-  test('should handle login form validation and navigation', async ({ page }) => {
+  test('should handle login form validation and error scenarios', async ({ page }) => {
     await page.goto('/login');
 
     // Try to submit empty form
@@ -43,9 +43,8 @@ test.describe('Auth Pages', () => {
     await page.goto('/login');
     await page.click('text=Create one');
     await expect(page).toHaveURL('/register');
-  });
 
-  test('should handle login error scenarios and authentication failures', async ({ page }) => {
+    // Test login error scenarios
     await page.goto('/login');
 
     // Fill with invalid credentials
@@ -64,24 +63,6 @@ test.describe('Auth Pages', () => {
 
     // Should show error message
     await expect(page.getByText('Invalid credentials')).toBeVisible();
-
-    // Test authentication errors gracefully
-    await page.goto('/');
-    await page.evaluate(() => {
-      localStorage.setItem(
-        'session',
-        JSON.stringify({
-          access_token: 'invalid-token',
-          user: { id: 'test', email: 'test@example.com', role: 'help_seeker' },
-        })
-      );
-    });
-
-    // Navigate to a protected page that will trigger authentication check
-    await page.goto('/profile');
-
-    // Should redirect to login page due to invalid token
-    await expect(page).toHaveURL('/login');
   });
 
   test('should handle session management and authentication errors', async ({ page }) => {
@@ -120,9 +101,27 @@ test.describe('Auth Pages', () => {
 
     // Should redirect to login due to authentication error
     await page.waitForURL('/login');
+
+    // Test authentication errors gracefully from login page
+    await page.goto('/');
+    await page.evaluate(() => {
+      localStorage.setItem(
+        'session',
+        JSON.stringify({
+          access_token: 'invalid-token',
+          user: { id: 'test', email: 'test@example.com', role: 'help_seeker' },
+        })
+      );
+    });
+
+    // Navigate to a protected page that will trigger authentication check
+    await page.goto('/profile');
+
+    // Should redirect to login page due to invalid token
+    await expect(page).toHaveURL('/login');
   });
 
-  test('should handle registration form validation and field requirements', async ({ page }) => {
+  test('should handle registration form validation and submission', async ({ page }) => {
     await page.goto('/register');
 
     // Try to submit empty form
@@ -174,9 +173,8 @@ test.describe('Auth Pages', () => {
 
     // Should show password confirmation error
     await expect(page.locator('[data-testid="confirmPassword"]')).toHaveAttribute('aria-invalid', 'true');
-  });
 
-  test('should handle registration form filling and description field validation', async ({ page }) => {
+    // Test registration form filling and description field validation
     await page.goto('/register');
 
     // Should show description field
@@ -238,12 +236,9 @@ test.describe('Auth Pages', () => {
 
     // Should show loading state (button disabled during submission)
     await expect(page.locator('[data-testid="register-button"]')).toBeDisabled();
-  });
-
-  test('should handle registration form submission and navigation', async ({ page }) => {
-    await page.goto('/register');
 
     // Test navigation to login page
+    await page.goto('/register');
     await page.click('text=Sign in');
     await expect(page).toHaveURL('/login');
 
@@ -269,9 +264,8 @@ test.describe('Auth Pages', () => {
     // Wait for navigation to complete - should be redirected to dashboard (auto-login)
     await page.waitForURL(/\/dashboard/);
     expect(page.url()).toMatch(/\/dashboard/);
-  });
 
-  test('should handle registration loading states and status validation', async ({ page }) => {
+    // Test registration loading states and status validation
     await page.goto('/register');
 
     // Fill form with valid data

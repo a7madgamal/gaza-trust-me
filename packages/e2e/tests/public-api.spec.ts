@@ -3,29 +3,18 @@ import { testTRPC } from './utils/trpc-client';
 import { assertNotEmptyString, assertNotNull, assertNotUndefined } from './utils/test-utils';
 
 test.describe('Public API Endpoints', () => {
-  test('should get users for cards', async () => {
+  test('should handle complete user data retrieval and validation with proper schema', async () => {
     const users = await testTRPC.getUsersForCards.query({
       limit: 10,
       offset: 0,
     });
 
     expect(Array.isArray(users)).toBe(true);
-  });
 
-  test('should get verified user count', async () => {
+    // Get verified user count
     const count = await testTRPC.getVerifiedUserCount.query();
-
     expect(typeof count).toBe('number');
     expect(count).toBeGreaterThanOrEqual(0);
-  });
-
-  test('should validate user schema when users exist', async () => {
-    const users = await testTRPC.getUsersForCards.query({
-      limit: 10,
-      offset: 0,
-    });
-
-    expect(Array.isArray(users)).toBe(true);
 
     // Require at least one user for this test
     expect(users.length).toBeGreaterThan(0);
@@ -52,25 +41,25 @@ test.describe('Public API Endpoints', () => {
     expect(typeof user.created_at).toBe('string');
   });
 
-  test('should handle invalid input gracefully', async () => {
+  test('should handle error cases and input validation gracefully', async () => {
+    // Test invalid negative limit
     await expect(
       testTRPC.getUsersForCards.query({
-        limit: -1, // Invalid negative limit
+        limit: -1,
+        offset: 0,
+      })
+    ).rejects.toThrow();
+
+    // Test very large limit
+    await expect(
+      testTRPC.getUsersForCards.query({
+        limit: 1000,
         offset: 0,
       })
     ).rejects.toThrow();
   });
 
-  test('should handle large limit gracefully', async () => {
-    await expect(
-      testTRPC.getUsersForCards.query({
-        limit: 1000, // Very large limit
-        offset: 0,
-      })
-    ).rejects.toThrow();
-  });
-
-  test('should return only verified help_seeker users', async () => {
+  test('should return only verified help_seeker users ordered by creation date', async () => {
     const users = await testTRPC.getUsersForCards.query({
       limit: 50,
       offset: 0,
@@ -83,23 +72,14 @@ test.describe('Public API Endpoints', () => {
       expect(user.status).toBe('verified');
       expect(user.role).toBe('help_seeker');
     });
-  });
 
-  test('should order users by creation date (newest first)', async () => {
-    const users = await testTRPC.getUsersForCards.query({
-      limit: 10,
-      offset: 0,
-    });
-
-    expect(Array.isArray(users)).toBe(true);
-
-    // Require at least one user for this test
+    // Require at least one user for ordering test
     expect(users.length).toBeGreaterThan(0);
 
     // Check that users are ordered by created_at descending
     for (let i = 0; i < users.length - 1; i++) {
-      const currentUser = users[i]; // Assert user exists since we're in bounds
-      const nextUser = users[i + 1]; // Assert user exists since we're in bounds
+      const currentUser = users[i];
+      const nextUser = users[i + 1];
 
       assertNotUndefined(currentUser);
       assertNotUndefined(nextUser);

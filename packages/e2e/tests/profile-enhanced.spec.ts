@@ -7,7 +7,9 @@ test.describe('Enhanced Profile Page', () => {
     await clearBrowserState(page);
   });
 
-  test('should display all profile fields including new ones', async ({ page }) => {
+  test('should display complete profile with all fields and external links for users with full data', async ({
+    page,
+  }) => {
     // Login as a predefined test user with all fields populated
     await loginAsUser(page, 'userWithLinkedinandcampaign');
 
@@ -30,17 +32,6 @@ test.describe('Enhanced Profile Page', () => {
     await expect(page.locator('[data-testid="profile-campaign-url"]')).toBeVisible();
     await expect(page.locator('[data-testid="profile-url-id"]')).toBeVisible();
     await expect(page.locator('[data-testid="profile-created-at"]')).toBeVisible();
-  });
-
-  test('should display clickable external links when available', async ({ page }) => {
-    // Login as a predefined test user with LinkedIn and campaign URLs
-    await loginAsUser(page, 'userWithLinkedinandcampaign');
-
-    // Navigate to profile page
-    await page.goto(`${env.FRONTEND_URL}/profile`);
-
-    // Wait for profile to load
-    await expect(page.locator('[data-testid="profile-fullName"]')).toBeVisible();
 
     // Check LinkedIn button is present and clickable
     const linkedinButton = page.getByRole('link', { name: 'View LinkedIn Profile' });
@@ -55,7 +46,7 @@ test.describe('Enhanced Profile Page', () => {
     await expect(campaignButton).toHaveAttribute('rel', 'noopener noreferrer');
   });
 
-  test('should display public profile link when url_id is available', async ({ page }) => {
+  test('should display public profile link and handle missing optional fields gracefully', async ({ page }) => {
     // Login as a predefined test user
     await loginAsUser(page, 'helpSeeker');
 
@@ -70,13 +61,10 @@ test.describe('Enhanced Profile Page', () => {
     await expect(publicProfileButton).toBeVisible();
     await expect(publicProfileButton).toHaveAttribute('target', '_blank');
     await expect(publicProfileButton).toHaveAttribute('rel', 'noopener noreferrer');
-  });
 
-  test('should handle missing optional fields gracefully', async ({ page }) => {
-    // Login as a predefined test user without LinkedIn/campaign URLs
+    // Login as admin user without LinkedIn/campaign URLs
+    await clearBrowserState(page);
     await loginAsUser(page, 'admin');
-
-    // Navigate to profile page
     await page.goto(`${env.FRONTEND_URL}/profile`);
 
     // Wait for profile to load
@@ -90,7 +78,7 @@ test.describe('Enhanced Profile Page', () => {
     await expect(page.getByText('External Links')).toBeHidden();
   });
 
-  test('should display proper loading states', async ({ page }) => {
+  test('should display proper loading states and handle authentication scenarios', async ({ page }) => {
     // Login first to avoid immediate redirect
     await loginAsUser(page, 'helpSeeker');
 
@@ -105,5 +93,24 @@ test.describe('Enhanced Profile Page', () => {
 
     // Should eventually show the profile content
     await expect(page.locator('[data-testid="profile-fullName"]')).toBeVisible();
+
+    // Test authentication scenarios
+    await clearBrowserState(page);
+    await page.goto('/profile');
+
+    // Wait for authentication check to complete and redirect to happen
+    await page.waitForURL('/login');
+
+    // Assert we're on the login page
+    await expect(page).toHaveURL(/.*login/);
+
+    // Should show login form
+    await expect(page.locator('[data-testid="email"]')).toBeVisible();
+    await expect(page.locator('[data-testid="password"]')).toBeVisible();
+    await expect(page.locator('[data-testid="login-button"]')).toBeVisible();
+
+    // Should show registration link
+    await expect(page.getByText("Don't have an account?")).toBeVisible();
+    await expect(page.getByText('Create one')).toBeVisible();
   });
 });

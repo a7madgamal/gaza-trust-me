@@ -8,7 +8,9 @@ test.describe('Enhanced Admin Dashboard', () => {
     await clearBrowserState(page);
   });
 
-  test('should display verify and flag buttons for pending users', async ({ page }) => {
+  test('should display complete admin dashboard with verify/flag functionality and WhatsApp links', async ({
+    page,
+  }) => {
     // Login as admin
     await loginAsUser(page, 'admin');
 
@@ -24,40 +26,17 @@ test.describe('Enhanced Admin Dashboard', () => {
 
     await expect(verifyButtons.first()).toBeVisible();
     await expect(flagButtons.first()).toBeVisible();
-  });
-
-  test('should display clickable WhatsApp phone numbers', async ({ page }) => {
-    // Login as admin
-    await loginAsUser(page, 'admin');
-
-    // Navigate to admin dashboard
-    await page.goto(`${env.FRONTEND_URL}/admin/dashboard`);
-
-    // Wait for dashboard to load
-    await expect(page.getByTestId('admin-dashboard-title')).toBeVisible();
 
     // Wait for users table to load
     await expect(page.getByTestId('users-table')).toBeVisible();
 
     // Check that phone numbers are clickable WhatsApp links
-    // Look for any link that has a WhatsApp href pattern
     const whatsappLinks = page.locator('a[href*="wa.me"]');
     await expect(whatsappLinks.first()).toBeVisible();
     await expect(whatsappLinks.first()).toHaveAttribute('target', '_blank');
     await expect(whatsappLinks.first()).toHaveAttribute('rel', 'noopener noreferrer');
-  });
 
-  test('should handle verify action with confirmation dialog', async ({ page }) => {
-    // Login as admin
-    await loginAsUser(page, 'admin');
-
-    // Navigate to admin dashboard
-    await page.goto(`${env.FRONTEND_URL}/admin/dashboard`);
-
-    // Wait for dashboard to load
-    await expect(page.getByTestId('admin-dashboard-title')).toBeVisible();
-
-    // Click first verify button
+    // Test verify action with confirmation dialog
     const verifyButton = page.getByRole('button', { name: 'Verify' }).first();
     await verifyButton.click();
 
@@ -73,19 +52,8 @@ test.describe('Enhanced Admin Dashboard', () => {
 
     // Dialog should close
     await expect(page.getByTestId('action-dialog')).toBeHidden();
-  });
 
-  test('should handle flag action with confirmation dialog', async ({ page }) => {
-    // Login as admin
-    await loginAsUser(page, 'admin');
-
-    // Navigate to admin dashboard
-    await page.goto(`${env.FRONTEND_URL}/admin/dashboard`);
-
-    // Wait for dashboard to load
-    await expect(page.getByTestId('admin-dashboard-title')).toBeVisible();
-
-    // Click first flag button
+    // Test flag action with confirmation dialog
     const flagButton = page.getByRole('button', { name: 'Flag' }).first();
     await flagButton.click();
 
@@ -103,7 +71,10 @@ test.describe('Enhanced Admin Dashboard', () => {
     await expect(page.getByTestId('action-dialog')).toBeHidden();
   });
 
-  test('should display status filter functionality', async ({ page }) => {
+  test('should handle status filtering and verified user links', async ({ page }) => {
+    // Create a verified user first to ensure we have test data
+    await createTestUserViaAPI('helpSeeker');
+
     // Login as admin
     await loginAsUser(page, 'admin');
 
@@ -123,9 +94,17 @@ test.describe('Enhanced Admin Dashboard', () => {
 
     // Should show filtered results
     await expect(page.getByTestId('users-table')).toBeVisible();
+
+    // Filter to show only verified users
+    await statusFilter.click();
+    await page.getByRole('option', { name: 'Verified' }).click();
+
+    // Now check that user links have correct format
+    const userLinks = page.locator('a[href*="/user/"]');
+    await expect(userLinks.first()).toHaveAttribute('href', /\/user\/\d+/);
   });
 
-  test('should display super admin role management for super admins', async ({ page }) => {
+  test('should display super admin role management functionality', async ({ page }) => {
     // Login as super admin
     await loginAsUser(page, 'superAdmin');
 
@@ -138,31 +117,5 @@ test.describe('Enhanced Admin Dashboard', () => {
     // Check that upgrade buttons are present for super admins
     const upgradeButtons = page.getByRole('button', { name: 'Make Admin' });
     await expect(upgradeButtons.first()).toBeVisible();
-  });
-
-  test('should display verified users as clickable links', async ({ page }) => {
-    // Create a verified user first to ensure we have test data
-    await createTestUserViaAPI('helpSeeker');
-
-    // Login as admin
-    await loginAsUser(page, 'admin');
-
-    // Navigate to admin dashboard
-    await page.goto(`${env.FRONTEND_URL}/admin/dashboard`);
-
-    // Wait for dashboard to load
-    await expect(page.getByTestId('admin-dashboard-title')).toBeVisible();
-
-    // Wait for users table to load
-    await expect(page.getByTestId('users-table')).toBeVisible();
-
-    // Filter to show only verified users
-    const statusFilter = page.getByTestId('status-filter');
-    await statusFilter.click();
-    await page.getByRole('option', { name: 'Verified' }).click();
-
-    // Now check that user links have correct format
-    const userLinks = page.locator('a[href*="/user/"]');
-    await expect(userLinks.first()).toHaveAttribute('href', /\/user\/\d+/);
   });
 });
