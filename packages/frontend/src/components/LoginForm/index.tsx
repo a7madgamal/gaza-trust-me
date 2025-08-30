@@ -190,6 +190,14 @@ const LoginForm = () => {
             {loading ? <CircularProgress size={24} color="inherit" /> : 'Sign In'}
           </Button>
 
+          <Box sx={{ textAlign: 'center', mb: 2 }}>
+            <Typography variant="body2" color="text.secondary">
+              <Link component={RouterLink} to="/forgot-password" variant="body2">
+                Forgot your password?
+              </Link>
+            </Typography>
+          </Box>
+
           <Box sx={{ textAlign: 'center' }}>
             <Typography variant="body2" color="text.secondary">
               Don't have an account?{' '}

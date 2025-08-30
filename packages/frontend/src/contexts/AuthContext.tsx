@@ -177,6 +177,36 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const resetPasswordForEmail = async (email: string) => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+
+      if (error) {
+        throw error;
+      }
+    } catch (error) {
+      console.error('Password reset error:', error);
+      throw error;
+    }
+  };
+
+  const updatePassword = async (password: string) => {
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: password,
+      });
+
+      if (error) {
+        throw error;
+      }
+    } catch (error) {
+      console.error('Password update error:', error);
+      throw error;
+    }
+  };
+
   // Handle auth state changes
   useEffect(() => {
     // Get initial session
@@ -218,6 +248,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         login,
         signup,
         logout,
+        resetPasswordForEmail,
+        updatePassword,
         fetchUserProfile: async () => {
           const {
             data: { session },

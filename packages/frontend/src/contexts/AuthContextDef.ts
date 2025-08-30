@@ -42,6 +42,8 @@ interface AuthContextType {
     metadata?: Record<string, unknown>
   ) => Promise<{ user: AuthContextUser } | { user: null; requiresEmailVerification: true } | null>;
   logout: () => Promise<void>;
+  resetPasswordForEmail: (email: string) => Promise<void>;
+  updatePassword: (password: string) => Promise<void>;
   fetchUserProfile: () => Promise<void>;
   refetchProfile: () => Promise<void>;
   setUser: (user: AuthContextUser | null) => void;

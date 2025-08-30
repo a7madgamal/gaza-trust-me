@@ -7,6 +7,8 @@ import { Header } from './components/Header';
 import HomePage from './components/HomePage';
 import LoginForm from './components/LoginForm';
 import RegistrationForm from './components/RegistrationForm';
+import ForgotPasswordForm from './components/ForgotPasswordForm';
+import ResetPasswordForm from './components/ResetPasswordForm';
 import Dashboard from './components/Dashboard';
 import Profile from './components/Profile';
 import PublicPage from './components/PublicPage';
@@ -69,7 +71,13 @@ function App() {
             />
             <Route path="/register" element={<RegistrationForm />} />
             <Route path="/login" element={<LoginForm />} />
+            <Route path="/forgot-password" element={<ForgotPasswordForm />} />
+            <Route path="/reset-password" element={<ResetPasswordForm />} />
+            {/* Auth callback routes - both handled by the same component */}
+            {/* /auth/callback: Used for general auth callbacks (email verification, OAuth, etc.) */}
             <Route path="/auth/callback" element={<AuthCallback />} />
+            {/* /auth/confirm: Used specifically for password reset confirmations from Supabase */}
+            <Route path="/auth/confirm" element={<AuthCallback />} />
           </Routes>
         </ToastProvider>
       </AuthProvider>

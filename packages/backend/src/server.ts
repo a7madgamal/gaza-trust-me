@@ -118,6 +118,87 @@ app.get('/auth/callback', async (req, res) => {
   }
 });
 
+// Password reset REST endpoints (for backward compatibility)
+app.post('/api/auth/reset-password', async (req, res) => {
+  try {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-unsafe-type-assertion
+    const body = (req.body as { email?: string }) || ({} as { email?: string });
+
+    const { email } = body;
+
+    if (!email || typeof email !== 'string') {
+      return res.status(400).json({ error: 'Email is required' });
+    }
+
+    logger.info('Password reset requested for email:', email);
+
+    // Send password reset email using Supabase Auth
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${env.FRONTEND_URL}/reset-password`,
+    });
+
+    if (error) {
+      logger.error('Password reset error:', error);
+      return res.status(400).json({ error: error.message });
+    }
+
+    logger.info('Password reset email sent successfully for:', email);
+
+    return res.status(200).json({ success: true });
+  } catch (error) {
+    logger.error('Password reset error:', error);
+    return res.status(500).json({ error: 'Password reset failed' });
+  }
+});
+
+app.post('/api/auth/update-password', async (req, res) => {
+  try {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-unsafe-type-assertion
+    const body = req.body as { password?: string };
+    const { password } = body;
+    const authHeader = req.headers.authorization;
+
+    if (!password || typeof password !== 'string') {
+      return res.status(400).json({ error: 'Password is required' });
+    }
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    const token = authHeader.substring(7);
+
+    // Verify user token
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(token);
+
+    if (authError || !user) {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+
+    logger.info('Password update requested for user:', user.id);
+
+    // Update user password using Supabase Auth
+    const { error } = await supabase.auth.updateUser({
+      password: password,
+    });
+
+    if (error) {
+      logger.error('Password update error:', error);
+      return res.status(400).json({ error: error.message });
+    }
+
+    logger.info('Password updated successfully for user:', user.id);
+
+    return res.status(200).json({ success: true });
+  } catch (error) {
+    logger.error('Password update error:', error);
+    return res.status(500).json({ error: 'Password update failed' });
+  }
+});
+
 // tRPC middleware
 app.use(
   '/api/trpc',

@@ -59,6 +59,23 @@ export const AuthLogoutOutputSchema = z.object({
   success: z.boolean(),
 });
 
+// Password reset schemas
+export const AuthResetPasswordInputSchema = z.object({
+  email: z.string().email('Invalid email address'),
+});
+
+export const AuthResetPasswordOutputSchema = z.object({
+  success: z.boolean(),
+});
+
+export const AuthUpdatePasswordInputSchema = z.object({
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+});
+
+export const AuthUpdatePasswordOutputSchema = z.object({
+  success: z.boolean(),
+});
+
 // Admin router schemas
 export const AdminUserListInputSchema = z.object({
   status: z.enum(SEEKER_STATUSES).optional(),

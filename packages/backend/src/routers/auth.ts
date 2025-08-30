@@ -9,6 +9,10 @@ import {
   AuthRegistrationOutputSchema,
   AuthLoginOutputSchema,
   AuthLogoutOutputSchema,
+  AuthResetPasswordInputSchema,
+  AuthResetPasswordOutputSchema,
+  AuthUpdatePasswordInputSchema,
+  AuthUpdatePasswordOutputSchema,
 } from '../types/supabase-types';
 import { z } from 'zod';
 
@@ -160,6 +164,76 @@ export const authRouter = t.router({
       };
     }
   }),
+
+  // Password reset request
+  resetPasswordForEmail: publicProcedure
+    .input(AuthResetPasswordInputSchema)
+    .output(ApiResponseSchema(AuthResetPasswordOutputSchema))
+    .mutation(async ({ input }) => {
+      try {
+        logger.info('Password reset requested for email:', input.email);
+
+        // Send password reset email using Supabase Auth
+        const { error } = await supabase.auth.resetPasswordForEmail(input.email, {
+          redirectTo: `${env.FRONTEND_URL}/reset-password`,
+        });
+
+        if (error) {
+          logger.error('Password reset error:', error);
+          throw new Error(error.message);
+        }
+
+        logger.info('Password reset email sent successfully for:', input.email);
+
+        return {
+          success: true,
+          data: {
+            success: true,
+          },
+        };
+      } catch (error) {
+        logger.error('Password reset error:', error);
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Password reset failed',
+        };
+      }
+    }),
+
+  // Update password for authenticated user
+  updatePassword: protectedProcedure
+    .input(AuthUpdatePasswordInputSchema)
+    .output(ApiResponseSchema(AuthUpdatePasswordOutputSchema))
+    .mutation(async ({ input, ctx }) => {
+      try {
+        logger.info('Password update requested for user:', ctx.user.id);
+
+        // Update user password using Supabase Auth
+        const { error } = await supabase.auth.updateUser({
+          password: input.password,
+        });
+
+        if (error) {
+          logger.error('Password update error:', error);
+          throw new Error(error.message);
+        }
+
+        logger.info('Password updated successfully for user:', ctx.user.id);
+
+        return {
+          success: true,
+          data: {
+            success: true,
+          },
+        };
+      } catch (error) {
+        logger.error('Password update error:', error);
+        return {
+          success: false,
+          error: error instanceof Error ? error.message : 'Password update failed',
+        };
+      }
+    }),
 
   // PKCE callback endpoint for auth code exchange
   callback: publicProcedure

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useToast } from '../../hooks/useToast';
 import { useAuth } from '../../hooks/useAuth';
 import { Box, CircularProgress, Typography } from '@mui/material';
@@ -7,6 +7,7 @@ import { supabase } from '../../lib/supabase';
 
 export const AuthCallback = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { showToast } = useToast();
   const { userProfile, loading } = useAuth();
   const [isProcessing, setIsProcessing] = useState(true);
@@ -14,7 +15,49 @@ export const AuthCallback = () => {
   useEffect(() => {
     const handleAuthCallback = async () => {
       try {
-        // Handle the auth callback from Supabase
+        // Check if this is a password reset flow
+        const type = searchParams.get('type');
+        const next = searchParams.get('next');
+        const tokenHash = searchParams.get('token_hash');
+
+        console.log('AuthCallback - URL params:', { type, next, tokenHash });
+
+        if (type === 'recovery' && next === '/reset-password') {
+          // This is a password reset confirmation
+          console.log('Processing password reset confirmation');
+
+          // For password reset, we need to exchange the token for a session
+          // The token_hash parameter contains the recovery token
+          const { data, error } = await supabase.auth.verifyOtp({
+            token_hash: tokenHash || '',
+            type: 'recovery',
+          });
+
+          console.log('Password reset OTP verification:', { hasSession: !!data.session, error });
+
+          if (error) {
+            console.error('Password reset OTP verification error:', error);
+            showToast('Password reset link is invalid or expired', 'error');
+            setTimeout(() => navigate('/forgot-password'), 2000);
+            return;
+          }
+
+          if (data.session) {
+            // Session is established, redirect to reset password page
+            console.log('Password reset successful, redirecting to /reset-password');
+            showToast('Password reset link validated successfully', 'success');
+            navigate('/reset-password');
+            return;
+          } else {
+            // No session found, redirect to forgot password
+            console.log('No session found after OTP verification, redirecting to /forgot-password');
+            showToast('Password reset link is invalid or expired', 'error');
+            setTimeout(() => navigate('/forgot-password'), 2000);
+            return;
+          }
+        }
+
+        // Handle regular auth callback (email verification, etc.)
         const { data, error } = await supabase.auth.getSession();
 
         if (error) {
@@ -44,7 +87,7 @@ export const AuthCallback = () => {
     };
 
     void handleAuthCallback();
-  }, [navigate, showToast]);
+  }, [navigate, showToast, searchParams]);
 
   // Handle redirect after profile is loaded
   useEffect(() => {
