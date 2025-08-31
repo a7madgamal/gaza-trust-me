@@ -132,7 +132,7 @@ const LoginForm = () => {
         </Typography>
 
         <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 3 }}>
-          Welcome back to Gazaconfirm
+          Welcome back to GazaTrustMe
         </Typography>
 
         {successMessage && (

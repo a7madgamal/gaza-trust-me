@@ -1,6 +1,6 @@
 # Backend API Server
 
-Production-ready Node.js backend for the Gazaconfirm help-seeking platform.
+Production-ready Node.js backend for the GazaTrustMe help-seeking platform.
 
 ## Features
 

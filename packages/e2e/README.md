@@ -1,6 +1,6 @@
-# E2E Tests - Gazaconfirm Platform
+# E2E Tests - GazaTrustMe Platform
 
-End-to-end tests for the Gazaconfirm help-seeking platform using Playwright with strict TypeScript and ESLint rules.
+End-to-end tests for the GazaTrustMe help-seeking platform using Playwright with strict TypeScript and ESLint rules.
 
 ## Features
 

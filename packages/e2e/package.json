@@ -1,7 +1,7 @@
 {
-  "name": "@gazaconfirm/e2e",
+  "name": "@gazatrustme/e2e",
   "version": "1.0.0",
-  "description": "End-to-end tests for Gazaconfirm platform",
+  "description": "End-to-end tests for GazaTrustMe platform",
   "private": true,
   "type": "module",
   "scripts": {

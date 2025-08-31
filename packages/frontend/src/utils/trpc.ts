@@ -1,7 +1,7 @@
 import { createTRPCReact } from '@trpc/react-query';
 import { createTRPCProxyClient, httpBatchLink } from '@trpc/client';
 import type { inferRouterOutputs } from '@trpc/server';
-import type { AppRouter } from '@gazaconfirm/backend';
+import type { AppRouter } from '@gazatrustme/backend';
 import { config } from './config';
 import { parseSessionData } from './validation';
 

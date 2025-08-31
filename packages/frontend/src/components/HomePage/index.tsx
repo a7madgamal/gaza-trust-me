@@ -26,7 +26,7 @@ const HomePage = () => {
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            Gazaconfirm
+            GazaTrustMe
           </Typography>
 
           {user ? (
@@ -150,7 +150,7 @@ const HomePage = () => {
                 fontWeight: 700,
               }}
             >
-              Welcome to Gazaconfirm
+              Welcome to GazaTrustMe
             </Typography>
 
             <Typography variant="h5" color="text.secondary" paragraph>

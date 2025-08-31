@@ -30,7 +30,7 @@ const RegistrationForm = () => {
         </Typography>
 
         <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 3 }}>
-          Join Gazaconfirm to submit and track help requests
+          Join GazaTrustMe to submit and track help requests
         </Typography>
 
         {apiError && (

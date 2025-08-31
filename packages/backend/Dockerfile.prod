@@ -1,4 +1,4 @@
-# Backend Dockerfile for Gazaconfirm Platform
+# Backend Dockerfile for GazaTrustMe Platform
 # Note: This should be built from the project root with: docker build -f packages/backend/Dockerfile .
 
 FROM node:22-alpine AS base

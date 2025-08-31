@@ -1,7 +1,7 @@
 {
-  "name": "@gazaconfirm/frontend",
+  "name": "@gazatrustme/frontend",
   "version": "1.0.0",
-  "description": "Frontend React application for Gazaconfirm platform",
+  "description": "Frontend React application for GazaTrustMe platform",
   "private": true,
   "scripts": {
     "dev": "vite",

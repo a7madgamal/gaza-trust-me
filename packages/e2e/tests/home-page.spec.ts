@@ -227,7 +227,7 @@ test.describe('Home Page', () => {
     await page.waitForURL('/login');
 
     // Check that the page loads
-    await expect(page).toHaveTitle(/Gazaconfirm/);
+    await expect(page).toHaveTitle(/GazaTrustMe/);
 
     // Check for login form heading
     await expect(page.getByRole('heading', { name: 'Sign In' })).toBeVisible();
