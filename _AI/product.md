@@ -149,7 +149,8 @@
 5.9.7. Facebook profile links (when provided)
 5.9.8. Telegram profile links (when provided)
 5.9.9. Verification badge showing "Verified by [Admin Name]" with link to admin profile
-5.9.8. Search and filter functionality
+5.9.10. View count tracking and display for profile popularity
+5.9.11. Search and filter functionality
 
 ### Image Management
 
@@ -202,22 +203,23 @@
 5.30. DELETE /profiles/:id - Delete profile (owner only)
 5.31. POST /profiles/:id/images - Upload profile images
 5.32. DELETE /profiles/:id/images/:imageId - Delete profile image
-5.33. GET /admins/:id - Get admin profile details (public)
+5.33. POST /profiles/:id/view - Increment profile view count
+5.34. GET /admins/:id - Get admin profile details (public)
 
 #### Admin
 
-5.34. GET /admin/profiles - List all profiles (admin only)
-5.35. PUT /admin/profiles/:id/verify - Verify profile (admin only)
-5.36. PUT /admin/profiles/:id/flag - Flag profile (admin only)
-5.37. GET /admin/audit-logs - View audit logs (super admin only)
-5.38. PUT /admin/users/:id/role - Upgrade/downgrade user role (super admin only)
+5.35. GET /admin/profiles - List all profiles (admin only)
+5.36. PUT /admin/profiles/:id/verify - Verify profile (admin only)
+5.37. PUT /admin/profiles/:id/flag - Flag profile (admin only)
+5.38. GET /admin/audit-logs - View audit logs (super admin only)
+5.39. PUT /admin/users/:id/role - Upgrade/downgrade user role (super admin only)
 
 #### Users
 
-5.39. GET /users/profile - Get user profile
-5.40. PUT /users/profile - Update user profile
-5.41. GET /admin/users - List all users (super admin only)
-5.42. PUT /admin/users/:id/role - Assign user role (super admin only)
+5.40. GET /users/profile - Get user profile
+5.41. PUT /users/profile - Update user profile
+5.42. GET /admin/users - List all users (super admin only)
+5.43. PUT /admin/users/:id/role - Assign user role (super admin only)
 
 ## UI/UX Requirements
 

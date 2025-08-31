@@ -14,6 +14,41 @@ import {
 } from '../types/supabase-types';
 
 export const publicRouter = t.router({
+  // Increment view count for a user
+  incrementViewCount: publicProcedure
+    .input(z.object({ userId: z.string().uuid() }))
+    .output(z.object({ success: z.boolean() }))
+    .mutation(async ({ input }) => {
+      try {
+        // First get the current view_count
+        const { data: currentUser, error: fetchError } = await supabase
+          .from('users')
+          .select('view_count')
+          .eq('id', input.userId)
+          .single();
+
+        if (fetchError) {
+          logger.error('Error fetching current user:', fetchError);
+          throw new Error('Failed to fetch current user');
+        }
+
+        // Then increment it
+        const { error } = await supabase
+          .from('users')
+          .update({ view_count: (currentUser.view_count || 0) + 1 })
+          .eq('id', input.userId);
+
+        if (error) {
+          logger.error('Error incrementing view count:', error);
+          throw new Error('Failed to increment view count');
+        }
+
+        return { success: true };
+      } catch (error) {
+        logger.error('Error in incrementViewCount:', error);
+        throw new Error('Failed to increment view count');
+      }
+    }),
   hello: publicProcedure
     .input(PublicHelloInputSchema)
     .output(ApiResponseSchema(PublicHelloOutputSchema))
@@ -35,12 +70,13 @@ export const publicRouter = t.router({
         const { data, error } = await supabase
           .from('users')
           .select(
-            'id, url_id, full_name, description, phone_number, status, role, verified_at, verified_by, created_at, linkedin_url, campaign_url, facebook_url, telegram_url'
+            'id, url_id, full_name, description, phone_number, status, role, verified_at, verified_by, created_at, view_count, linkedin_url, campaign_url, facebook_url, telegram_url'
           )
           .in('role', ['help_seeker', 'admin']) // Show help seekers and admins (but not super admins)
           .not('status', 'is', null) // Ensure status is not null
           .eq('status', 'verified') // Only verified users
-          .order('created_at', { ascending: false }) // Newest first
+          .order('view_count', { ascending: true }) // Lowest view count first
+          .order('created_at', { ascending: false }) // Then newest first
           .range(input.offset, input.offset + input.limit - 1);
 
         if (error) {
@@ -63,7 +99,7 @@ export const publicRouter = t.router({
         let query = supabase
           .from('users')
           .select(
-            'id, url_id, full_name, description, phone_number, status, role, verified_at, verified_by, created_at, linkedin_url, campaign_url, facebook_url, telegram_url'
+            'id, url_id, full_name, description, phone_number, status, role, verified_at, verified_by, created_at, view_count, linkedin_url, campaign_url, facebook_url, telegram_url'
           )
           .in('role', ['help_seeker', 'admin']) // Show help seekers and admins (but not super admins)
           .not('status', 'is', null) // Ensure status is not null
@@ -73,18 +109,24 @@ export const publicRouter = t.router({
         if (input.currentUserId) {
           const { data: currentUser } = await supabase
             .from('users')
-            .select('created_at')
+            .select('view_count, created_at')
             .eq('id', input.currentUserId)
             .single();
 
           if (currentUser) {
-            // Since we order by created_at DESC (newest first),
-            // "next" means finding users with OLDER created_at dates
-            query = query.lt('created_at', currentUser.created_at);
+            // Since we order by view_count ASC, created_at DESC,
+            // "next" means finding users with higher view_count OR same view_count but older created_at
+            query = query.or(
+              `view_count.gt.${currentUser.view_count},and(view_count.eq.${currentUser.view_count},created_at.lt.${currentUser.created_at})`
+            );
           }
         }
 
-        const { data, error } = await query.order('created_at', { ascending: false }).limit(1).single();
+        const { data, error } = await query
+          .order('view_count', { ascending: true })
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
 
         if (error && error.code !== 'PGRST116') {
           // PGRST116 = no rows returned
@@ -97,11 +139,12 @@ export const publicRouter = t.router({
           const { data: firstUser, error: firstUserError } = await supabase
             .from('users')
             .select(
-              'id, url_id, full_name, description, phone_number, status, role, verified_at, verified_by, created_at, linkedin_url, campaign_url, facebook_url, telegram_url'
+              'id, url_id, full_name, description, phone_number, status, role, verified_at, verified_by, created_at, view_count, linkedin_url, campaign_url, facebook_url, telegram_url'
             )
             .in('role', ['help_seeker', 'admin']) // Show help seekers and admins (but not super admins)
             .not('status', 'is', null)
             .eq('status', 'verified')
+            .order('view_count', { ascending: true })
             .order('created_at', { ascending: false })
             .limit(1)
             .single();
@@ -151,7 +194,7 @@ export const publicRouter = t.router({
         const { data, error } = await supabase
           .from('users')
           .select(
-            'id, url_id, full_name, description, phone_number, status, role, verified_at, verified_by, created_at, linkedin_url, campaign_url, facebook_url, telegram_url'
+            'id, url_id, full_name, description, phone_number, status, role, verified_at, verified_by, created_at, view_count, linkedin_url, campaign_url, facebook_url, telegram_url'
           )
           .eq('url_id', input.urlId)
           .in('role', ['help_seeker', 'admin']) // Show help seekers and admins (but not super admins)

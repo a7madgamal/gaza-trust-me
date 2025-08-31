@@ -195,19 +195,42 @@ export async function createTestUserViaAPI(userType: keyof typeof PREDEFINED_TES
     }
   }
 
+  // Get admin user ID for verification
+  const { data: adminUser } = await supabase.from('users').select('id').eq('role', 'admin').limit(1).single();
+
+  // Prepare update data
+  const updateData: {
+    full_name: string;
+    phone_number: string;
+    linkedin_url: string | null;
+    campaign_url: string | null;
+    facebook_url: string | null;
+    telegram_url: string | null;
+    status: SeekerStatus;
+    role: UserRole;
+    verified_at?: string;
+    verified_by?: string;
+  } = {
+    full_name: user.fullName,
+    phone_number: user.phoneNumber,
+    linkedin_url: user.linkedinUrl || null,
+    campaign_url: user.campaignUrl || null,
+    facebook_url: user.facebookUrl || null,
+    telegram_url: user.telegramUrl || null,
+    status: user.status,
+    role: user.role,
+  };
+
+  // Add verification data for verified users
+  if (user.status === 'verified' && adminUser) {
+    updateData.verified_at = new Date().toISOString();
+    updateData.verified_by = adminUser.id;
+  }
+
   // Update user data to match TEST_USERS definition
   const { data: updatedUser, error: updateError } = await supabase
     .from('users')
-    .update({
-      full_name: user.fullName,
-      phone_number: user.phoneNumber,
-      linkedin_url: user.linkedinUrl || null,
-      campaign_url: user.campaignUrl || null,
-      facebook_url: user.facebookUrl || null,
-      telegram_url: user.telegramUrl || null,
-      status: user.status,
-      role: user.role,
-    })
+    .update(updateData)
     .eq('email', user.email)
     .select('url_id')
     .single();

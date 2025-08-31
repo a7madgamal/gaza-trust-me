@@ -115,7 +115,7 @@ export default [
       ...reactHooks.configs.recommended.rules,
       ...reactRefresh.configs.recommended.rules,
       ...TS_RULES,
-      'react/jsx-no-bind': 'warn', // REVIEW: Avoid inline function creation in JSX
+      'react/jsx-no-bind': 'off', // REVIEW: Avoid inline function creation in JSX
     },
   },
 

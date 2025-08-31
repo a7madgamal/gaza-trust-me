@@ -16,6 +16,7 @@ export const appRouter = t.router({
 
   // Public routes
   hello: publicRouter.hello,
+  incrementViewCount: publicRouter.incrementViewCount,
   getUsersForCards: publicRouter.getUsersForCards,
   getNextUser: publicRouter.getNextUser,
   getVerifiedUserCount: publicRouter.getVerifiedUserCount,

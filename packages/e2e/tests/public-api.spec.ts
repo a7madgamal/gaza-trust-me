@@ -1,6 +1,6 @@
 import { test, expect } from './global-test-hook';
 import { testTRPC } from './utils/trpc-client';
-import { assertNotEmptyString, assertNotNull, assertNotUndefined } from './utils/test-utils';
+import { assertNotNull, assertNotUndefined } from './utils/test-utils';
 
 test.describe('Public API Endpoints', () => {
   test('should handle complete user data retrieval and validation with proper schema', async () => {
@@ -59,7 +59,7 @@ test.describe('Public API Endpoints', () => {
     ).rejects.toThrow();
   });
 
-  test('should return only verified help_seeker and admin users ordered by creation date', async () => {
+  test('should return only verified help_seeker and admin users ordered by view count and creation date', async () => {
     const users = await testTRPC.getUsersForCards.query({
       limit: 50,
       offset: 0,
@@ -72,12 +72,14 @@ test.describe('Public API Endpoints', () => {
       expect(user.status).toBe('verified');
       expect(['help_seeker', 'admin']).toContain(user.role);
       expect(user.role).not.toBe('super_admin'); // Super admins should not appear
+      expect(user).toHaveProperty('view_count');
+      expect(typeof user.view_count).toBe('number');
     });
 
     // Require at least one user for ordering test
     expect(users.length).toBeGreaterThan(0);
 
-    // Check that users are ordered by created_at descending
+    // Check that users are ordered by view_count ASC, then created_at DESC
     for (let i = 0; i < users.length - 1; i++) {
       const currentUser = users[i];
       const nextUser = users[i + 1];
@@ -85,25 +87,29 @@ test.describe('Public API Endpoints', () => {
       assertNotUndefined(currentUser);
       assertNotUndefined(nextUser);
 
+      expect(currentUser.view_count).toBeDefined();
+      expect(nextUser.view_count).toBeDefined();
       expect(currentUser.created_at).toBeDefined();
       expect(nextUser.created_at).toBeDefined();
 
+      const currentViewCount = currentUser.view_count;
+      const nextViewCount = nextUser.view_count;
       const { created_at: currentCreatedAt } = currentUser;
       const { created_at: nextCreatedAt } = nextUser;
+
       assertNotNull(currentCreatedAt);
       assertNotNull(nextCreatedAt);
 
       const currentDate = new Date(currentCreatedAt);
       const nextDate = new Date(nextCreatedAt);
 
-      assertNotUndefined(currentDate);
-      assertNotUndefined(nextDate);
-      assertNotNull(currentDate);
-      assertNotNull(nextDate);
-      assertNotEmptyString(currentDate);
-      assertNotEmptyString(nextDate);
-
-      expect(currentDate.getTime()).toBeGreaterThanOrEqual(nextDate.getTime());
+      // Primary sort: view_count ASC (lower view counts come first)
+      if (currentViewCount !== nextViewCount) {
+        expect(currentViewCount).toBeLessThanOrEqual(nextViewCount);
+      } else {
+        // Secondary sort: created_at DESC (newer users come first when view_count is equal)
+        expect(currentDate.getTime()).toBeGreaterThanOrEqual(nextDate.getTime());
+      }
     }
   });
 

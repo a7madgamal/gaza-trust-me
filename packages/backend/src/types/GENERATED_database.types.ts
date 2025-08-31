@@ -180,6 +180,7 @@ export type Database = {
           url_id: number;
           verified_at: string | null;
           verified_by: string | null;
+          view_count: number;
         };
         Insert: {
           campaign_url?: string | null;
@@ -198,6 +199,7 @@ export type Database = {
           url_id?: number;
           verified_at?: string | null;
           verified_by?: string | null;
+          view_count?: number;
         };
         Update: {
           campaign_url?: string | null;
@@ -216,6 +218,7 @@ export type Database = {
           url_id?: number;
           verified_at?: string | null;
           verified_by?: string | null;
+          view_count?: number;
         };
         Relationships: [
           {

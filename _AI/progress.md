@@ -491,6 +491,46 @@
 
 ---
 
+## MVP Feature 9: View Count System ✅
+
+**Goal:** Track and display user profile view counts with proper sorting
+
+**Backend:**
+
+- ✅ Database migration with view_count column (default 0, NOT NULL)
+- ✅ Performance index on view_count column
+- ✅ incrementViewCount tRPC procedure
+- ✅ Updated sorting logic: view_count ASC, created_at DESC
+- ✅ Schema updates for all user response types
+- ✅ Backend unit tests for increment functionality
+
+**Frontend:**
+
+- ✅ View count display on user cards
+- ✅ Automatic increment on card view
+- ✅ Duplicate increment prevention with useRef tracking
+- ✅ Navigation increment on next/previous actions
+- ✅ TypeScript type updates for view_count field
+
+**Testing:**
+
+- ✅ 13 E2E tests covering increment scenarios
+- ✅ Relative comparison testing (≥ current count)
+- ✅ Navigation and sorting validation
+- ✅ Data persistence verification
+- ✅ Edge case handling (duplicate prevention)
+
+**Key Implementation Details:**
+
+- ✅ **Sorting Priority:** Users with fewer views appear first
+- ✅ **Duplicate Prevention:** useRef tracks incremented users per session
+- ✅ **Performance:** Indexed view_count column for efficient sorting
+- ✅ **Type Safety:** Complete TypeScript integration
+
+**Success:** Users see view counts on cards, counts increment properly without duplicates, and sorting prioritizes less-viewed profiles
+
+---
+
 ## Deployment Status
 
 - ✅ Development environment: Local setup complete with Docker Compose

@@ -1,8 +1,15 @@
 import { test, expect } from './global-test-hook';
 import { loginAsUser, clearBrowserState } from './utils/auth-helpers';
+import { createTestUserViaAPI } from './utils/test-data';
 import { env } from './utils/env';
 
 test.describe('Home Page', () => {
+  test.beforeAll(async () => {
+    // Create admin user first (needed for verification)
+    await createTestUserViaAPI('admin');
+    // Create a verified help seeker user for the test
+    await createTestUserViaAPI('helpSeeker');
+  });
   test('should load public page and handle navigation interactions', async ({ page }) => {
     await page.goto('/');
 
@@ -17,7 +24,12 @@ test.describe('Home Page', () => {
 
     // Check if we have users or empty state
     // We know we have a test user from beforeAll
-    await expect(page.locator('[data-testid="user-card"]').getByText('Verified')).toBeVisible();
+
+    await page
+      .locator('[data-testid="user-card"]')
+      .getByText(/Verified by/)
+      .waitFor({ timeout: 5000 });
+
     await expect(page.locator('[data-testid="user-card"]').getByText('WhatsApp')).toBeVisible();
 
     // Check if WhatsApp link exists and validate it

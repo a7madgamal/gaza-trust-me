@@ -216,6 +216,7 @@ export const PublicUserSchema = z.object({
   verified_at: z.string().nullable(),
   verified_by: z.string().nullable(),
   created_at: z.string().nullable(),
+  view_count: z.number().int().nonnegative(),
   linkedin_url: z.string().nullable(),
   campaign_url: z.string().nullable(),
   facebook_url: z.string().nullable(),

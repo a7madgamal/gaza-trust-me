@@ -27,3 +27,29 @@
 - **When testing role-based UI behavior, ensure tests cover all user roles (help_seeker, admin, super_admin) and verify that UI elements appear/disappear correctly based on user permissions.** (ID: 7270236)
 - **When adding new fields to database/backend, always update corresponding frontend state types to avoid TypeScript errors.** (ID: 7623301)
 - **When modifying existing tests, prefer updating current related tests rather than creating new separate tests when possible.** (ID: 7623291)
+
+## Technical Implementation Context
+
+### View Count System Implementation
+
+**Database Design:**
+- Added `view_count` column with DEFAULT 0 NOT NULL constraint
+- Created performance index on `view_count` for efficient sorting
+- Migration updates existing users to view_count = 0
+
+**Sorting Logic:**
+- Primary sort: `view_count ASC` (fewer views first)
+- Secondary sort: `created_at DESC` (newer users first within same view count)
+- Ensures fair exposure for new and less-viewed profiles
+
+**Duplicate Prevention Strategy:**
+- Used `useRef<Set<string>>()` to track incremented user IDs per session
+- Prevents multiple increments from same user session
+- Clears tracking when user data changes (logout/login)
+- Both initial page load and navigation check tracking
+
+**Testing Approach:**
+- Relative comparisons (`expect(newCount).toBeGreaterThanOrEqual(currentCount)`) instead of exact values
+- Prevents test flakiness from concurrent increments
+- Tests cover increment scenarios, navigation, sorting, and persistence
+- Edge case testing for duplicate prevention

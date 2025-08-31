@@ -233,3 +233,19 @@
   - ❌ `const text = value as string` → ✅ `const text = value; assertNotEmptyString(text);`
 - **Lesson:** Assert functions are safer than type assertions and help TypeScript understand your intent
 - **Result:** Better type safety and clearer code intent
+
+### 🔢 **Prevent Duplicate Increments with useRef Tracking**
+
+- **Problem:** View count incremented multiple times for same user due to useEffect re-runs
+- **Solution:** Use `useRef<Set<string>>` to track already incremented user IDs per session
+- **Pattern:** Check tracking set before increment, add ID after successful increment
+- **Lesson:** useEffect with dependencies can fire multiple times - use refs for session-based tracking
+- **Result:** Each user's view count increments exactly once per session
+
+### 📊 **Test with Relative Comparisons for Stability**
+
+- **Problem:** Exact view count assertions fail due to test environment variations
+- **Solution:** Use relative comparisons (`>=`, `>`) instead of exact numbers
+- **Pattern:** Store initial count, perform action, assert new count >= initial + expected
+- **Lesson:** Tests should be resilient to existing data and parallel test runs
+- **Result:** Stable tests that validate increment behavior without brittle exact matches

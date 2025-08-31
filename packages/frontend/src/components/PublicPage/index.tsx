@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Box, Typography, Card, CardContent, Button, Stack, CircularProgress, Link } from '@mui/material';
 import {
   WhatsApp,
@@ -42,6 +42,16 @@ const PublicPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const { showToast } = useToast();
 
+  // Track which users have already had their view count incremented
+  const viewCountIncrementedRef = useRef(new Set<string>());
+
+  // Mutation for incrementing view count
+  const incrementViewCountMutation = trpc.incrementViewCount.useMutation({
+    onError: error => {
+      console.error('Failed to increment view count:', error);
+    },
+  });
+
   // Generate sharing data with fallbacks
   const currentUser = users[currentUserIndex];
   const shareUrl = currentUser ? `${window.location.origin}/user/${currentUser.url_id}` : '';
@@ -74,6 +84,9 @@ const PublicPage: React.FC = () => {
       setUsers(usersData);
       setLoading(false);
 
+      // Clear tracking when users data changes
+      viewCountIncrementedRef.current.clear();
+
       // If we have a urlId, find the matching user and set the index
       if (urlId) {
         const userIndex = usersData.findIndex(user => user.url_id === parseInt(urlId, 10));
@@ -99,12 +112,25 @@ const PublicPage: React.FC = () => {
     }
   }, [urlId, users, navigate]);
 
+  // Increment view count on initial page load when urlId is found
+  useEffect(() => {
+    if (urlId && currentUser?.id && !viewCountIncrementedRef.current.has(currentUser.id)) {
+      viewCountIncrementedRef.current.add(currentUser.id);
+      incrementViewCountMutation.mutate({ userId: currentUser.id });
+    }
+  }, [urlId, currentUser?.id, incrementViewCountMutation]);
+
   const handleNext = () => {
     if (currentUserIndex < users.length - 1) {
       const nextIndex = currentUserIndex + 1;
       const nextUser = users[nextIndex];
       setCurrentUserIndex(nextIndex);
       navigate(`/user/${nextUser.url_id}`, { replace: true });
+      // Increment view count for the new user only if not already incremented
+      if (!viewCountIncrementedRef.current.has(nextUser.id)) {
+        viewCountIncrementedRef.current.add(nextUser.id);
+        incrementViewCountMutation.mutate({ userId: nextUser.id });
+      }
     }
   };
 
@@ -114,6 +140,11 @@ const PublicPage: React.FC = () => {
       const prevUser = users[prevIndex];
       setCurrentUserIndex(prevIndex);
       navigate(`/user/${prevUser.url_id}`, { replace: true });
+      // Increment view count for the new user only if not already incremented
+      if (!viewCountIncrementedRef.current.has(prevUser.id)) {
+        viewCountIncrementedRef.current.add(prevUser.id);
+        incrementViewCountMutation.mutate({ userId: prevUser.id });
+      }
     }
   };
 
@@ -257,10 +288,13 @@ const PublicPage: React.FC = () => {
                       borderTop: '1px solid rgba(255,255,255,0.2)',
                     }}
                   >
-                    {/* Join Date and Phone */}
+                    {/* Join Date, View Count and Phone */}
                     <Box mb={2}>
                       <Typography variant="body2" color="rgba(255,255,255,0.8)" mb={1}>
                         Joined: {currentUser.created_at ? new Date(currentUser.created_at).toLocaleDateString() : 'N/A'}
+                      </Typography>
+                      <Typography variant="body2" color="rgba(255,255,255,0.8)" mb={1}>
+                        Views: {currentUser.view_count || 0}
                       </Typography>
                       {currentUser.phone_number && (
                         <Box display="flex" alignItems="center" gap={1}>
