@@ -44,7 +44,7 @@ export const useMetaTags = ({ title, description, url, imageUrl }: MetaTagsProps
     updateMetaTag('og:image', imageUrl);
     updateMetaTag('og:image:width', '1200');
     updateMetaTag('og:image:height', '630');
-    updateMetaTag('og:site_name', 'Confirmed in Gaza');
+    updateMetaTag('og:site_name', 'GazaTrust.Me');
 
     // Twitter
     updateMetaTag('twitter:card', 'summary_large_image');
@@ -55,7 +55,7 @@ export const useMetaTags = ({ title, description, url, imageUrl }: MetaTagsProps
 
     // Cleanup function to reset meta tags when component unmounts
     return () => {
-      document.title = 'Confirmed in Gaza';
+      document.title = 'GazaTrust.Me';
       // Remove the meta tags we added
       const metaTags = document.querySelectorAll(
         'meta[property^="og:"], meta[property^="twitter:"], meta[name="description"]'

@@ -55,8 +55,8 @@ const PublicPage: React.FC = () => {
   // Generate sharing data with fallbacks
   const currentUser = users[currentUserIndex];
   const shareUrl = currentUser ? `${window.location.origin}/user/${currentUser.url_id}` : '';
-  const shareTitle = currentUser ? `${currentUser.full_name} - Verified Help Seeker` : 'Confirmed in Gaza';
-  const shareDescription = currentUser?.description || 'A verified help seeker on Confirmed in Gaza platform.';
+  const shareTitle = currentUser ? `${currentUser.full_name} - Verified Help Seeker` : 'GazaTrust.Me';
+  const shareDescription = currentUser?.description || 'A verified help seeker on GazaTrust.Me platform.';
   const ogImageUrl = `${window.location.origin}/icon.svg`;
 
   // Set meta tags for social sharing

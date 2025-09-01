@@ -88,7 +88,7 @@ export const Header: React.FC = () => {
           <Box
             component="img"
             src="/icon.svg"
-            alt="Confirmed in Gaza"
+            alt="GazaTrust.Me"
             sx={{
               width: 32,
               height: 32,
@@ -96,7 +96,7 @@ export const Header: React.FC = () => {
             }}
           />
           <Typography variant="h6" component="div">
-            Confirmed in Gaza
+            GazaTrust.Me
           </Typography>
         </Box>
 

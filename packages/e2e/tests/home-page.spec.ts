@@ -105,7 +105,7 @@ test.describe('Home Page', () => {
     await page.goto(env.FRONTEND_URL);
 
     // Check title is visible and clickable
-    const title = page.getByText('Confirmed in Gaza');
+    const title = page.getByText('GazaTrust.Me');
     await expect(title).toBeVisible();
 
     // Check login and register buttons are visible
@@ -119,7 +119,7 @@ test.describe('Home Page', () => {
     await page.goto(`${env.FRONTEND_URL}/login`);
 
     // Click the title
-    void page.getByText('Confirmed in Gaza').click();
+    void page.getByText('GazaTrust.Me').click();
 
     // Should navigate back to home and auto-redirect to user URL
     await page.waitForURL(/\/user\/\d+/);
@@ -199,7 +199,7 @@ test.describe('Home Page', () => {
     await page.setViewportSize({ width: 375, height: 667 });
 
     // Check title is still visible
-    await expect(page.getByText('Confirmed in Gaza')).toBeVisible();
+    await expect(page.getByText('GazaTrust.Me')).toBeVisible();
 
     // When logged in as admin, should show user menu, not login/register buttons
     await expect(page.getByRole('button', { name: 'account of current user' })).toBeVisible();
@@ -210,7 +210,7 @@ test.describe('Home Page', () => {
     await page.setViewportSize({ width: 768, height: 1024 });
 
     // Check all elements are visible
-    await expect(page.getByText('Confirmed in Gaza')).toBeVisible();
+    await expect(page.getByText('GazaTrust.Me')).toBeVisible();
     await expect(page.getByRole('button', { name: 'account of current user' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Login' })).toBeHidden();
     await expect(page.getByRole('button', { name: 'Register' })).toBeHidden();

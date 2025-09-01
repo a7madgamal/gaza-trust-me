@@ -1,4 +1,4 @@
-# Confirmed in Gaza - Product Requirements Document
+# GazaTrust.Me - Product Requirements Document
 
 ## Document Update Guidelines
 
@@ -12,7 +12,7 @@
 
 ## Project Overview
 
-**Product Name:** Confirmed in Gaza  
+**Product Name:** GazaTrust.Me  
 **Type:** Production-ready web application  
 **Purpose:** Connect people in need with potential helpers through a human verified, secure platform
 
