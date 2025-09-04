@@ -232,16 +232,26 @@ const AdminDashboard: React.FC = () => {
   }
 
   return (
-    <Box p={3}>
-      <Typography variant="h4" gutterBottom data-testid="admin-dashboard-title">
+    <Box sx={{ p: { xs: 1, sm: 2, md: 3 } }}>
+      <Typography
+        variant="h4"
+        gutterBottom
+        data-testid="admin-dashboard-title"
+        sx={{ fontSize: { xs: '1.5rem', sm: '2rem', md: '2.125rem' } }}
+      >
         Admin Dashboard
-      </Typography>
-      <Typography variant="body1" color="text.secondary" gutterBottom data-testid="admin-welcome-message">
-        Welcome, {userProfile.full_name} ({userProfile.role})
       </Typography>
 
       {/* Filters */}
-      <Box mb={3} display="flex" gap={2} alignItems="center">
+      <Box
+        mb={3}
+        sx={{
+          display: 'flex',
+          flexDirection: { xs: 'column', sm: 'row' },
+          gap: { xs: 1, sm: 2 },
+          alignItems: { xs: 'stretch', sm: 'center' },
+        }}
+      >
         <TextField
           label="Search"
           placeholder="Search by name, email, or description..."
@@ -249,10 +259,18 @@ const AdminDashboard: React.FC = () => {
           onChange={e => {
             setSearchFilter(e.target.value);
           }}
-          sx={{ minWidth: 300 }}
+          sx={{
+            minWidth: { xs: '100%', sm: 250, md: 300 },
+            maxWidth: { xs: '100%', sm: 'none' },
+          }}
           data-testid="search-filter"
         />
-        <FormControl sx={{ minWidth: 200 }}>
+        <FormControl
+          sx={{
+            minWidth: { xs: '100%', sm: 180, md: 200 },
+            maxWidth: { xs: '100%', sm: 'none' },
+          }}
+        >
           <InputLabel>Status Filter</InputLabel>
           <Select
             value={statusFilter}
@@ -272,7 +290,12 @@ const AdminDashboard: React.FC = () => {
           </Select>
         </FormControl>
         {userProfile?.role === 'super_admin' && (
-          <FormControl sx={{ minWidth: 200 }}>
+          <FormControl
+            sx={{
+              minWidth: { xs: '100%', sm: 180, md: 200 },
+              maxWidth: { xs: '100%', sm: 'none' },
+            }}
+          >
             <InputLabel>Role Filter</InputLabel>
             <Select
               value={roleFilter}
@@ -296,11 +319,18 @@ const AdminDashboard: React.FC = () => {
 
       {/* Users Table */}
       <Paper>
-        <TableContainer data-testid="users-table">
-          <Table>
+        <TableContainer
+          data-testid="users-table"
+          sx={{
+            overflowX: 'auto',
+            WebkitOverflowScrolling: 'touch',
+            maxHeight: '70vh',
+          }}
+        >
+          <Table sx={{ minWidth: { xs: 650, sm: 800 } }}>
             <TableHead>
               <TableRow>
-                <TableCell>
+                <TableCell sx={{ minWidth: { xs: 120, sm: 150 } }}>
                   <Box display="flex" alignItems="center" gap={1}>
                     <Tooltip title="Sort by name">
                       <IconButton
@@ -314,18 +344,24 @@ const AdminDashboard: React.FC = () => {
                     </Tooltip>
                   </Box>
                 </TableCell>
-                <TableCell>Email</TableCell>
-                <TableCell>Phone</TableCell>
-                <TableCell>
+                <TableCell sx={{ minWidth: { xs: 120, sm: 180 } }}>
+                  <Typography sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>Email</Typography>
+                </TableCell>
+                <TableCell sx={{ minWidth: { xs: 100, sm: 120 } }}>
+                  <Typography sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>Phone</Typography>
+                </TableCell>
+                <TableCell sx={{ minWidth: { xs: 80, sm: 100 } }}>
                   <Box display="flex" alignItems="center" gap={1}>
                     <Tooltip title="Sort by role">
                       <IconButton size="small" onClick={() => handleSort('role')} sx={{ p: 0 }} data-testid="sort-role">
-                        Role {getSortIcon('role')}
+                        <Typography sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
+                          Role {getSortIcon('role')}
+                        </Typography>
                       </IconButton>
                     </Tooltip>
                   </Box>
                 </TableCell>
-                <TableCell>
+                <TableCell sx={{ minWidth: { xs: 80, sm: 100 } }}>
                   <Box display="flex" alignItems="center" gap={1}>
                     <Tooltip title="Sort by status">
                       <IconButton
@@ -334,13 +370,17 @@ const AdminDashboard: React.FC = () => {
                         sx={{ p: 0 }}
                         data-testid="sort-status"
                       >
-                        Status {getSortIcon('status')}
+                        <Typography sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
+                          Status {getSortIcon('status')}
+                        </Typography>
                       </IconButton>
                     </Tooltip>
                   </Box>
                 </TableCell>
-                <TableCell>Description</TableCell>
-                <TableCell>
+                <TableCell sx={{ minWidth: { xs: 100, sm: 150 } }}>
+                  <Typography sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>Description</Typography>
+                </TableCell>
+                <TableCell sx={{ minWidth: { xs: 80, sm: 100 } }}>
                   <Box display="flex" alignItems="center" gap={1}>
                     <Tooltip title="Sort by created date">
                       <IconButton
@@ -349,12 +389,16 @@ const AdminDashboard: React.FC = () => {
                         sx={{ p: 0 }}
                         data-testid="sort-created"
                       >
-                        Created {getSortIcon('created_at')}
+                        <Typography sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
+                          Created {getSortIcon('created_at')}
+                        </Typography>
                       </IconButton>
                     </Tooltip>
                   </Box>
                 </TableCell>
-                <TableCell>Actions</TableCell>
+                <TableCell sx={{ minWidth: { xs: 100, sm: 120 } }}>
+                  <Typography sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>Actions</Typography>
+                </TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -373,7 +417,7 @@ const AdminDashboard: React.FC = () => {
               ) : usersData?.success && usersData.data?.users && usersData.data.users.length > 0 ? (
                 usersData.data.users.map((user: User) => (
                   <TableRow key={user.id}>
-                    <TableCell>
+                    <TableCell sx={{ minWidth: { xs: 120, sm: 150 } }}>
                       {user.role === 'admin' || user.role === 'super_admin' ? (
                         <Link
                           component={RouterLink}
@@ -406,8 +450,10 @@ const AdminDashboard: React.FC = () => {
                         user.full_name
                       )}
                     </TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>
+                    <TableCell sx={{ minWidth: { xs: 120, sm: 180 } }}>
+                      <Typography sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>{user.email}</Typography>
+                    </TableCell>
+                    <TableCell sx={{ minWidth: { xs: 100, sm: 120 } }}>
                       <Link
                         href={`https://wa.me/${user.phone_number.replace(/\D/g, '')}`}
                         target="_blank"
@@ -416,6 +462,7 @@ const AdminDashboard: React.FC = () => {
                           textDecoration: 'none',
                           color: '#25D366',
                           fontWeight: 500,
+                          fontSize: { xs: '0.75rem', sm: '0.875rem' },
                           '&:hover': {
                             textDecoration: 'underline',
                             color: '#128C7E',
@@ -426,11 +473,21 @@ const AdminDashboard: React.FC = () => {
                         {user.phone_number}
                       </Link>
                     </TableCell>
-                    <TableCell>
-                      <Chip label={user.role} color={getRoleColor(user.role)} size="small" />
+                    <TableCell sx={{ minWidth: { xs: 80, sm: 100 } }}>
+                      <Chip
+                        label={user.role}
+                        color={getRoleColor(user.role)}
+                        size="small"
+                        sx={{ fontSize: { xs: '0.7rem', sm: '0.75rem' } }}
+                      />
                     </TableCell>
-                    <TableCell>
-                      <Chip label={user.status || 'N/A'} color={getStatusColor(user.status)} size="small" />
+                    <TableCell sx={{ minWidth: { xs: 80, sm: 100 } }}>
+                      <Chip
+                        label={user.status || 'N/A'}
+                        color={getStatusColor(user.status)}
+                        size="small"
+                        sx={{ fontSize: { xs: '0.7rem', sm: '0.75rem' } }}
+                      />
                       {user.status === 'verified' && user.verified_by && (
                         <Box mt={0.5}>
                           <Link
@@ -451,11 +508,11 @@ const AdminDashboard: React.FC = () => {
                         </Box>
                       )}
                     </TableCell>
-                    <TableCell>
+                    <TableCell sx={{ minWidth: { xs: 100, sm: 150 } }}>
                       <Typography
                         variant="body2"
                         sx={{
-                          maxWidth: 200,
+                          maxWidth: { xs: 120, sm: 200 },
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
                           whiteSpace: 'nowrap',
@@ -464,10 +521,14 @@ const AdminDashboard: React.FC = () => {
                         {user.description}
                       </Typography>
                     </TableCell>
-                    <TableCell>{user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}</TableCell>
-                    <TableCell>
+                    <TableCell sx={{ minWidth: { xs: 80, sm: 100 } }}>
+                      <Typography sx={{ fontSize: { xs: '0.75rem', sm: '0.875rem' } }}>
+                        {user.created_at ? new Date(user.created_at).toLocaleDateString() : 'N/A'}
+                      </Typography>
+                    </TableCell>
+                    <TableCell sx={{ minWidth: { xs: 100, sm: 120 } }}>
                       {user.status === 'pending' && (
-                        <Box display="flex" gap={1}>
+                        <Box display="flex" gap={1} flexDirection="row">
                           <Button
                             size="small"
                             variant="contained"
@@ -476,6 +537,9 @@ const AdminDashboard: React.FC = () => {
                             data-testid={`verify-button-${user.id}`}
                             sx={{
                               background: 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)',
+                              fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                              px: { xs: 1, sm: 1.5 },
+                              py: { xs: 0.5, sm: 0.75 },
                               '&:hover': {
                                 background: 'linear-gradient(135deg, #45a049 0%, #3d8b40 100%)',
                               },
@@ -490,6 +554,11 @@ const AdminDashboard: React.FC = () => {
                             onClick={() => handleAction(user, 'flag')}
                             disabled={updateUserStatusMutation.isPending}
                             data-testid={`flag-button-${user.id}`}
+                            sx={{
+                              fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                              px: { xs: 1, sm: 1.5 },
+                              py: { xs: 0.5, sm: 0.75 },
+                            }}
                           >
                             Flag
                           </Button>
@@ -497,7 +566,7 @@ const AdminDashboard: React.FC = () => {
                       )}
                       {/* Super admin role management */}
                       {userProfile.role === 'super_admin' && user.role !== 'super_admin' && (
-                        <Box display="flex" gap={1} mt={1}>
+                        <Box display="flex" gap={1} mt={1} flexDirection="row">
                           {user.role === 'help_seeker' ? (
                             <Button
                               size="small"
@@ -506,6 +575,11 @@ const AdminDashboard: React.FC = () => {
                               onClick={() => handleRoleUpgrade(user, 'admin')}
                               disabled={upgradeUserRoleMutation.isPending}
                               data-testid={`upgrade-to-admin-${user.id}`}
+                              sx={{
+                                fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                                px: { xs: 1, sm: 1.5 },
+                                py: { xs: 0.5, sm: 0.75 },
+                              }}
                             >
                               Make Admin
                             </Button>
@@ -517,6 +591,11 @@ const AdminDashboard: React.FC = () => {
                               onClick={() => handleRoleUpgrade(user, 'help_seeker')}
                               disabled={upgradeUserRoleMutation.isPending}
                               data-testid={`downgrade-to-help-seeker-${user.id}`}
+                              sx={{
+                                fontSize: { xs: '0.7rem', sm: '0.75rem' },
+                                px: { xs: 1, sm: 1.5 },
+                                py: { xs: 0.5, sm: 0.75 },
+                              }}
                             >
                               Remove Admin
                             </Button>
@@ -540,11 +619,19 @@ const AdminDashboard: React.FC = () => {
 
       {/* Pagination */}
       {usersData?.success && usersData.data?.total && usersData.data.total > limit && (
-        <Box display="flex" justifyContent="center" mt={3}>
+        <Box display="flex" justifyContent="center" mt={{ xs: 2, sm: 3 }} sx={{ overflowX: 'auto' }}>
           <Pagination
             count={Math.ceil((usersData.data?.total || 0) / limit)}
             page={page}
             onChange={(_, newPage) => setPage(newPage)}
+            size="small"
+            sx={{
+              '& .MuiPaginationItem-root': {
+                fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                minWidth: { xs: 32, sm: 40 },
+                height: { xs: 32, sm: 40 },
+              },
+            }}
           />
         </Box>
       )}
