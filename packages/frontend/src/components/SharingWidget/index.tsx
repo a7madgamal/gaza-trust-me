@@ -67,12 +67,26 @@ const SharingWidget: React.FC<SharingWidgetProps> = ({ url, title, description }
   return (
     <>
       <Paper
-        elevation={2}
+        elevation={{ xs: 0, sm: 1, md: 2 }}
         sx={{
           p: { xs: 1, md: 2 },
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
-          border: '1px solid rgba(255,255,255,0.1)',
-          backdropFilter: 'blur(10px)',
+          background: {
+            xs: 'transparent',
+            sm: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%)',
+          },
+          border: {
+            xs: 'none',
+            sm: '1px solid rgba(255,255,255,0.1)',
+          },
+          backdropFilter: {
+            xs: 'none',
+            sm: 'blur(10px)',
+          },
+          borderRadius: {
+            xs: 0,
+            sm: 1,
+            md: 1,
+          },
           minWidth: 60,
           display: 'flex',
           flexDirection: 'column',
@@ -90,6 +104,27 @@ const SharingWidget: React.FC<SharingWidgetProps> = ({ url, title, description }
           }}
         >
           Share
+        </Typography>
+
+        {/* Descriptive text - responsive orientation */}
+        <Typography
+          variant="caption"
+          sx={{
+            color: {
+              xs: 'rgba(0, 0, 0, 0.8)', // Darker text for light background on small screens
+              sm: 'rgba(0, 0, 0, 0.8)', // Darker text for light background on small screens
+              md: 'rgba(0, 0, 0, 0.8)', // Dark text for all backgrounds on large screens
+            },
+            fontSize: { xs: '0.6rem', sm: '0.7rem', md: '0.65rem' },
+            textAlign: 'center',
+            maxWidth: { xs: '200px', md: '50px' },
+            lineHeight: 1.2,
+            mb: { xs: 2, sm: 2, md: 2 }, // Increased spacing on all screen sizes
+            display: 'block', // Always show on all screen sizes
+            textShadow: { xs: 'none', sm: 'none', md: '0 0 2px rgba(255, 255, 255, 0.8)' }, // White glow on large screens
+          }}
+        >
+          Share user's profile to help him survive
         </Typography>
 
         <Stack

@@ -80,9 +80,14 @@ export const Header: React.FC = () => {
 
   return (
     <AppBar position="static" elevation={1}>
-      <Toolbar>
+      <Toolbar
+        sx={{
+          minHeight: { xs: 48, sm: 64 },
+          px: { xs: 1, sm: 2 },
+        }}
+      >
         <Box
-          sx={{ display: 'flex', alignItems: 'center', gap: 2, flexGrow: 1, cursor: 'pointer' }}
+          sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1, sm: 2 }, flexGrow: 1, cursor: 'pointer' }}
           onClick={handleHomeClick}
         >
           <Box
@@ -90,12 +95,18 @@ export const Header: React.FC = () => {
             src="/icon.svg"
             alt="GazaTrust.Me"
             sx={{
-              width: 32,
-              height: 32,
+              width: { xs: 24, sm: 32 },
+              height: { xs: 24, sm: 32 },
               filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))',
             }}
           />
-          <Typography variant="h6" component="div">
+          <Typography
+            variant="h6"
+            component="div"
+            sx={{
+              fontSize: { xs: '1rem', sm: '1.25rem' },
+            }}
+          >
             GazaTrust.Me
           </Typography>
         </Box>
@@ -160,11 +171,31 @@ export const Header: React.FC = () => {
             </Menu>
           </Box>
         ) : (
-          <Box sx={{ display: 'flex', gap: 1 }}>
-            <Button color="inherit" onClick={handleLoginClick}>
+          <Box sx={{ display: 'flex', gap: { xs: 0.5, sm: 1 } }}>
+            <Button
+              color="inherit"
+              onClick={handleLoginClick}
+              size="small"
+              sx={{
+                px: { xs: 1, sm: 2 },
+                py: { xs: 0.5, sm: 1 },
+                fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                minWidth: { xs: 'auto', sm: 'auto' },
+              }}
+            >
               Login
             </Button>
-            <Button color="inherit" onClick={handleRegisterClick}>
+            <Button
+              color="inherit"
+              onClick={handleRegisterClick}
+              size="small"
+              sx={{
+                px: { xs: 1, sm: 2 },
+                py: { xs: 0.5, sm: 1 },
+                fontSize: { xs: '0.75rem', sm: '0.875rem' },
+                minWidth: { xs: 'auto', sm: 'auto' },
+              }}
+            >
               Register
             </Button>
           </Box>

@@ -184,26 +184,34 @@ const PublicPage: React.FC = () => {
 
   return (
     <>
-      <Box sx={{ maxWidth: 800, mx: 'auto', p: 3 }}>
+      <Box
+        sx={{
+          maxWidth: { xs: '100%', sm: 600, md: 800 },
+          mx: 'auto',
+          p: { xs: 1, sm: 2, md: 3 },
+          pb: { xs: 8, sm: 10 }, // Bottom padding only for small screens with fixed sharing widget
+        }}
+      >
         {/* Card Stack with Sharing Widget */}
         <Box
           sx={{
             display: 'flex',
-            gap: 2,
+            gap: { xs: 1, sm: 2 },
             alignItems: 'flex-start',
             flexDirection: { xs: 'column', md: 'row' },
           }}
         >
           {/* Main Card */}
-          <Box sx={{ flex: 1 }}>
-            <Box position="relative" mb={{ xs: 2, md: 4 }}>
+          <Box sx={{ flex: 1, width: '100%' }}>
+            <Box position="relative" mb={{ xs: 1, sm: 2, md: 4 }}>
               {/* Main Card */}
               <Card
                 elevation={8}
                 data-testid="user-card"
                 sx={{
-                  height: { xs: 400, md: 500 },
+                  height: { xs: '65vh', sm: 400, md: 500 },
                   position: 'relative',
+                  width: '100%',
                   background: 'linear-gradient(135deg, #d32f2f 0%, #b71c1c 50%, #8e0000 100%)',
                   color: 'white',
                   border: '1px solid rgba(255, 255, 255, 0.1)',
@@ -223,7 +231,13 @@ const PublicPage: React.FC = () => {
                 }}
               >
                 <CardContent
-                  sx={{ p: 4, height: '100%', display: 'flex', flexDirection: 'column', position: 'relative' }}
+                  sx={{
+                    p: { xs: 2, sm: 3, md: 4 },
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    position: 'relative',
+                  }}
                 >
                   {/* User Name with Badge */}
                   <Box
@@ -256,7 +270,7 @@ const PublicPage: React.FC = () => {
                       sx={{
                         flex: 1,
                         overflowY: 'auto',
-                        maxHeight: '200px',
+                        maxHeight: { xs: '180px', sm: '220px', md: '280px' },
                         pr: 1,
                         '&::-webkit-scrollbar': {
                           width: '6px',
@@ -371,7 +385,7 @@ const PublicPage: React.FC = () => {
                             }}
                           >
                             <LinkedIn sx={{ fontSize: '1rem' }} />
-                            LinkedIn Profile
+                            LinkedIn
                           </Link>
                         )}
 
@@ -403,7 +417,7 @@ const PublicPage: React.FC = () => {
                             }}
                           >
                             <Campaign sx={{ fontSize: '1rem' }} />
-                            Campaign/Fundraising
+                            Campaign
                           </Link>
                         )}
 
@@ -436,7 +450,7 @@ const PublicPage: React.FC = () => {
                             }}
                           >
                             <Facebook sx={{ fontSize: '1rem' }} />
-                            Facebook Profile
+                            Facebook
                           </Link>
                         )}
 
@@ -469,7 +483,7 @@ const PublicPage: React.FC = () => {
                             }}
                           >
                             <Telegram sx={{ fontSize: '1rem' }} />
-                            Telegram Profile
+                            Telegram
                           </Link>
                         )}
                       </Stack>
@@ -519,16 +533,40 @@ const PublicPage: React.FC = () => {
             </Box>
           </Box>
 
-          {/* Sharing Widget */}
+          {/* Sharing Widget - Responsive positioning */}
           {currentUser && (
-            <Box
-              sx={{
-                flexShrink: 0,
-                width: { xs: '100%', md: 'auto' },
-              }}
-            >
-              <SharingWidget url={shareUrl} title={shareTitle} description={shareDescription} />
-            </Box>
+            <>
+              {/* Fixed at bottom on small screens */}
+              <Box
+                sx={{
+                  position: 'fixed',
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  zIndex: 1000,
+                  backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                  backdropFilter: 'blur(10px)',
+                  borderTop: '1px solid rgba(0, 0, 0, 0.1)',
+                  p: { xs: 1, sm: 2 },
+                  display: { xs: 'flex', md: 'none' },
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}
+              >
+                <SharingWidget url={shareUrl} title={shareTitle} description={shareDescription} />
+              </Box>
+
+              {/* Next to card on larger screens */}
+              <Box
+                sx={{
+                  flexShrink: 0,
+                  width: 'auto',
+                  display: { xs: 'none', md: 'block' },
+                }}
+              >
+                <SharingWidget url={shareUrl} title={shareTitle} description={shareDescription} />
+              </Box>
+            </>
           )}
         </Box>
       </Box>

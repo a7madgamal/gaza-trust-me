@@ -22,9 +22,8 @@
     "types:gen": "npm run types:gen --workspace=@gazatrustme/backend",
     "docker:dev": "docker-compose -f docker-compose.dev.yml up --build",
     "docker:dev:down": "docker-compose -f docker-compose.dev.yml down",
-    "docker:prod": "docker-compose -f docker-compose.prod.yml up --build -d --force-recreate",
+    "docker:prod": "docker-compose -f docker-compose.prod.yml down && docker-compose -f docker-compose.prod.yml up --build -d",
     "docker:prod:down": "docker-compose -f docker-compose.prod.yml down",
-    "docker:prod:refresh": "docker-compose -f docker-compose.prod.yml down && docker-compose -f docker-compose.prod.yml up --build -d",
     "docker:prod:build": "docker-compose -f docker-compose.prod.yml build --progress=plain",
     "docker:prod:verbose": "docker-compose -f docker-compose.prod.yml build --progress=plain --no-cache",
     "clean": "npm run clean --workspaces && rimraf node_modules packages/*/node_modules packages/*/dist packages/*/build"
