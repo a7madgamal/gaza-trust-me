@@ -67,7 +67,7 @@ const SharingWidget: React.FC<SharingWidgetProps> = ({ url, title, description }
   return (
     <>
       <Paper
-        elevation={{ xs: 0, sm: 1, md: 2 }}
+        elevation={1}
         sx={{
           p: { xs: 1, md: 2 },
           background: {
@@ -91,6 +91,11 @@ const SharingWidget: React.FC<SharingWidgetProps> = ({ url, title, description }
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
+          boxShadow: {
+            xs: 'none',
+            sm: '0px 1px 3px rgba(0,0,0,0.12), 0px 1px 2px rgba(0,0,0,0.24)',
+            md: '0px 3px 6px rgba(0,0,0,0.16), 0px 3px 6px rgba(0,0,0,0.23)',
+          },
         }}
       >
         <Typography
@@ -124,7 +129,7 @@ const SharingWidget: React.FC<SharingWidgetProps> = ({ url, title, description }
             textShadow: { xs: 'none', sm: 'none', md: '0 0 2px rgba(255, 255, 255, 0.8)' }, // White glow on large screens
           }}
         >
-          Share user's profile to help him survive
+          Share user's profile to help them survive
         </Typography>
 
         <Stack

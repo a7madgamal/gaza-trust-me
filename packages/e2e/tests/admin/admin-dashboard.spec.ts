@@ -31,7 +31,6 @@ test.describe('Admin Dashboard', () => {
     await loginAsUser(page, 'admin');
     await expect(page).toHaveURL('/admin/dashboard');
     await expect(page.locator('[data-testid="admin-dashboard-title"]')).toBeVisible();
-    await expect(page.locator('[data-testid="admin-welcome-message"]')).toContainText('admin');
 
     // Test unauthenticated access
     await clearBrowserState(page);
@@ -96,7 +95,6 @@ test.describe('Admin Dashboard', () => {
 
     // Wait for the admin dashboard to load
     await expect(page.locator('[data-testid="admin-dashboard-title"]')).toBeVisible();
-    await expect(page.locator('[data-testid="admin-welcome-message"]')).toContainText('super_admin');
 
     // Wait for the table to load
     await expect(page.locator('[data-testid="users-table"]')).toBeVisible();

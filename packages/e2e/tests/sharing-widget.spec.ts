@@ -18,14 +18,21 @@ test.describe('Sharing Widget', () => {
     // Navigate to the public page
     await page.goto(`/user/${user.url_id}`);
 
+    // Set viewport to small screen size to ensure bottom sharing widget is visible
+    await page.setViewportSize({ width: 375, height: 667 });
+
     // Wait for the page to load
     await page.locator('[data-testid="user-card"]').waitFor();
 
-    // Check that sharing widget is present
-    await expect(page.locator('text=Share')).toBeVisible();
+    // Wait for page to be fully loaded
+    await page.waitForLoadState('domcontentloaded');
+
+    // Check that sharing widget is present - look for the text anywhere on the page, but get the first one
+    const shareText = page.getByText("Share user's profile to help them survive").first();
+    await expect(shareText).toBeVisible();
 
     // Wait for sharing widget to be fully loaded
-    await page.locator('text=Share').waitFor();
+    await shareText.waitFor();
 
     // Check for all sharing buttons using aria-label selectors
     await expect(page.getByRole('button', { name: 'Copy link' })).toBeVisible();
@@ -35,7 +42,7 @@ test.describe('Sharing Widget', () => {
     await expect(page.getByRole('button', { name: 'Share on LinkedIn' })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Share via Email' })).toBeVisible();
 
-    // Test mobile responsiveness
+    // Test mobile responsiveness - set to small screen size to ensure bottom sharing widget is visible
     await page.setViewportSize({ width: 375, height: 667 });
 
     // Check that sharing widget is still present and functional on mobile

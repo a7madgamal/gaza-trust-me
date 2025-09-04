@@ -27,28 +27,28 @@ test.describe('Card Links', () => {
     await expect(whatsappLink).toHaveAttribute('href', 'https://wa.me/9999999');
 
     // Verify LinkedIn link is displayed with correct attributes
-    const linkedinLink = page.getByRole('link', { name: 'LinkedIn Profile' });
+    const linkedinLink = page.getByRole('link', { name: 'LinkedIn' });
     await expect(linkedinLink).toBeVisible();
     await expect(linkedinLink).toHaveAttribute('target', '_blank');
     await expect(linkedinLink).toHaveAttribute('rel', 'noopener noreferrer');
     await expect(linkedinLink).toHaveAttribute('href', 'https://linkedin.com/in/userWithLinkedinandcampaign');
 
     // Verify campaign link is displayed with correct attributes
-    const campaignLink = page.getByRole('link', { name: 'Campaign/Fundraising' });
+    const campaignLink = page.getByRole('link', { name: 'Campaign' });
     await expect(campaignLink).toBeVisible();
     await expect(campaignLink).toHaveAttribute('target', '_blank');
     await expect(campaignLink).toHaveAttribute('rel', 'noopener noreferrer');
     await expect(campaignLink).toHaveAttribute('href', 'https://gofundme.com/userWithLinkedinandcampaign');
 
     // Verify Facebook link is displayed with correct attributes
-    const facebookLink = page.getByRole('link', { name: 'Facebook Profile' });
+    const facebookLink = page.getByRole('link', { name: 'Facebook' });
     await expect(facebookLink).toBeVisible();
     await expect(facebookLink).toHaveAttribute('target', '_blank');
     await expect(facebookLink).toHaveAttribute('rel', 'noopener noreferrer');
     await expect(facebookLink).toHaveAttribute('href', 'https://facebook.com/userWithLinkedinandcampaign');
 
     // Verify Telegram link is displayed with correct attributes
-    const telegramLink = page.getByRole('link', { name: 'Telegram Profile' });
+    const telegramLink = page.getByRole('link', { name: 'Telegram' });
     await expect(telegramLink).toBeVisible();
     await expect(telegramLink).toHaveAttribute('target', '_blank');
     await expect(telegramLink).toHaveAttribute('rel', 'noopener noreferrer');
