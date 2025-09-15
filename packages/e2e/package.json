@@ -10,6 +10,8 @@
     "test:headed": "playwright test --headed",
     "test:ui": "playwright test --ui",
     "test:debug": "playwright test --debug",
+    "test:debug-headed": "playwright test --debug --headed",
+    "test:debug-file": "playwright test --debug",
     "test:report": "playwright show-report",
     "install-browsers": "playwright install",
     "format": "prettier --write . --log-level error",

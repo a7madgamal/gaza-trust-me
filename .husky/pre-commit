@@ -10,5 +10,5 @@ elif [ -f ~/.profile ]; then
   . ~/.profile
 fi
 
-# Run all checks including formatting
-GIT_HOOKS=1 npm run check
+# Run all checks including formatting with debug tests
+GIT_HOOKS=1 npm run check:debug
