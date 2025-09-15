@@ -10,5 +10,11 @@ elif [ -f ~/.profile ]; then
   . ~/.profile
 fi
 
-# Run all checks including formatting
-GIT_HOOKS=1 npm run check
+# Run formatting, linting, and type checking (required)
+npm run format
+npm run lint
+npm run type-check
+
+# Run all tests (fail commit if any test fails, but run all tests)
+echo "Running all tests..."
+GIT_HOOKS=1 npm run test -- --max-failures=0
