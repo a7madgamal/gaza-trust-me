@@ -70,7 +70,7 @@ test.describe('Home Page', () => {
     // Mock API error by temporarily changing the endpoint
     await page.route('**/trpc/**', route => {
       console.log('Intercepted tRPC request to:', route.request().url());
-      if (route.request().url().includes('getUsersForCards')) {
+      if (route.request().url().includes('getNextUser')) {
         void route.fulfill({
           status: 500,
           contentType: 'application/json',
@@ -92,14 +92,14 @@ test.describe('Home Page', () => {
     await page.waitForLoadState('domcontentloaded');
 
     // Wait for error state to appear
-    await expect(page.getByText('Error Loading Users')).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText('Error Loading User')).toBeVisible({ timeout: 10000 });
     await expect(page.getByText('Please try refreshing the page.')).toBeVisible();
 
     // Reset route and test loading state
     await page.unroute('**/trpc/**');
 
     // Mock slow API response
-    await page.route('**/trpc/getUsersForCards', route => {
+    await page.route('**/trpc/getNextUser', route => {
       // Delay the response to test loading state
       void setTimeout(() => {
         void route.continue();

@@ -258,22 +258,5 @@ function writeDebugFile(testTitle: string, debugEvents: DebugEvent[]) {
   writeFileSync(debugFile, textContent);
 }
 
-// Add afterEach hook to keep browser open on test failures
-test.afterEach(async (_, testInfo) => {
-  // Check if test failed and we're not in CI
-  if (testInfo.status !== 'passed' && !process.env['CI']) {
-    console.log(`\n🔍 Test "${testInfo.title}" failed. Keeping browser open for debugging...`);
-    console.log('   Press Ctrl+C to close the browser and continue.');
-
-    // Disable timeout and keep the browser open
-    testInfo.setTimeout(0);
-
-    // Create an unresolved promise to hold execution
-    await new Promise(() => {
-      // This promise never resolves, keeping the browser open
-    });
-  }
-});
-
 export { expect, chromium } from '@playwright/test';
 export type { Page, Browser, BrowserContext, Locator, FullConfig } from '@playwright/test';

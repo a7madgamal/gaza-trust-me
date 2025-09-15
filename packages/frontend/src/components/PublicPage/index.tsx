@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Box, Typography, Card, CardContent, Button, Stack, CircularProgress, Link } from '@mui/material';
+import { Box, Typography, Card, CardContent, Button, Stack, CircularProgress, Link, Fade } from '@mui/material';
 import {
   WhatsApp,
   LinkedIn,
@@ -11,9 +11,10 @@ import {
   Telegram,
 } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
-import { trpc } from '../../utils/trpc';
+import { trpc, trpcClient } from '../../utils/trpc';
 import { useToast } from '../../hooks/useToast';
 import { useMetaTags } from '../../hooks/useMetaTags';
+import { useAuth } from '../../contexts/AuthContextDef';
 import type { RouterOutputs } from '../../utils/trpc';
 import VerificationBadge from '../VerificationBadge';
 import SharingWidget from '../SharingWidget';
@@ -31,19 +32,27 @@ const createWhatsAppLink = (phone: string): string => {
   return `https://wa.me/${formattedPhone}`;
 };
 
-type User = RouterOutputs['getUsersForCards'][number];
+type User = RouterOutputs['getUserByUrlId'];
 
 const PublicPage: React.FC = () => {
   const { urlId } = useParams<{ urlId: string }>();
   const navigate = useNavigate();
 
-  const [currentUserIndex, setCurrentUserIndex] = useState(0);
-  const [users, setUsers] = useState<User[]>([]);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isNavigating, setIsNavigating] = useState(false);
+  const [navigationHistory, setNavigationHistory] = useState<User[]>([]);
   const { showToast } = useToast();
+  const { user: currentLoggedInUser } = useAuth();
 
   // Track which users have already had their view count incremented
   const viewCountIncrementedRef = useRef(new Set<string>());
+  // Track if we're doing programmatic navigation
+  const isProgrammaticNavigationRef = useRef(false);
+  // Track the last user ID to detect programmatic navigation
+  const lastUserIdRef = useRef<string | null>(null);
+  // Track if we're navigating back (to prevent clearing history)
+  const isNavigatingBackRef = useRef(false);
 
   // Mutation for incrementing view count
   const incrementViewCountMutation = trpc.incrementViewCount.useMutation({
@@ -52,128 +61,173 @@ const PublicPage: React.FC = () => {
     },
   });
 
-  // Generate sharing data with fallbacks
-  const currentUser = users[currentUserIndex];
-  const shareUrl = currentUser ? `${window.location.origin}/user/${currentUser.url_id}` : '';
-  const shareTitle = currentUser ? `${currentUser.full_name} - Verified Help Seeker` : 'GazaTrust.Me';
-  const shareDescription = currentUser?.description || 'A verified help seeker on GazaTrust.Me platform.';
-  const ogImageUrl = `${window.location.origin}/icon.svg`;
-
   // Set meta tags for social sharing
   useMetaTags({
-    title: shareTitle,
-    description: shareDescription,
-    url: shareUrl,
-    imageUrl: ogImageUrl,
+    title: currentUser ? `${currentUser.full_name} - Verified Help Seeker` : '',
+    description: currentUser?.description || '',
+    url: currentUser ? `${window.location.origin}/user/${currentUser.url_id}` : '',
+    imageUrl: `${window.location.origin}/icon.svg`,
   });
 
-  // Fetch users for the card stack
+  // Fetch user by URL ID
+  const urlIdNumber = urlId ? parseInt(urlId, 10) : 0;
   const {
-    data: usersData,
-    isLoading: usersLoading,
-    error: usersError,
-  } = trpc.getUsersForCards.useQuery({
-    limit: 20,
-    offset: 0,
-  });
+    data: userData,
+    isLoading: userLoading,
+    error: userError,
+  } = trpc.getUserByUrlId.useQuery({ urlId: urlIdNumber }, { enabled: !!urlId && urlIdNumber > 0 });
 
-  // Get total count
+  // Fetch first user when no URL ID is provided
+  const {
+    data: firstUserData,
+    isLoading: firstUserLoading,
+    error: firstUserError,
+  } = trpc.getNextUser.useQuery({ direction: 'next' }, { enabled: !urlId });
 
+  // Handle user data updates
   useEffect(() => {
-    if (usersData) {
-      setUsers(usersData);
-      setLoading(false);
+    if (urlId) {
+      // When we have a URL ID, only use userData
+      if (userData) {
+        setCurrentUser(userData);
+        setLoading(false);
 
-      // Clear tracking when users data changes
-      viewCountIncrementedRef.current.clear();
+        // Only clear navigation history if this is a direct URL access (not programmatic navigation)
+        // We detect programmatic navigation by checking if the user ID changed from our last known user
+        const isProgrammaticNav =
+          isProgrammaticNavigationRef.current || (lastUserIdRef.current && lastUserIdRef.current !== userData.id);
 
-      // If we have a urlId, find the matching user and set the index
-      if (urlId) {
-        const userIndex = usersData.findIndex(user => user.url_id === parseInt(urlId, 10));
-        if (userIndex !== -1) {
-          setCurrentUserIndex(userIndex);
+        // Don't clear history if we're navigating back or if this is programmatic navigation
+        // Only clear history on true initial load (when currentUser is null and we're not navigating)
+        if (!isProgrammaticNav && !isNavigatingBackRef.current && !currentUser && !isNavigating) {
+          // This is initial load, clear history
+          setNavigationHistory([]);
         }
+
+        // Update the last user ID
+        lastUserIdRef.current = userData.id;
+        // Reset the flag after processing
+        isProgrammaticNavigationRef.current = false;
+      } else if (userData === null && !userLoading) {
+        // User not found
+        setCurrentUser(null);
+        setLoading(false);
+      }
+    } else {
+      // When no URL ID, use firstUserData
+      if (firstUserData) {
+        setCurrentUser(firstUserData);
+        setLoading(false);
+        // Navigate to the first user's URL
+        navigate(`/user/${firstUserData.url_id}`, { replace: true });
+        // Clear navigation history when starting fresh
+        setNavigationHistory([]);
+        lastUserIdRef.current = firstUserData.id;
       }
     }
-  }, [usersData, urlId]);
+  }, [userData, firstUserData, userLoading, urlId, navigate, currentUser]);
 
   // Handle errors
   useEffect(() => {
-    if (usersError) {
-      showToast('Failed to load users: ' + usersError.message, 'error');
+    if (userError) {
+      showToast('Failed to load user: ' + userError.message, 'error');
+      setLoading(false);
+    } else if (firstUserError) {
+      showToast('Failed to load users: ' + firstUserError.message, 'error');
       setLoading(false);
     }
-  }, [usersError, showToast]);
+  }, [userError, firstUserError, showToast]);
 
-  // Navigate to first user when component loads (only when not already on a specific user URL)
+  // Increment view count on initial page load when user is found (only for anonymous users)
   useEffect(() => {
-    if (!urlId && users.length > 0 && users[0]?.url_id) {
-      navigate(`/user/${users[0].url_id}`, { replace: true });
-    }
-  }, [urlId, users, navigate]);
-
-  // Increment view count on initial page load when urlId is found
-  useEffect(() => {
-    if (urlId && currentUser?.id && !viewCountIncrementedRef.current.has(currentUser.id)) {
+    if (currentUser?.id && !currentLoggedInUser && !viewCountIncrementedRef.current.has(currentUser.id)) {
       viewCountIncrementedRef.current.add(currentUser.id);
       incrementViewCountMutation.mutate({ userId: currentUser.id });
     }
-  }, [urlId, currentUser?.id, incrementViewCountMutation]);
+  }, [currentUser?.id, currentLoggedInUser, incrementViewCountMutation]);
 
-  const handleNext = () => {
-    if (currentUserIndex < users.length - 1) {
-      const nextIndex = currentUserIndex + 1;
-      const nextUser = users[nextIndex];
-      setCurrentUserIndex(nextIndex);
-      navigate(`/user/${nextUser.url_id}`, { replace: true });
-      // Increment view count for the new user only if not already incremented
-      if (!viewCountIncrementedRef.current.has(nextUser.id)) {
-        viewCountIncrementedRef.current.add(nextUser.id);
-        incrementViewCountMutation.mutate({ userId: nextUser.id });
+  const handleNext = async () => {
+    if (currentUser && !isNavigating) {
+      setIsNavigating(true);
+      isProgrammaticNavigationRef.current = true;
+      try {
+        // Add current user to history before navigating
+        setNavigationHistory(prev => [...prev, currentUser]);
+
+        // Fetch next user with view_count > current
+        const nextUser = await trpcClient.getNextUser.query({
+          currentUserId: currentUser.id,
+          direction: 'next',
+        });
+
+        if (nextUser) {
+          setCurrentUser(nextUser);
+          navigate(`/user/${nextUser.url_id}`, { replace: true });
+          // Increment view count AFTER setting the user (only for anonymous users)
+          if (!currentLoggedInUser && !viewCountIncrementedRef.current.has(nextUser.id)) {
+            viewCountIncrementedRef.current.add(nextUser.id);
+            incrementViewCountMutation.mutate({ userId: nextUser.id });
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch next user:', error);
+        showToast('Failed to load next user', 'error');
+      } finally {
+        setIsNavigating(false);
+        // Reset the flag after a delay to ensure useEffect has run
+        setTimeout(() => {
+          isProgrammaticNavigationRef.current = false;
+        }, 100);
       }
     }
   };
 
   const handlePrevious = () => {
-    if (currentUserIndex > 0) {
-      const prevIndex = currentUserIndex - 1;
-      const prevUser = users[prevIndex];
-      setCurrentUserIndex(prevIndex);
-      navigate(`/user/${prevUser.url_id}`, { replace: true });
-      // Increment view count for the new user only if not already incremented
-      if (!viewCountIncrementedRef.current.has(prevUser.id)) {
-        viewCountIncrementedRef.current.add(prevUser.id);
-        incrementViewCountMutation.mutate({ userId: prevUser.id });
-      }
+    if (!isNavigating && navigationHistory.length > 0) {
+      setIsNavigating(true);
+      isNavigatingBackRef.current = true;
+
+      // Get the last user from history
+      const previousUser = navigationHistory[navigationHistory.length - 1];
+      if (!previousUser) return;
+
+      // Remove the last user from history
+      setNavigationHistory(prev => prev.slice(0, -1));
+
+      // Set the previous user as current and navigate
+      setCurrentUser(previousUser);
+      navigate(`/user/${previousUser.url_id}`, { replace: true });
+
+      // Reset navigation state
+      setTimeout(() => {
+        setIsNavigating(false);
+        isNavigatingBackRef.current = false;
+      }, 100);
     }
   };
 
-  if (loading || usersLoading) {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
-        <CircularProgress />
-      </Box>
-    );
-  }
+  // Determine if we're loading
+  const isLoading = loading || (urlId && userLoading) || (!urlId && firstUserLoading) || isNavigating;
 
-  if (!users.length && !loading && !usersError) {
+  // Only show full-page states when we have no current user and no loading
+  if (!currentUser && !isLoading && !userError && !firstUserError) {
     return (
       <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" minHeight="60vh">
         <Typography variant="h4" gutterBottom>
-          No Users Available
+          {urlId ? 'User Not Found' : 'No Users Available'}
         </Typography>
         <Typography variant="body1" color="text.secondary">
-          There are currently no verified users to browse.
+          {urlId ? 'The requested user could not be found.' : 'There are currently no verified users to browse.'}
         </Typography>
       </Box>
     );
   }
 
-  if (usersError) {
+  if ((userError || firstUserError) && !currentUser) {
     return (
       <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" minHeight="60vh">
         <Typography variant="h4" gutterBottom color="error">
-          Error Loading Users
+          Error Loading User
         </Typography>
         <Typography variant="body1" color="text.secondary">
           Please try refreshing the page.
@@ -230,6 +284,56 @@ const PublicPage: React.FC = () => {
                   },
                 }}
               >
+                {/* Loading Overlay */}
+                <Fade in={isLoading} timeout={300}>
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      background:
+                        'linear-gradient(135deg, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.6) 50%, rgba(0, 0, 0, 0.8) 100%)',
+                      backdropFilter: 'blur(4px)',
+                      display: isLoading ? 'flex' : 'none',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      zIndex: 10,
+                      borderRadius: 'inherit',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        gap: 2,
+                      }}
+                    >
+                      <CircularProgress
+                        sx={{
+                          color: 'rgba(255, 255, 255, 0.9)',
+                          '& .MuiCircularProgress-circle': {
+                            strokeLinecap: 'round',
+                          },
+                        }}
+                        size={40}
+                      />
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: 'rgba(255, 255, 255, 0.8)',
+                          fontWeight: 500,
+                          textAlign: 'center',
+                        }}
+                      >
+                        Loading...
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Fade>
                 <CardContent
                   sx={{
                     p: { xs: 2, sm: 3, md: 4 },
@@ -239,256 +343,261 @@ const PublicPage: React.FC = () => {
                     position: 'relative',
                   }}
                 >
-                  {/* User Name with Badge */}
-                  <Box
-                    sx={{
-                      display: 'flex',
-                      flexDirection: { xs: 'column', md: 'row' },
-                      alignItems: { xs: 'flex-start', md: 'center' },
-                      gap: { xs: 0.5, md: 1 },
-                      mb: 2,
-                    }}
-                  >
-                    <Typography
-                      variant="h4"
-                      fontWeight="bold"
-                      sx={{
-                        fontSize: { xs: '1.5rem', md: '2.125rem' },
-                        lineHeight: { xs: 1.2, md: 1.4 },
-                      }}
-                    >
-                      {currentUser.full_name}
-                    </Typography>
-                    <Box sx={{ display: 'flex', justifyContent: { xs: 'flex-start', md: 'center' } }}>
-                      <VerificationBadge verifiedBy={currentUser.verified_by} status={currentUser.status} />
-                    </Box>
-                  </Box>
+                  {currentUser && (
+                    <>
+                      {/* User Name with Badge */}
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          flexDirection: { xs: 'column', md: 'row' },
+                          alignItems: { xs: 'flex-start', md: 'center' },
+                          gap: { xs: 0.5, md: 1 },
+                          mb: 2,
+                        }}
+                      >
+                        <Typography
+                          variant="h4"
+                          fontWeight="bold"
+                          sx={{
+                            fontSize: { xs: '1.5rem', md: '2.125rem' },
+                            lineHeight: { xs: 1.2, md: 1.4 },
+                          }}
+                        >
+                          {currentUser.full_name}
+                        </Typography>
+                        <Box sx={{ display: 'flex', justifyContent: { xs: 'flex-start', md: 'center' } }}>
+                          <VerificationBadge verifiedBy={currentUser.verified_by} status={currentUser.status} />
+                        </Box>
+                      </Box>
 
-                  {/* Description */}
-                  <Box flex={1} sx={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-                    <Box
-                      sx={{
-                        flex: 1,
-                        overflowY: 'auto',
-                        maxHeight: { xs: '180px', sm: '220px', md: '280px' },
-                        pr: 1,
-                        '&::-webkit-scrollbar': {
-                          width: '6px',
-                        },
-                        '&::-webkit-scrollbar-track': {
-                          background: 'rgba(255,255,255,0.1)',
-                          borderRadius: '3px',
-                        },
-                        '&::-webkit-scrollbar-thumb': {
-                          background: 'rgba(255,255,255,0.3)',
-                          borderRadius: '3px',
-                          '&:hover': {
-                            background: 'rgba(255,255,255,0.5)',
-                          },
-                        },
-                      }}
-                    >
-                      <Typography variant="body1" sx={{ lineHeight: 1.6 }}>
-                        {currentUser.description || 'No description provided.'}
-                      </Typography>
-                    </Box>
-                  </Box>
-
-                  {/* Details Section - All info below the line */}
-                  <Box
-                    sx={{
-                      mt: 'auto',
-                      pt: 2,
-                      borderTop: '1px solid rgba(255,255,255,0.2)',
-                    }}
-                  >
-                    {/* Join Date, View Count and Phone */}
-                    <Box mb={2}>
-                      <Typography variant="body2" color="rgba(255,255,255,0.8)" mb={1}>
-                        Joined: {currentUser.created_at ? new Date(currentUser.created_at).toLocaleDateString() : 'N/A'}
-                      </Typography>
-                      <Typography variant="body2" color="rgba(255,255,255,0.8)" mb={1}>
-                        Views: {currentUser.view_count || 0}
-                      </Typography>
-                      {currentUser.phone_number && (
-                        <Box display="flex" alignItems="center" gap={1}>
-                          <Phone sx={{ fontSize: '1rem', color: 'rgba(255,255,255,0.8)' }} />
-                          <Typography variant="body2" color="rgba(255,255,255,0.8)">
-                            {currentUser.phone_number}
+                      {/* Description */}
+                      <Box flex={1} sx={{ display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+                        <Box
+                          sx={{
+                            flex: 1,
+                            overflowY: 'auto',
+                            maxHeight: { xs: '180px', sm: '220px', md: '280px' },
+                            pr: 1,
+                            '&::-webkit-scrollbar': {
+                              width: '6px',
+                            },
+                            '&::-webkit-scrollbar-track': {
+                              background: 'rgba(255,255,255,0.1)',
+                              borderRadius: '3px',
+                            },
+                            '&::-webkit-scrollbar-thumb': {
+                              background: 'rgba(255,255,255,0.3)',
+                              borderRadius: '3px',
+                              '&:hover': {
+                                background: 'rgba(255,255,255,0.5)',
+                              },
+                            },
+                          }}
+                        >
+                          <Typography variant="body1" sx={{ lineHeight: 1.6 }}>
+                            {currentUser.description || 'No description provided.'}
                           </Typography>
                         </Box>
-                      )}
-                    </Box>
+                      </Box>
 
-                    {/* Links Section */}
-                    {(currentUser.phone_number || currentUser.linkedin_url || currentUser.campaign_url) && (
-                      <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-                        {/* WhatsApp Link */}
-                        {currentUser.phone_number && (
-                          <Link
-                            href={createWhatsAppLink(currentUser.phone_number)}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            sx={{
-                              color: '#ffffff',
-                              textDecoration: 'none',
-                              backgroundColor: '#25D366',
-                              px: 1.5,
-                              py: 0.75,
-                              borderRadius: 1.5,
-                              fontSize: '0.8rem',
-                              fontWeight: 'medium',
-                              border: '1px solid #25D366',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 0.5,
-                              '&:hover': {
-                                backgroundColor: '#128C7E',
-                                borderColor: '#128C7E',
-                                textDecoration: 'none',
-                                transform: 'translateY(-1px)',
-                              },
-                              transition: 'all 0.2s ease-in-out',
-                            }}
-                          >
-                            <WhatsApp sx={{ fontSize: '1rem' }} />
-                            WhatsApp
-                          </Link>
-                        )}
+                      {/* Details Section - All info below the line */}
+                      <Box
+                        sx={{
+                          mt: 'auto',
+                          pt: 2,
+                          borderTop: '1px solid rgba(255,255,255,0.2)',
+                        }}
+                      >
+                        {/* Join Date, View Count and Phone */}
+                        <Box mb={2}>
+                          <Typography variant="body2" color="rgba(255,255,255,0.8)" mb={1}>
+                            Joined:{' '}
+                            {currentUser.created_at ? new Date(currentUser.created_at).toLocaleDateString() : 'N/A'}
+                          </Typography>
+                          <Typography variant="body2" color="rgba(255,255,255,0.8)" mb={1}>
+                            Views: {currentUser.view_count || 0}
+                          </Typography>
+                          {currentUser.phone_number && (
+                            <Box display="flex" alignItems="center" gap={1}>
+                              <Phone sx={{ fontSize: '1rem', color: 'rgba(255,255,255,0.8)' }} />
+                              <Typography variant="body2" color="rgba(255,255,255,0.8)">
+                                {currentUser.phone_number}
+                              </Typography>
+                            </Box>
+                          )}
+                        </Box>
 
-                        {/* LinkedIn Profile */}
-                        {currentUser.linkedin_url && (
-                          <Link
-                            href={currentUser.linkedin_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            sx={{
-                              color: '#ffffff',
-                              textDecoration: 'none',
-                              backgroundColor: '#0077b5',
-                              px: 1.5,
-                              py: 0.75,
-                              borderRadius: 1.5,
-                              fontSize: '0.8rem',
-                              fontWeight: 'medium',
-                              border: '1px solid #0077b5',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 0.5,
-                              '&:hover': {
-                                backgroundColor: '#005885',
-                                borderColor: '#005885',
-                                textDecoration: 'none',
-                                transform: 'translateY(-1px)',
-                              },
-                              transition: 'all 0.2s ease-in-out',
-                            }}
-                          >
-                            <LinkedIn sx={{ fontSize: '1rem' }} />
-                            LinkedIn
-                          </Link>
-                        )}
+                        {/* Links Section */}
+                        {(currentUser.phone_number || currentUser.linkedin_url || currentUser.campaign_url) && (
+                          <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                            {/* WhatsApp Link */}
+                            {currentUser.phone_number && (
+                              <Link
+                                href={createWhatsAppLink(currentUser.phone_number)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                sx={{
+                                  color: '#ffffff',
+                                  textDecoration: 'none',
+                                  backgroundColor: '#25D366',
+                                  px: 1.5,
+                                  py: 0.75,
+                                  borderRadius: 1.5,
+                                  fontSize: '0.8rem',
+                                  fontWeight: 'medium',
+                                  border: '1px solid #25D366',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 0.5,
+                                  '&:hover': {
+                                    backgroundColor: '#128C7E',
+                                    borderColor: '#128C7E',
+                                    textDecoration: 'none',
+                                    transform: 'translateY(-1px)',
+                                  },
+                                  transition: 'all 0.2s ease-in-out',
+                                }}
+                              >
+                                <WhatsApp sx={{ fontSize: '1rem' }} />
+                                WhatsApp
+                              </Link>
+                            )}
 
-                        {/* Campaign/Fundraising Link */}
-                        {currentUser.campaign_url && (
-                          <Link
-                            href={currentUser.campaign_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            sx={{
-                              color: 'rgba(255,255,255,0.9)',
-                              textDecoration: 'none',
-                              backgroundColor: 'rgba(255,255,255,0.15)',
-                              px: 1.5,
-                              py: 0.75,
-                              borderRadius: 1.5,
-                              fontSize: '0.8rem',
-                              fontWeight: 'medium',
-                              border: '1px solid rgba(255,255,255,0.2)',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 0.5,
-                              '&:hover': {
-                                backgroundColor: 'rgba(255,255,255,0.25)',
-                                textDecoration: 'none',
-                                transform: 'translateY(-1px)',
-                              },
-                              transition: 'all 0.2s ease-in-out',
-                            }}
-                          >
-                            <Campaign sx={{ fontSize: '1rem' }} />
-                            Campaign
-                          </Link>
-                        )}
+                            {/* LinkedIn Profile */}
+                            {currentUser.linkedin_url && (
+                              <Link
+                                href={currentUser.linkedin_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                sx={{
+                                  color: '#ffffff',
+                                  textDecoration: 'none',
+                                  backgroundColor: '#0077b5',
+                                  px: 1.5,
+                                  py: 0.75,
+                                  borderRadius: 1.5,
+                                  fontSize: '0.8rem',
+                                  fontWeight: 'medium',
+                                  border: '1px solid #0077b5',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 0.5,
+                                  '&:hover': {
+                                    backgroundColor: '#005885',
+                                    borderColor: '#005885',
+                                    textDecoration: 'none',
+                                    transform: 'translateY(-1px)',
+                                  },
+                                  transition: 'all 0.2s ease-in-out',
+                                }}
+                              >
+                                <LinkedIn sx={{ fontSize: '1rem' }} />
+                                LinkedIn
+                              </Link>
+                            )}
 
-                        {/* Facebook Profile */}
-                        {currentUser.facebook_url && (
-                          <Link
-                            href={currentUser.facebook_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            sx={{
-                              color: '#ffffff',
-                              textDecoration: 'none',
-                              backgroundColor: '#1877f2',
-                              px: 1.5,
-                              py: 0.75,
-                              borderRadius: 1.5,
-                              fontSize: '0.8rem',
-                              fontWeight: 'medium',
-                              border: '1px solid #1877f2',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 0.5,
-                              '&:hover': {
-                                backgroundColor: '#0d5aa7',
-                                borderColor: '#0d5aa7',
-                                textDecoration: 'none',
-                                transform: 'translateY(-1px)',
-                              },
-                              transition: 'all 0.2s ease-in-out',
-                            }}
-                          >
-                            <Facebook sx={{ fontSize: '1rem' }} />
-                            Facebook
-                          </Link>
-                        )}
+                            {/* Campaign/Fundraising Link */}
+                            {currentUser.campaign_url && (
+                              <Link
+                                href={currentUser.campaign_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                sx={{
+                                  color: 'rgba(255,255,255,0.9)',
+                                  textDecoration: 'none',
+                                  backgroundColor: 'rgba(255,255,255,0.15)',
+                                  px: 1.5,
+                                  py: 0.75,
+                                  borderRadius: 1.5,
+                                  fontSize: '0.8rem',
+                                  fontWeight: 'medium',
+                                  border: '1px solid rgba(255,255,255,0.2)',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 0.5,
+                                  '&:hover': {
+                                    backgroundColor: 'rgba(255,255,255,0.25)',
+                                    textDecoration: 'none',
+                                    transform: 'translateY(-1px)',
+                                  },
+                                  transition: 'all 0.2s ease-in-out',
+                                }}
+                              >
+                                <Campaign sx={{ fontSize: '1rem' }} />
+                                Campaign
+                              </Link>
+                            )}
 
-                        {/* Telegram Profile */}
-                        {currentUser.telegram_url && (
-                          <Link
-                            href={currentUser.telegram_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            sx={{
-                              color: '#ffffff',
-                              textDecoration: 'none',
-                              backgroundColor: '#0088cc',
-                              px: 1.5,
-                              py: 0.75,
-                              borderRadius: 1.5,
-                              fontSize: '0.8rem',
-                              fontWeight: 'medium',
-                              border: '1px solid #0088cc',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 0.5,
-                              '&:hover': {
-                                backgroundColor: '#006699',
-                                borderColor: '#006699',
-                                textDecoration: 'none',
-                                transform: 'translateY(-1px)',
-                              },
-                              transition: 'all 0.2s ease-in-out',
-                            }}
-                          >
-                            <Telegram sx={{ fontSize: '1rem' }} />
-                            Telegram
-                          </Link>
+                            {/* Facebook Profile */}
+                            {currentUser.facebook_url && (
+                              <Link
+                                href={currentUser.facebook_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                sx={{
+                                  color: '#ffffff',
+                                  textDecoration: 'none',
+                                  backgroundColor: '#1877f2',
+                                  px: 1.5,
+                                  py: 0.75,
+                                  borderRadius: 1.5,
+                                  fontSize: '0.8rem',
+                                  fontWeight: 'medium',
+                                  border: '1px solid #1877f2',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 0.5,
+                                  '&:hover': {
+                                    backgroundColor: '#0d5aa7',
+                                    borderColor: '#0d5aa7',
+                                    textDecoration: 'none',
+                                    transform: 'translateY(-1px)',
+                                  },
+                                  transition: 'all 0.2s ease-in-out',
+                                }}
+                              >
+                                <Facebook sx={{ fontSize: '1rem' }} />
+                                Facebook
+                              </Link>
+                            )}
+
+                            {/* Telegram Profile */}
+                            {currentUser.telegram_url && (
+                              <Link
+                                href={currentUser.telegram_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                sx={{
+                                  color: '#ffffff',
+                                  textDecoration: 'none',
+                                  backgroundColor: '#0088cc',
+                                  px: 1.5,
+                                  py: 0.75,
+                                  borderRadius: 1.5,
+                                  fontSize: '0.8rem',
+                                  fontWeight: 'medium',
+                                  border: '1px solid #0088cc',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: 0.5,
+                                  '&:hover': {
+                                    backgroundColor: '#006699',
+                                    borderColor: '#006699',
+                                    textDecoration: 'none',
+                                    transform: 'translateY(-1px)',
+                                  },
+                                  transition: 'all 0.2s ease-in-out',
+                                }}
+                              >
+                                <Telegram sx={{ fontSize: '1rem' }} />
+                                Telegram
+                              </Link>
+                            )}
+                          </Stack>
                         )}
-                      </Stack>
-                    )}
-                  </Box>
+                      </Box>
+                    </>
+                  )}
                 </CardContent>
               </Card>
 
@@ -497,7 +606,7 @@ const PublicPage: React.FC = () => {
                 <Button
                   variant="outlined"
                   onClick={handlePrevious}
-                  disabled={currentUserIndex === 0}
+                  disabled={isLoading || navigationHistory.length === 0}
                   startIcon={<NavigateBefore />}
                   sx={{
                     minWidth: 120,
@@ -507,6 +616,10 @@ const PublicPage: React.FC = () => {
                       borderColor: '#2e7d32',
                       backgroundColor: 'rgba(76, 175, 80, 0.08)',
                     },
+                    '&:disabled': {
+                      borderColor: 'rgba(76, 175, 80, 0.3)',
+                      color: 'rgba(76, 175, 80, 0.3)',
+                    },
                   }}
                 >
                   Previous
@@ -514,8 +627,8 @@ const PublicPage: React.FC = () => {
 
                 <Button
                   variant="outlined"
-                  onClick={handleNext}
-                  disabled={currentUserIndex === users.length - 1}
+                  onClick={() => void handleNext()}
+                  disabled={isLoading}
                   endIcon={<NavigateNext />}
                   sx={{
                     minWidth: 120,
@@ -524,6 +637,10 @@ const PublicPage: React.FC = () => {
                     '&:hover': {
                       borderColor: '#2e7d32',
                       backgroundColor: 'rgba(76, 175, 80, 0.08)',
+                    },
+                    '&:disabled': {
+                      borderColor: 'rgba(76, 175, 80, 0.3)',
+                      color: 'rgba(76, 175, 80, 0.3)',
                     },
                   }}
                 >
@@ -553,7 +670,11 @@ const PublicPage: React.FC = () => {
                   alignItems: 'center',
                 }}
               >
-                <SharingWidget url={shareUrl} title={shareTitle} description={shareDescription} />
+                <SharingWidget
+                  url={`${window.location.origin}/user/${currentUser.url_id}`}
+                  title={`${currentUser.full_name} - Verified Help Seeker`}
+                  description={currentUser.description}
+                />
               </Box>
 
               {/* Next to card on larger screens */}
@@ -564,7 +685,11 @@ const PublicPage: React.FC = () => {
                   display: { xs: 'none', md: 'block' },
                 }}
               >
-                <SharingWidget url={shareUrl} title={shareTitle} description={shareDescription} />
+                <SharingWidget
+                  url={`${window.location.origin}/user/${currentUser.url_id}`}
+                  title={`${currentUser.full_name} - Verified Help Seeker`}
+                  description={currentUser.description}
+                />
               </Box>
             </>
           )}

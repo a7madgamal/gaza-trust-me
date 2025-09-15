@@ -5,7 +5,6 @@ export {
   AuthRegistrationInputSchema,
   AuthLoginInputSchema,
   UserProfileUpdateSchema,
-  PublicUsersForCardsInputSchema,
   CardStackNavigationInputSchema,
 } from '../types/supabase-types';
 

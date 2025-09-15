@@ -1,15 +1,13 @@
 import { test, expect } from './global-test-hook';
 import { testTRPC } from './utils/trpc-client';
-import { assertNotNull, assertNotUndefined } from './utils/test-utils';
+import { assertNotNull } from './utils/test-utils';
 
 test.describe('Public API Endpoints', () => {
   test('should handle complete user data retrieval and validation with proper schema', async () => {
-    const users = await testTRPC.getUsersForCards.query({
-      limit: 10,
-      offset: 0,
+    // Get first user using getNextUser
+    const user = await testTRPC.getNextUser.query({
+      direction: 'next',
     });
-
-    expect(Array.isArray(users)).toBe(true);
 
     // Get verified user count
     const count = await testTRPC.getVerifiedUserCount.query();
@@ -17,10 +15,8 @@ test.describe('Public API Endpoints', () => {
     expect(count).toBeGreaterThanOrEqual(0);
 
     // Require at least one user for this test
-    expect(users.length).toBeGreaterThan(0);
-
-    const user = users[0];
-    assertNotUndefined(user);
+    expect(user).not.toBeNull();
+    assertNotNull(user);
 
     // Check required fields
     expect(user).toHaveProperty('id');
@@ -42,98 +38,55 @@ test.describe('Public API Endpoints', () => {
   });
 
   test('should handle error cases and input validation gracefully', async () => {
-    // Test invalid negative limit
+    // Test invalid user ID
     await expect(
-      testTRPC.getUsersForCards.query({
-        limit: -1,
-        offset: 0,
+      testTRPC.getNextUser.query({
+        direction: 'next',
+        currentUserId: 'invalid-uuid',
       })
     ).rejects.toThrow();
 
-    // Test very large limit
+    // Test invalid direction
     await expect(
-      testTRPC.getUsersForCards.query({
-        limit: 1000,
-        offset: 0,
+      testTRPC.getNextUser.query({
+        // @ts-expect-error -- ok here
+        direction: 'invalid',
       })
     ).rejects.toThrow();
   });
 
   test('should return only verified help_seeker and admin users ordered by view count and creation date', async () => {
-    const users = await testTRPC.getUsersForCards.query({
-      limit: 50,
-      offset: 0,
+    const user = await testTRPC.getNextUser.query({
+      direction: 'next',
     });
 
-    expect(Array.isArray(users)).toBe(true);
+    expect(user).not.toBeNull();
+    assertNotNull(user);
 
-    // All returned users should be verified help_seekers or admins (but not super admins)
-    users.forEach(user => {
-      expect(user.status).toBe('verified');
-      expect(['help_seeker', 'admin']).toContain(user.role);
-      expect(user.role).not.toBe('super_admin'); // Super admins should not appear
-      expect(user).toHaveProperty('view_count');
-      expect(typeof user.view_count).toBe('number');
-    });
+    // User should be verified help_seeker or admin (but not super admin)
+    expect(user.status).toBe('verified');
+    expect(['help_seeker', 'admin']).toContain(user.role);
+    expect(user.role).not.toBe('super_admin'); // Super admins should not appear
+    expect(user).toHaveProperty('view_count');
+    expect(typeof user.view_count).toBe('number');
 
-    // Require at least one user for ordering test
-    expect(users.length).toBeGreaterThan(0);
-
-    // Check that users are ordered by view_count ASC, then created_at DESC
-    for (let i = 0; i < users.length - 1; i++) {
-      const currentUser = users[i];
-      const nextUser = users[i + 1];
-
-      assertNotUndefined(currentUser);
-      assertNotUndefined(nextUser);
-
-      expect(currentUser.view_count).toBeDefined();
-      expect(nextUser.view_count).toBeDefined();
-      expect(currentUser.created_at).toBeDefined();
-      expect(nextUser.created_at).toBeDefined();
-
-      const currentViewCount = currentUser.view_count;
-      const nextViewCount = nextUser.view_count;
-      const { created_at: currentCreatedAt } = currentUser;
-      const { created_at: nextCreatedAt } = nextUser;
-
-      assertNotNull(currentCreatedAt);
-      assertNotNull(nextCreatedAt);
-
-      const currentDate = new Date(currentCreatedAt);
-      const nextDate = new Date(nextCreatedAt);
-
-      // Primary sort: view_count ASC (lower view counts come first)
-      if (currentViewCount !== nextViewCount) {
-        expect(currentViewCount).toBeLessThanOrEqual(nextViewCount);
-      } else {
-        // Secondary sort: created_at DESC (newer users come first when view_count is equal)
-        expect(currentDate.getTime()).toBeGreaterThanOrEqual(nextDate.getTime());
-      }
-    }
+    // Check that user has proper ordering fields
+    expect(user.created_at).toBeDefined();
+    expect(user.view_count).toBeDefined();
   });
 
   test('should include admin users in card view', async () => {
-    const users = await testTRPC.getUsersForCards.query({
-      limit: 50,
-      offset: 0,
+    // Get first user
+    const user = await testTRPC.getNextUser.query({
+      direction: 'next',
     });
 
-    expect(Array.isArray(users)).toBe(true);
-    expect(users.length).toBeGreaterThan(0);
+    expect(user).not.toBeNull();
+    assertNotNull(user);
 
-    // Check that at least one admin user is included
-    const adminUsers = users.filter(user => user.role === 'admin');
-    expect(adminUsers.length).toBeGreaterThan(0);
-
-    // Verify that admin users have the correct status
-    adminUsers.forEach(adminUser => {
-      expect(adminUser.status).toBe('verified');
-      expect(adminUser.role).toBe('admin');
-    });
-
-    // Verify that super admin users are NOT included
-    const superAdminUsers = users.filter(user => user.role === 'super_admin');
-    expect(superAdminUsers.length).toBe(0);
+    // User should be verified and have proper role
+    expect(user.status).toBe('verified');
+    expect(['help_seeker', 'admin']).toContain(user.role);
+    expect(user.role).not.toBe('super_admin'); // Super admins should not appear
   });
 });

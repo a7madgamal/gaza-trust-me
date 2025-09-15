@@ -80,14 +80,20 @@ test.describe('URL Routing Tests', () => {
     await expect(page.locator('[data-testid="user-card"]')).toBeVisible();
     await page.waitForURL(/\/user\/\d+/);
 
+    // Get the original URL before clicking Next
+    const originalUrl = page.url();
+
     // Navigate to next user first
     const nextButton = page.getByRole('button', { name: 'Next' });
     await expect(nextButton).toBeVisible();
     await expect(nextButton).toBeEnabled();
     await nextButton.click();
 
-    // Wait for URL to change
-    await page.waitForURL(url => !url.toString().endsWith('/'));
+    // Wait for URL to change to a different user
+    await page.waitForURL(url => {
+      const currentUrl = url.toString();
+      return currentUrl !== originalUrl && !!currentUrl.match(/\/user\/\d+$/);
+    });
 
     // Get the URL after clicking Next
     const urlAfterNext = page.url();
@@ -96,13 +102,16 @@ test.describe('URL Routing Tests', () => {
     const previousButton = page.getByRole('button', { name: 'Previous' });
     await expect(previousButton).toBeVisible();
     await expect(previousButton).toBeEnabled();
+
+    // Click Previous and wait for navigation
     await previousButton.click();
 
-    // Wait for URL to change back
-    await page.waitForURL(url => url.toString() !== urlAfterNext);
+    // Wait for URL to change back to original URL
+    await page.waitForURL(originalUrl, { timeout: 10000 });
 
-    // Verify URL pattern is maintained but different from the "next" URL
+    // Verify URL pattern is maintained and we're back to original URL
     expect(page.url()).toMatch(/\/user\/\d+$/);
+    expect(page.url()).toBe(originalUrl);
     expect(page.url()).not.toBe(urlAfterNext);
 
     // Verify user data has changed back

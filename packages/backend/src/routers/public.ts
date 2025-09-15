@@ -6,7 +6,6 @@ import { t, publicProcedure } from './shared';
 import {
   PublicHelloInputSchema,
   PublicHelloOutputSchema,
-  PublicUsersForCardsInputSchema,
   PublicUserSchema,
   AdminProfileSchema,
   CardStackNavigationInputSchema,
@@ -61,36 +60,6 @@ export const publicRouter = t.router({
       };
     }),
 
-  // Public user browsing - Card stack interface
-  getUsersForCards: publicProcedure
-    .input(PublicUsersForCardsInputSchema)
-    .output(z.array(PublicUserSchema))
-    .query(async ({ input }) => {
-      try {
-        const { data, error } = await supabase
-          .from('users')
-          .select(
-            'id, url_id, full_name, description, phone_number, status, role, verified_at, verified_by, created_at, view_count, linkedin_url, campaign_url, facebook_url, telegram_url'
-          )
-          .in('role', ['help_seeker', 'admin']) // Show help seekers and admins (but not super admins)
-          .not('status', 'is', null) // Ensure status is not null
-          .eq('status', 'verified') // Only verified users
-          .order('view_count', { ascending: true }) // Lowest view count first
-          .order('created_at', { ascending: false }) // Then newest first
-          .range(input.offset, input.offset + input.limit - 1);
-
-        if (error) {
-          logger.error('Error fetching users for cards:', error);
-          throw new Error('Failed to fetch users');
-        }
-
-        return data || [];
-      } catch (error) {
-        logger.error('Error in getUsersForCards:', error);
-        throw new Error('Failed to fetch users');
-      }
-    }),
-
   getNextUser: publicProcedure
     .input(CardStackNavigationInputSchema)
     .output(PublicUserSchema.nullable())
@@ -114,8 +83,8 @@ export const publicRouter = t.router({
             .single();
 
           if (currentUser) {
-            // Since we order by view_count ASC, created_at DESC,
-            // "next" means finding users with higher view_count OR same view_count but older created_at
+            // Fetch user with view_count > current (strict inequality to avoid loops)
+            // OR same view_count but older created_at (to handle ties)
             query = query.or(
               `view_count.gt.${currentUser.view_count},and(view_count.eq.${currentUser.view_count},created_at.lt.${currentUser.created_at})`
             );

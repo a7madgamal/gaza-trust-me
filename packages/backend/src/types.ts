@@ -5,7 +5,6 @@ import {
   AuthRegistrationInputSchema,
   AuthLoginInputSchema,
   UserProfileUpdateSchema,
-  PublicUsersForCardsInputSchema,
   CardStackNavigationInputSchema,
   PublicUserSchema,
   UserProfileOutputSchema,
@@ -31,7 +30,6 @@ export type AuditLog = Database['public']['Tables']['audit_logs']['Row'];
 export type AuthRegistrationInput = z.infer<typeof AuthRegistrationInputSchema>;
 export type AuthLoginInput = z.infer<typeof AuthLoginInputSchema>;
 export type UserProfileUpdateInput = z.infer<typeof UserProfileUpdateSchema>;
-export type PublicUsersForCardsInput = z.infer<typeof PublicUsersForCardsInputSchema>;
 export type CardStackNavigationInput = z.infer<typeof CardStackNavigationInputSchema>;
 export type PublicUser = z.infer<typeof PublicUserSchema>;
 export type UserProfileOutput = z.infer<typeof UserProfileOutputSchema>;

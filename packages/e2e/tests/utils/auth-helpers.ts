@@ -50,14 +50,17 @@ export async function loginWithCredentials(
   // Submit form
   await page.click('[data-testid="login-button"]');
 
+  // Wait for navigation to complete
+  await page.waitForLoadState('domcontentloaded');
+
   // Wait for successful login - check for dashboard elements based on user type
   if (userType === 'admin' || userType === 'superAdmin') {
     // Admin and super admin users should be redirected to admin dashboard
-    await expect(page.locator('[data-testid="admin-dashboard-title"]')).toBeVisible();
+    await expect(page.locator('[data-testid="admin-dashboard-title"]')).toBeVisible({ timeout: 10000 });
     await expect(page).toHaveURL('/admin/dashboard');
   } else {
     // Regular users should be redirected to regular dashboard
-    await expect(page.locator('[data-testid="dashboard-title"]')).toBeVisible();
+    await expect(page.locator('[data-testid="dashboard-title"]')).toBeVisible({ timeout: 10000 });
     await expect(page).toHaveURL('/dashboard');
   }
 }

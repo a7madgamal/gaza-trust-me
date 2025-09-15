@@ -200,11 +200,6 @@ export const PublicHelloOutputSchema = z.object({
   greeting: z.string(),
 });
 
-export const PublicUsersForCardsInputSchema = z.object({
-  limit: z.number().int().positive().max(50).default(10),
-  offset: z.number().int().nonnegative().default(0),
-});
-
 export const PublicUserSchema = z.object({
   id: z.string().uuid(),
   url_id: z.number(),
@@ -269,7 +264,6 @@ export type UserProfileUpdateOutput = z.infer<typeof UserProfileUpdateOutputSche
 
 export type PublicHelloInput = z.infer<typeof PublicHelloInputSchema>;
 export type PublicHelloOutput = z.infer<typeof PublicHelloOutputSchema>;
-export type PublicUsersForCardsInput = z.infer<typeof PublicUsersForCardsInputSchema>;
 export type PublicUser = z.infer<typeof PublicUserSchema>;
 export type CardStackNavigationInput = z.infer<typeof CardStackNavigationInputSchema>;
 export type GetUserByUrlIdInput = z.infer<typeof GetUserByUrlIdInputSchema>;

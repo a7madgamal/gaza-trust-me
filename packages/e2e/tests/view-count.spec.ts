@@ -1,4 +1,5 @@
 import { test, expect } from './global-test-hook';
+import { strict as assert } from 'assert';
 
 test.describe('View Count Functionality', () => {
   test.beforeEach(async ({ page }) => {
@@ -106,27 +107,23 @@ test.describe('View Count Functionality', () => {
         const count = parseInt(viewCountText?.match(/\d+/)?.[0] || '0');
         viewCounts.push(count);
 
-        // Navigate to next user if not last iteration
-        // eslint-disable-next-line playwright/no-conditional-in-test
-        if (i < 2) {
-          const nextButton = page.locator('button:has-text("Next")');
-          if (await nextButton.isEnabled()) {
-            await nextButton.click();
-            await page.waitForURL(/\/user\/\d+/);
-            await expect(page.locator('[data-testid="user-card"]')).toBeVisible();
-          } else {
-            break;
-          }
-        }
+        // Navigate to next user for first 2 iterations
+        const nextButton = page.locator('button:has-text("Next")');
+        await expect(nextButton).toBeEnabled();
+        await nextButton.click();
+        await page.waitForURL(/\/user\/\d+/);
+        await expect(page.locator('[data-testid="user-card"]')).toBeVisible();
       }
 
       // Verify ascending order (allowing for equal values)
       for (let i = 1; i < viewCounts.length; i++) {
         const currentCount = viewCounts[i];
         const previousCount = viewCounts[i - 1];
-        if (currentCount !== undefined && previousCount !== undefined) {
-          expect(currentCount).toBeGreaterThanOrEqual(previousCount);
-        }
+        expect(currentCount).toBeDefined();
+        expect(previousCount).toBeDefined();
+        assert(currentCount !== undefined);
+        assert(previousCount !== undefined);
+        expect(currentCount).toBeGreaterThanOrEqual(previousCount);
       }
     });
 
@@ -140,19 +137,15 @@ test.describe('View Count Functionality', () => {
 
       // Navigate through a few users to verify this is indeed the lowest
       const nextButton = page.locator('button:has-text("Next")');
-      if (await nextButton.isEnabled()) {
-        await nextButton.click();
-        await page.waitForURL(/\/user\/\d+/);
-        await expect(page.locator('[data-testid="user-card"]')).toBeVisible();
+      await expect(nextButton).toBeEnabled();
+      await nextButton.click();
+      await page.waitForURL(/\/user\/\d+/);
+      await expect(page.locator('[data-testid="user-card"]')).toBeVisible();
 
-        const nextViewCountText = await page
-          .locator('[data-testid="user-card"]')
-          .locator('text=/Views:/')
-          .textContent();
-        const nextCount = parseInt(nextViewCountText?.match(/\d+/)?.[0] || '0');
+      const nextViewCountText = await page.locator('[data-testid="user-card"]').locator('text=/Views:/').textContent();
+      const nextCount = parseInt(nextViewCountText?.match(/\d+/)?.[0] || '0');
 
-        expect(nextCount).toBeGreaterThanOrEqual(count);
-      }
+      expect(nextCount).toBeGreaterThanOrEqual(count);
     });
 
     test('should preserve view count ordering during navigation', async ({ page }) => {
@@ -164,17 +157,19 @@ test.describe('View Count Functionality', () => {
         const count = parseInt(viewCountText?.match(/\d+/)?.[0] || '0');
         viewCounts.push(count);
 
+        // Only navigate for first 2 iterations
         const nextButton = page.locator('button:has-text("Next")');
-        if ((await nextButton.isEnabled()) && i < 2) {
-          await nextButton.click();
-          await page.waitForURL(/\/user\/\d+/);
-          await expect(page.locator('[data-testid="user-card"]')).toBeVisible();
-        }
+        await expect(nextButton).toBeEnabled();
+        await nextButton.click();
+        await page.waitForURL(/\/user\/\d+/);
+        await expect(page.locator('[data-testid="user-card"]')).toBeVisible();
       }
 
       // Navigate backward and verify same ordering
       for (let i = viewCounts.length - 2; i >= 0; i--) {
-        await page.click('button:has-text("Previous")');
+        const previousButton = page.locator('button:has-text("Previous")');
+        await expect(previousButton).toBeEnabled();
+        await previousButton.click();
         await page.waitForURL(/\/user\/\d+/);
         await expect(page.locator('[data-testid="user-card"]')).toBeVisible();
 
@@ -183,9 +178,9 @@ test.describe('View Count Functionality', () => {
 
         // Account for the increment that happened during forward navigation
         const expectedCount = viewCounts[i];
-        if (expectedCount !== undefined) {
-          expect(count).toBeGreaterThanOrEqual(expectedCount);
-        }
+        expect(expectedCount).toBeDefined();
+        assert(expectedCount !== undefined);
+        expect(count).toBeGreaterThanOrEqual(expectedCount);
       }
     });
   });
@@ -232,17 +227,24 @@ test.describe('View Count Functionality', () => {
 
       // Navigate to last user
       const nextButton = page.locator('button:has-text("Next")');
+      let hasNavigated = false;
+
       while (await nextButton.isEnabled()) {
         await nextButton.click();
         await page.waitForURL(/\/user\/\d+/);
         await expect(page.locator('[data-testid="user-card"]')).toBeVisible();
+        hasNavigated = true;
       }
 
       // Next button should be disabled at last user
       await expect(nextButton).toBeDisabled();
 
-      // Previous button should be enabled (unless only one user)
-      await expect(prevButton).toBeEnabled();
+      // Previous button should be enabled only if we actually navigated
+      if (hasNavigated) {
+        await expect(prevButton).toBeEnabled();
+      } else {
+        await expect(prevButton).toBeDisabled();
+      }
     });
 
     test('should handle single user scenario', async ({ page }) => {
@@ -265,10 +267,10 @@ test.describe('View Count Functionality', () => {
         telegram_url: null,
       };
 
-      await page.route('**/api/trpc/getUsersForCards*', async route => {
+      await page.route('**/api/trpc/getNextUser*', async route => {
         const json = {
           result: {
-            data: [mockUser],
+            data: mockUser,
           },
         };
         await route.fulfill({ json });

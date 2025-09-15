@@ -5,13 +5,9 @@ import { assertNotNull, assertNotUndefined } from './utils/test-utils';
 test.describe('Sharing Widget', () => {
   test('should display sharing widget and be responsive on mobile', async ({ page }) => {
     // Get a user to visit
-    const users = await testTRPC.getUsersForCards.query({
-      limit: 1,
-      offset: 0,
+    const user = await testTRPC.getNextUser.query({
+      direction: 'next',
     });
-
-    expect(users.length).toBeGreaterThan(0);
-    const user = users[0];
     assertNotNull(user);
     assertNotUndefined(user);
 
@@ -70,13 +66,9 @@ test.describe('Sharing Widget', () => {
     });
 
     // Get a user to visit
-    const users = await testTRPC.getUsersForCards.query({
-      limit: 1,
-      offset: 0,
+    const user = await testTRPC.getNextUser.query({
+      direction: 'next',
     });
-
-    expect(users.length).toBeGreaterThan(0);
-    const user = users[0];
     assertNotNull(user);
     assertNotUndefined(user);
 
@@ -194,13 +186,9 @@ test.describe('Sharing Widget', () => {
     });
 
     // Get a user to visit
-    const users = await testTRPC.getUsersForCards.query({
-      limit: 1,
-      offset: 0,
+    const user = await testTRPC.getNextUser.query({
+      direction: 'next',
     });
-
-    expect(users.length).toBeGreaterThan(0);
-    const user = users[0];
     assertNotNull(user);
     assertNotUndefined(user);
 
