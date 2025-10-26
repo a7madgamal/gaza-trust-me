@@ -1,34 +1,33 @@
 import React from 'react';
 import { Chip, Link } from '@mui/material';
 import { Verified } from '@mui/icons-material';
-import { trpc } from '../../utils/trpc';
 
 interface VerificationBadgeProps {
-  verifiedBy: string | null;
-  status: string | null;
+  verifiedBy: string;
+  verifiedByAdmin: { full_name: string };
+  status: string;
 }
 
-const VerificationBadge: React.FC<VerificationBadgeProps> = ({ verifiedBy, status }) => {
-  const { data: adminData } = trpc.getAdminProfile.useQuery(
-    { adminId: verifiedBy },
-    {
-      enabled: !!verifiedBy && status === 'verified',
-    }
-  );
-
-  // Only show badge if status is verified and we have admin data
-  if (status !== 'verified' || !verifiedBy || !adminData?.data) {
-    return null;
+const VerificationBadge: React.FC<VerificationBadgeProps> = ({ verifiedBy, verifiedByAdmin, status }) => {
+  // CRASH HARD - no fallbacks, verified users MUST have admin data
+  if (status !== 'verified') {
+    throw new Error(`VerificationBadge: Expected status 'verified', got '${status}'`);
   }
 
-  const admin = adminData.data;
+  if (!verifiedBy) {
+    throw new Error('VerificationBadge: verifiedBy is required for verified users');
+  }
+
+  if (!verifiedByAdmin?.full_name) {
+    throw new Error('VerificationBadge: verifiedByAdmin.full_name is required for verified users');
+  }
 
   return (
     <Chip
       icon={<Verified sx={{ color: 'white !important' }} />}
       label={
         <Link
-          href={`/admins/${admin.id}`}
+          href={`/admins/${verifiedBy}`}
           target="_blank"
           rel="noopener noreferrer"
           sx={{
@@ -40,7 +39,7 @@ const VerificationBadge: React.FC<VerificationBadgeProps> = ({ verifiedBy, statu
             },
           }}
         >
-          Verified by {admin.full_name}
+          Verified by {verifiedByAdmin.full_name}
         </Link>
       }
       color="success"

@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "format": "prettier --write . --log-level error",
-    "type-check": "tsc --noEmit",
+    "type-check": "tsc --noEmit && echo 'FE Type check completed'",
     "test": "echo \"Frontend tests are run via Playwright E2E tests\" && exit 0",
     "clean": "rimraf dist"
   },

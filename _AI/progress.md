@@ -122,41 +122,38 @@
 
 **Backend:**
 
-- ✅ Public user listing endpoint (`getUsersForCards`)
-- ✅ User details endpoint (included in listing)
-- ✅ Card stack navigation (`getNextUser`)
-- ✅ User count endpoint (`getVerifiedUserCount`)
-- ✅ Card ordering criteria - Newest verified help seekers first
-- ✅ Search and filter functionality (basic filtering by role and status)
+- ✅ **Single-user fetching system** - Removed bulk `getUsersForCards`, now fetches one user at a time
+- ✅ **Smart navigation logic** - `getNextUser` with strict view count inequality to prevent loops
+- ✅ **View count-based sorting** - `view_count ASC, created_at DESC` for fair exposure
+- ✅ **Loop prevention** - Strict inequality ensures no infinite navigation loops
 
 **Frontend:**
 
-- ✅ **Public page with card stack interface** (top card focus)
-- ✅ User card component with quick overview
-- ✅ Accept/reject buttons (UI implemented, actions disabled for now)
-- ✅ Card navigation controls (previous/next)
-- ✅ Responsive card layout with Material UI
+- ✅ **Refactored card interface** - Single user display with efficient navigation
+- ✅ **Immediate loading feedback** - Loading state appears instantly on button clicks
+- ✅ **Card-only loading overlay** - Improved UI with gradient background and blur effect
+- ✅ **Navigation history system** - Previous button uses browser history, not complex state
+- ✅ **Anonymous view counting** - Only anonymous users increment view counts
+- ✅ **No fallback values** - Clean error handling without default values
 - ✅ WhatsApp integration for contact
 - ✅ Progress indicator and user count display
-- ✅ Loading states and error handling
 
 **Card Stack Design:**
 
-- ✅ Stack of user cards with top card fully visible
-- ✅ Show key details: name, description, status, role, phone number
-- ✅ Accept/reject buttons (UI ready, actions need backend implementation)
-- ✅ Next/previous navigation
+- ✅ Single user card with full details visible
+- ✅ Show key details: name, description, status, role, phone number, view count
+- ✅ **Smart navigation** - Next fetches user with higher view count, Previous uses history
 - ✅ WhatsApp contact integration
-- ✅ Beautiful gradient card design
+- ✅ Beautiful gradient card design with improved loading states
 
-**Card Ordering Criteria:**
+**Navigation Logic:**
 
-- ✅ Priority based on verification status (verified users only)
-- ✅ Time-based ordering (newest first)
-- ✅ User type priority (help_seeker and admin users, excluding super admins)
-- ✅ Pagination support (limit/offset)
+- ✅ **Next button** - Fetches user with `view_count > current` (strict inequality)
+- ✅ **Previous button** - Browser back navigation using history stack
+- ✅ **Loop prevention** - Strict view count comparison prevents infinite loops
+- ✅ **Fair exposure** - Users with fewer views appear first
 
-**Success:** Users can browse verified help seekers and admins with a beautiful card stack interface (super admins excluded from public view)
+**Success:** Users can browse verified help seekers and admins with efficient single-user fetching and smart navigation (super admins excluded from public view)
 
 ---
 
@@ -449,6 +446,26 @@
 
 ## Recent Achievements ✅
 
+**User Card System Refactoring:**
+
+- ✅ **Single-user fetching architecture** - Removed bulk user loading, now fetches one user at a time
+- ✅ **Smart navigation system** - Next button fetches users with higher view counts, Previous uses browser history
+- ✅ **Loop prevention logic** - Strict view count inequality prevents infinite navigation loops
+- ✅ **Immediate loading feedback** - Loading states appear instantly on button clicks
+- ✅ **Card-only loading overlay** - Improved UI with gradient background and blur effect
+- ✅ **Anonymous view counting** - Only anonymous users increment view counts for accurate analytics
+- ✅ **No fallback values** - Clean error handling without default values as requested
+- ✅ **Navigation history management** - Robust history system for Previous button functionality
+
+**Test Infrastructure Improvements:**
+
+- ✅ **All E2E tests passing** - 13 view count tests, URL routing tests, and navigation tests all working
+- ✅ **Removed test conditionals** - Tests now use explicit assertions instead of conditional logic
+- ✅ **Type-safe assertions** - Using `assert` functions for proper TypeScript type narrowing
+- ✅ **Playwright debugging** - Browser stays open on test failures for debugging
+- ✅ **Git hook optimization** - Pre-commit hook runs all tests without fail-fast for complete validation
+- ✅ **Test stability improvements** - Tests handle edge cases and boundary conditions properly
+
 **Profile Editing Functionality:**
 
 - ✅ **Complete profile editing system** - Users can edit their own profiles with form validation
@@ -460,16 +477,6 @@
 - ✅ **Form validation** - Only saves changed fields, prevents empty submissions
 - ✅ **Role-based behavior** - Super admins skip warning dialog, admins/super admins don't see verification badges
 - ✅ **Warning dialog handling** - Tests properly handle verification reset warnings for verified users
-  **Test Infrastructure Improvements:**
-
-- ✅ **Fixed admin login redirect** - Admin users now properly redirected to `/admin/dashboard` after login
-- ✅ **Fixed AuthContext callback issue** - `fetchUserProfile` now returns profile data for proper login redirects
-- ✅ **Improved session management** - Better handling of invalid tokens and authentication errors
-- ✅ **Enhanced session clearing** - Invalid tokens now properly clear user state and localStorage
-- ✅ **Updated registration flow** - Tests now assume automatic login (no email verification required)
-- ✅ **Enhanced admin dashboard tests** - Added status filtering for verified user verification
-- ✅ **Cleaned up test duplicates** - Removed redundant test logic and improved reliability
-- ✅ **All 60 E2E tests passing** - Comprehensive test coverage with proper error handling (46 original + 14 profile editing tests)
 
 **Super Admin Functionality:**
 
@@ -485,7 +492,7 @@
 
 - ✅ **Admin users in public card view** - Admin users now appear in the public card stack interface
 - ✅ **Super admin exclusion** - Super admins remain hidden from public view (system administrators only)
-- ✅ **Backend query updates** - Modified getUsersForCards, getNextUser, getVerifiedUserCount, and getUserByUrlId to include admin users
+- ✅ **Backend query updates** - Modified getNextUser to include admin users
 - ✅ **E2E test coverage** - Added tests to verify admin users appear and super admins are excluded
 - ✅ **UI text unchanged** - Kept "help seeker" terminology in UI as requested
 
@@ -500,25 +507,28 @@
 - ✅ Database migration with view_count column (default 0, NOT NULL)
 - ✅ Performance index on view_count column
 - ✅ incrementViewCount tRPC procedure
-- ✅ Updated sorting logic: view_count ASC, created_at DESC
+- ✅ **Updated sorting logic: view_count ASC, created_at DESC** - Integrated with navigation system
 - ✅ Schema updates for all user response types
 - ✅ Backend unit tests for increment functionality
+- ✅ **Loop prevention in getNextUser** - Strict view count inequality prevents infinite navigation
 
 **Frontend:**
 
 - ✅ View count display on user cards
-- ✅ Automatic increment on card view
+- ✅ **Anonymous-only incrementing** - Only anonymous users increment view counts
 - ✅ Duplicate increment prevention with useRef tracking
-- ✅ Navigation increment on next/previous actions
+- ✅ **Navigation-based incrementing** - Counts increment on Next button navigation
 - ✅ TypeScript type updates for view_count field
+- ✅ **Immediate loading feedback** - Loading states appear instantly on navigation
 
 **Testing:**
 
-- ✅ 13 E2E tests covering increment scenarios
+- ✅ **13 E2E tests covering increment scenarios** - All tests passing
 - ✅ Relative comparison testing (≥ current count)
 - ✅ Navigation and sorting validation
 - ✅ Data persistence verification
 - ✅ Edge case handling (duplicate prevention)
+- ✅ **Boundary testing** - Tests handle single user scenarios and navigation limits
 
 **Key Implementation Details:**
 
@@ -526,8 +536,10 @@
 - ✅ **Duplicate Prevention:** useRef tracks incremented users per session
 - ✅ **Performance:** Indexed view_count column for efficient sorting
 - ✅ **Type Safety:** Complete TypeScript integration
+- ✅ **Loop Prevention:** Strict inequality in navigation prevents infinite loops
+- ✅ **Anonymous Counting:** Only anonymous users contribute to view counts
 
-**Success:** Users see view counts on cards, counts increment properly without duplicates, and sorting prioritizes less-viewed profiles
+**Success:** Users see view counts on cards, counts increment properly without duplicates, and sorting prioritizes less-viewed profiles with smart navigation
 
 ---
 

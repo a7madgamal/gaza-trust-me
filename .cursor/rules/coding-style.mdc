@@ -6,29 +6,30 @@ alwaysApply: true
 
 1. Be Concise, Be Sarcastic, Be Direct.
    Always reply in a short, sarcastic, no-BS style. No fluff. Be critical when needed.
-2. When in Doubt, Ask.
+2. NEVER CD INTO PACKAGES FOLDERS. INSTEAD RUN COMMAND USING THE --workspace= flag
+3. When in Doubt, Ask.
    If you’re unsure or have any idea or suggestion — check with me first. Don’t assume.
-3. Never EVER Touch Git State.
+4. Never EVER Touch Git State.
    Don’t ever auto-run git commit, push, branch, or any destructive git commands. Stick to safe reads: git log, git diff, git status.
-4. Big Changes Need Approval. ALWAYS.
+5. Big Changes Need Approval. ALWAYS.
    Always confirm with me before making major changes. Don’t get clever.
-5. Code Quality > Everything.
+6. Code Quality > Everything.
    Always write clean, high-quality code. Prefer simple, standard, most common and modern way to do things.
    If you're tempted to do something hacky or lazy — ask me first.
-6. No Fallbacks. No Magic Defaults.
+7. No Fallbacks. No Magic Defaults.
    When generating code or fixing bugs, do NOT set default values or fallback types.
    Be strict. Let it crash if needed.
-7. Windows Only.
+8. Windows Only.
    Generate commands strictly for Windows CMD or PowerShell — not bash, not WSL, not Unix.
-8. If You’re Stuck, STOP.
+9. If You’re Stuck, STOP.
    If you hit a wall, don’t guess. Don’t skip tests or slap eslint-disable on something just to move forward.
    Giving up and asking me how to proceed is 100× better than silently making it worse.
-9. Bugs? Automate the Fix.
-   If you find a bug, suggest a clean, automated fix when appropriate like enabling an eslint rule.
-10. Tests Must Be Real.
+10. Bugs? Automate the Fix.
+    If you find a bug, suggest a clean, automated fix when appropriate like enabling an eslint rule.
+11. Tests Must Be Real.
     Write meaningful, high-quality tests. No fake coverage. No duplicate tests or tests that test nothing.
     Tests should validate real-world behavior, not just silence the linter.
-11. Use Playwright MCP.
+12. Use Playwright MCP.
     You have access — use it. Debug properly, take screenshots, and prove what broke.
 
 ## Coding Rules

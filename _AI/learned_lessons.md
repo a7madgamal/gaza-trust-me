@@ -249,3 +249,97 @@
 - **Pattern:** Store initial count, perform action, assert new count >= initial + expected
 - **Lesson:** Tests should be resilient to existing data and parallel test runs
 - **Result:** Stable tests that validate increment behavior without brittle exact matches
+
+### 🎯 **User Card System Refactoring Lessons**
+
+- **Problem:** Bulk user fetching caused performance issues and complex navigation logic
+- **Solution:** Single-user fetching with smart navigation based on view counts
+- **Key Changes:**
+  - Removed `getUsersForCards` procedure, now fetch one user at a time
+  - Next button fetches users with `view_count > current` (strict inequality)
+  - Previous button uses browser history instead of complex state management
+  - Anonymous-only view counting for accurate analytics
+- **Lesson:** Simple, focused APIs are better than complex bulk operations
+- **Result:** Faster loading, cleaner code, and better user experience
+
+### 🚫 **No Fallbacks Policy**
+
+- **Problem:** User explicitly requested "no fkn fallbacks" for sharing data
+- **Solution:** Remove all default values and fallback logic, let errors surface
+- **Pattern:** Use conditional rendering instead of fallback values
+- **Lesson:** Sometimes crashing is better than showing incorrect data
+- **Result:** Cleaner error handling and more predictable behavior
+
+### ⚡ **Immediate Loading Feedback**
+
+- **Problem:** Loading states appeared too late, making UI feel unresponsive
+- **Solution:** Set loading state immediately on button clicks, before API calls
+- **Pattern:** `setIsNavigating(true)` at start of click handler
+- **Lesson:** Users need immediate feedback for perceived performance
+- **Result:** UI feels much more responsive and professional
+
+### 🔄 **Loop Prevention in Navigation**
+
+- **Problem:** Navigation could get stuck in infinite loops with equal view counts
+- **Solution:** Use strict inequality (`view_count > current`) instead of `>=`
+- **Pattern:** `view_count.gt.${currentUser.view_count}` in database queries
+- **Lesson:** Always consider edge cases in navigation logic
+- **Result:** Robust navigation that never gets stuck
+
+### 🎭 **Playwright Test Configuration**
+
+- **Problem:** Browser closing on test failures made debugging difficult
+- **Solution:** Use `headless: false` in Playwright config for visible browser
+- **Pattern:** Simple config change instead of complex teardown hooks
+- **Lesson:** Sometimes the simplest solution is the best
+- **Result:** Easy debugging when tests fail
+
+### 🧪 **Remove Test Conditionals**
+
+- **Problem:** User requested "no if, you should know if it should be enabled and act"
+- **Solution:** Use explicit assertions instead of conditional logic in tests
+- **Pattern:** `await expect(button).toBeEnabled()` before clicking
+- **Lesson:** Tests should be deterministic and explicit
+- **Result:** More reliable tests that fail fast with clear assertions
+
+### 🔗 **Supabase Join Processing Function Bug**
+
+- **Problem:** Supabase join `verified_by_admin:verified_by(full_name)` returned correct data but processing function returned null
+- **Root Cause:** `processVerifiedByAdmin()` expected array but join returns single object
+- **Debug Process:** Used Docker logs to see raw data vs processed data, found the mismatch
+- **Fix:** Changed from `z.array(VerifiedByAdminSchema).safeParse(value)` to `VerifiedByAdminSchema.safeParse(value)`
+- **Lesson:** When joins return null, check the processing function - the join syntax might be correct but the data processing is wrong
+- **Result:** Join now works perfectly, fetching admin names in single query instead of extra API calls
+
+### 🎯 **Supabase Client Join Syntax Variations**
+
+- **Problem:** Join syntax `verified_by_admin:users!verified_by(full_name)` returned null despite admin existing
+- **Root Cause:** Supabase client join syntax can vary - sometimes returns object, sometimes array
+- **Debug Process:** Raw SQL worked perfectly, but client syntax failed
+- **Fix:** Changed to `verified_by_admin:verified_by(full_name)` (removed `users!` prefix)
+- **Lesson:** Supabase client joins are finicky - test different syntax variations when raw SQL works but client fails
+- **Result:** Single query optimization complete - no more extra API calls for admin names
+
+### 🚨 **Aggressive Validation Strategy**
+
+- **Problem:** User wanted "no fkn fallbacks" and "crash hard" when data is missing
+- **Solution:** Removed all fallback logic, made validation throw errors for missing admin data
+- **Pattern:** `if (!data.verified_by_admin) throw new Error(...)` for verified users
+- **Lesson:** Sometimes crashing is better than showing incomplete data - forces data integrity
+- **Result:** System now crashes immediately when verified users lack admin data, ensuring data quality
+
+### 🚨 **URL ID IS THE CARD DATA - NEVER BREAK SYNC**
+
+- **Problem:** Tried to optimize by removing navigation to avoid redundant API calls
+- **Critical Rule:** URL ID and user data MUST be exactly in sync at all times
+- **Why:** URL ID IS the card data - users can bookmark, share, and navigate directly to specific cards
+- **Lesson:** Never break URL-data sync for performance - the URL is the source of truth for the current card
+- **Fix:** Keep navigation and URL updates, optimize the backend queries instead of breaking frontend consistency
+
+## 🚨 **DATABASE SAFETY - NEVER MODIFY DATA**
+
+- **CRITICAL RULE:** NEVER run database changing commands (db reset, migrations, data modifications)
+- **Allowed:** Only read-only database queries for debugging and investigation
+- **Why:** Database changes can destroy data, break production, and cause irreversible damage
+- **When debugging data issues:** Use SELECT queries to investigate, never modify or reset data
+- **Lesson:** Always ask user before any database changes - they own the data, not the assistant

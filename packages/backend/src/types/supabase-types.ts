@@ -210,12 +210,23 @@ export const PublicUserSchema = z.object({
   role: z.enum(USER_ROLES),
   verified_at: z.string().nullable(),
   verified_by: z.string().nullable(),
+  verified_by_admin: z
+    .object({
+      full_name: z.string(),
+    })
+    .nullable(),
   created_at: z.string().nullable(),
   view_count: z.number().int().nonnegative(),
   linkedin_url: z.string().nullable(),
   campaign_url: z.string().nullable(),
   facebook_url: z.string().nullable(),
   telegram_url: z.string().nullable(),
+});
+
+// Enhanced schema with adjacent user URL IDs for efficient navigation
+export const PublicUserWithNavigationSchema = PublicUserSchema.extend({
+  nextUserUrlId: z.number().int().positive().nullable(),
+  previousUserUrlId: z.number().int().positive().nullable(),
 });
 
 export const AdminProfileSchema = z.object({
@@ -237,10 +248,6 @@ export const AdminProfileSchema = z.object({
 export const CardStackNavigationInputSchema = z.object({
   direction: z.enum(['next', 'previous']),
   currentUserId: z.string().uuid().optional(),
-});
-
-export const GetUserByUrlIdInputSchema = z.object({
-  urlId: z.number().int().positive('URL ID must be a positive integer'),
 });
 
 // Type exports for tRPC
@@ -265,5 +272,5 @@ export type UserProfileUpdateOutput = z.infer<typeof UserProfileUpdateOutputSche
 export type PublicHelloInput = z.infer<typeof PublicHelloInputSchema>;
 export type PublicHelloOutput = z.infer<typeof PublicHelloOutputSchema>;
 export type PublicUser = z.infer<typeof PublicUserSchema>;
+export type PublicUserWithNavigation = z.infer<typeof PublicUserWithNavigationSchema>;
 export type CardStackNavigationInput = z.infer<typeof CardStackNavigationInputSchema>;
-export type GetUserByUrlIdInput = z.infer<typeof GetUserByUrlIdInputSchema>;

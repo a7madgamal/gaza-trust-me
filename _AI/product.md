@@ -150,7 +150,9 @@
 5.9.8. Telegram profile links (when provided)
 5.9.9. Verification badge showing "Verified by [Admin Name]" with link to admin profile
 5.9.10. View count tracking and display for profile popularity
-5.9.11. Search and filter functionality
+5.9.11. Smart navigation system with view count-based sorting
+5.9.12. Anonymous-only view counting for accurate analytics
+5.9.13. Search and filter functionality
 
 ### Image Management
 
@@ -196,7 +198,7 @@
 
 #### User Profiles
 
-5.26. GET /profiles - List verified profiles (public)
+5.26. GET /profiles - List verified profiles (public) - **DEPRECATED: Now uses single-user fetching**
 5.27. POST /profiles - Create new profile (authenticated)
 5.28. GET /profiles/:id - Get profile details
 5.29. PUT /profiles/:id - Update profile (owner only)
@@ -205,21 +207,23 @@
 5.32. DELETE /profiles/:id/images/:imageId - Delete profile image
 5.33. POST /profiles/:id/view - Increment profile view count
 5.34. GET /admins/:id - Get admin profile details (public)
+5.35. GET /next-user - Get next user with higher view count (smart navigation)
+5.36. GET /user/:urlId - Get user by URL ID (direct access)
 
 #### Admin
 
-5.35. GET /admin/profiles - List all profiles (admin only)
-5.36. PUT /admin/profiles/:id/verify - Verify profile (admin only)
-5.37. PUT /admin/profiles/:id/flag - Flag profile (admin only)
-5.38. GET /admin/audit-logs - View audit logs (super admin only)
-5.39. PUT /admin/users/:id/role - Upgrade/downgrade user role (super admin only)
+5.37. GET /admin/profiles - List all profiles (admin only)
+5.38. PUT /admin/profiles/:id/verify - Verify profile (admin only)
+5.39. PUT /admin/profiles/:id/flag - Flag profile (admin only)
+5.40. GET /admin/audit-logs - View audit logs (super admin only)
+5.41. PUT /admin/users/:id/role - Upgrade/downgrade user role (super admin only)
 
 #### Users
 
-5.40. GET /users/profile - Get user profile
-5.41. PUT /users/profile - Update user profile
-5.42. GET /admin/users - List all users (super admin only)
-5.43. PUT /admin/users/:id/role - Assign user role (super admin only)
+5.42. GET /users/profile - Get user profile
+5.43. PUT /users/profile - Update user profile
+5.44. GET /admin/users - List all users (super admin only)
+5.45. PUT /admin/users/:id/role - Assign user role (super admin only)
 
 ## UI/UX Requirements
 
@@ -236,7 +240,7 @@
 #### Public Pages
 
 6.6. Home/Landing Page: Introduction, featured profiles, call-to-action
-6.7. Profiles Listing: Grid/list view of verified profiles with filters
+6.7. **User Card Interface: Single-user display with smart navigation**
 6.8. Profile Detail: Full profile information with images and contact details
 6.9. Admin Profile: Public admin profile page showing verification activity
 6.10. Registration: User registration form
@@ -342,6 +346,9 @@
 10.12. RLS policy bypass for test isolation
 10.13. Card interface testing (LinkedIn/campaign/Facebook/Telegram links, WhatsApp integration)
 10.14. URL routing and navigation testing
+10.15. **View count system testing with relative comparisons**
+10.16. **Smart navigation testing with loop prevention**
+10.17. **Anonymous view counting validation**
 
 ## Success Metrics
 

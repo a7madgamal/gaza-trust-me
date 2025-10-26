@@ -9,11 +9,6 @@ test.describe('Public API Endpoints', () => {
       direction: 'next',
     });
 
-    // Get verified user count
-    const count = await testTRPC.getVerifiedUserCount.query();
-    expect(typeof count).toBe('number');
-    expect(count).toBeGreaterThanOrEqual(0);
-
     // Require at least one user for this test
     expect(user).not.toBeNull();
     assertNotNull(user);

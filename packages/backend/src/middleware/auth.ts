@@ -102,7 +102,7 @@ export const createAuthContext = (supabase: typeof import('../utils/supabase').s
     }
 
     // Get user role from database
-    logger.info('Looking for user with ID:', user.id);
+    logger.info(`Looking for user with ID: ${user.id}`);
     const { data: userData, error: userError } = await supabase.from('users').select('role').eq('id', user.id).single();
 
     if (userError) {

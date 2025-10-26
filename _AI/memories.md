@@ -27,29 +27,57 @@
 - **When testing role-based UI behavior, ensure tests cover all user roles (help_seeker, admin, super_admin) and verify that UI elements appear/disappear correctly based on user permissions.** (ID: 7270236)
 - **When adding new fields to database/backend, always update corresponding frontend state types to avoid TypeScript errors.** (ID: 7623301)
 - **When modifying existing tests, prefer updating current related tests rather than creating new separate tests when possible.** (ID: 7623291)
+- **NEVER run database changing commands like db reset, migrations, or data modifications. Only read-only database queries are allowed.** (ID: 7623302)
 
 ## Technical Implementation Context
 
 ### View Count System Implementation
 
 **Database Design:**
+
 - Added `view_count` column with DEFAULT 0 NOT NULL constraint
 - Created performance index on `view_count` for efficient sorting
 - Migration updates existing users to view_count = 0
 
 **Sorting Logic:**
+
 - Primary sort: `view_count ASC` (fewer views first)
 - Secondary sort: `created_at DESC` (newer users first within same view count)
 - Ensures fair exposure for new and less-viewed profiles
 
 **Duplicate Prevention Strategy:**
+
 - Used `useRef<Set<string>>()` to track incremented user IDs per session
 - Prevents multiple increments from same user session
 - Clears tracking when user data changes (logout/login)
 - Both initial page load and navigation check tracking
 
 **Testing Approach:**
+
 - Relative comparisons (`expect(newCount).toBeGreaterThanOrEqual(currentCount)`) instead of exact values
 - Prevents test flakiness from concurrent increments
 - Tests cover increment scenarios, navigation, sorting, and persistence
 - Edge case testing for duplicate prevention
+
+### User Card System Refactoring
+
+**Architecture Changes:**
+
+- Removed bulk `getUsersForCards` procedure, now uses single-user fetching
+- `getNextUser` fetches users with `view_count > current` (strict inequality)
+- Previous button uses browser history instead of complex state management
+- Anonymous-only view counting for accurate analytics
+
+**Navigation Logic:**
+
+- Next button: Fetches user with higher view count to prevent loops
+- Previous button: Uses browser history stack for simple back navigation
+- Loop prevention: Strict view count inequality prevents infinite navigation
+- Immediate loading feedback on button clicks
+
+**UI Improvements:**
+
+- Card-only loading overlay with gradient background and blur effect
+- No fallback values - clean error handling without defaults
+- Improved loading states that appear instantly on user interaction
+- Better perceived performance with immediate feedback

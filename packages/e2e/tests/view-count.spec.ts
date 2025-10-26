@@ -249,6 +249,7 @@ test.describe('View Count Functionality', () => {
 
     test('should handle single user scenario', async ({ page }) => {
       // Mock API to return only one user
+
       const mockUser = {
         id: 'test-user-1',
         url_id: 1,
@@ -276,7 +277,7 @@ test.describe('View Count Functionality', () => {
         await route.fulfill({ json });
       });
 
-      await page.route('**/api/trpc/getUserByUrlId*', async route => {
+      await page.route('**/api/trpc/getUserData*', async route => {
         const json = {
           result: {
             data: mockUser,

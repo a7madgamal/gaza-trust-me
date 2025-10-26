@@ -10,7 +10,7 @@
     "build:prod": "tsc",
     "start": "node dist/index.js",
     "format": "prettier --write . --log-level error",
-    "type-check": "tsc --noEmit",
+    "type-check": "tsc --noEmit && echo 'BE Type check completed'",
     "test": "vitest run",
     "test:watch": "vitest --watch",
     "test:coverage": "vitest --coverage",

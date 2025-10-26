@@ -15,11 +15,9 @@ export const appRouter = t.router({
   updateProfile: profileRouter.updateProfile,
 
   // Public routes
-  hello: publicRouter.hello,
   incrementViewCount: publicRouter.incrementViewCount,
+  getUserData: publicRouter.getUserData,
   getNextUser: publicRouter.getNextUser,
-  getVerifiedUserCount: publicRouter.getVerifiedUserCount,
-  getUserByUrlId: publicRouter.getUserByUrlId,
   getAdminProfile: publicRouter.getAdminProfile,
 
   // Admin routes

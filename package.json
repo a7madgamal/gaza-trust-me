@@ -13,7 +13,7 @@
     "lint": "eslint . --fix --cache",
     "format": "npm run format --workspaces",
     "lint:sql": "npm run lint:sql --workspace=@gazatrustme/backend",
-    "type-check": "npm run type-check --workspaces",
+    "type-check": "npm run type-check --workspaces && echo 'Type check completed'",
     "check": "concurrently --kill-others-on-fail --names \"FRMT,LINT,TYPE,TEST\" -c \"bgYellow.bold,bgBlue.bold,bgMagenta.bold,bgGreen.bold\" \"npm run format\" \"npm run lint\" \"npm run type-check\" \"npm run test\"",
     "check:debug": "concurrently --kill-others-on-fail --names \"FRMT,LINT,TYPE,TEST\" -c \"bgYellow.bold,bgBlue.bold,bgMagenta.bold,bgGreen.bold\" \"npm run format\" \"npm run lint\" \"npm run type-check\" \"npm run test:debug --workspace=@gazatrustme/e2e\"",
     "test": "npm run test --workspaces",

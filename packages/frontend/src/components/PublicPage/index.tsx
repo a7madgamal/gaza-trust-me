@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { z } from 'zod';
 import { Box, Typography, Card, CardContent, Button, Stack, CircularProgress, Link, Fade } from '@mui/material';
 import {
   WhatsApp,
@@ -11,7 +12,7 @@ import {
   Telegram,
 } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
-import { trpc, trpcClient } from '../../utils/trpc';
+import { trpc } from '../../utils/trpc';
 import { useToast } from '../../hooks/useToast';
 import { useMetaTags } from '../../hooks/useMetaTags';
 import { useAuth } from '../../contexts/AuthContextDef';
@@ -32,7 +33,7 @@ const createWhatsAppLink = (phone: string): string => {
   return `https://wa.me/${formattedPhone}`;
 };
 
-type User = RouterOutputs['getUserByUrlId'];
+type User = RouterOutputs['getUserData'];
 
 const PublicPage: React.FC = () => {
   const { urlId } = useParams<{ urlId: string }>();
@@ -47,10 +48,6 @@ const PublicPage: React.FC = () => {
 
   // Track which users have already had their view count incremented
   const viewCountIncrementedRef = useRef(new Set<string>());
-  // Track if we're doing programmatic navigation
-  const isProgrammaticNavigationRef = useRef(false);
-  // Track the last user ID to detect programmatic navigation
-  const lastUserIdRef = useRef<string | null>(null);
   // Track if we're navigating back (to prevent clearing history)
   const isNavigatingBackRef = useRef(false);
 
@@ -69,63 +66,54 @@ const PublicPage: React.FC = () => {
     imageUrl: `${window.location.origin}/icon.svg`,
   });
 
-  // Fetch user by URL ID
+  // Single source of truth: URL
   const urlIdNumber = urlId ? parseInt(urlId, 10) : 0;
+
+  // Single query for all user data (includes navigation info)
   const {
     data: userData,
     isLoading: userLoading,
     error: userError,
-  } = trpc.getUserByUrlId.useQuery({ urlId: urlIdNumber }, { enabled: !!urlId && urlIdNumber > 0 });
+  } = trpc.getUserData.useQuery(
+    { urlId: urlIdNumber },
+    {
+      enabled: !!urlId && urlIdNumber > 0,
+    }
+  );
 
-  // Fetch first user when no URL ID is provided
+  // Fallback for homepage (no URL ID) - get first user
   const {
     data: firstUserData,
     isLoading: firstUserLoading,
     error: firstUserError,
-  } = trpc.getNextUser.useQuery({ direction: 'next' }, { enabled: !urlId });
-
-  // Handle user data updates
-  useEffect(() => {
-    if (urlId) {
-      // When we have a URL ID, only use userData
-      if (userData) {
-        setCurrentUser(userData);
-        setLoading(false);
-
-        // Only clear navigation history if this is a direct URL access (not programmatic navigation)
-        // We detect programmatic navigation by checking if the user ID changed from our last known user
-        const isProgrammaticNav =
-          isProgrammaticNavigationRef.current || (lastUserIdRef.current && lastUserIdRef.current !== userData.id);
-
-        // Don't clear history if we're navigating back or if this is programmatic navigation
-        // Only clear history on true initial load (when currentUser is null and we're not navigating)
-        if (!isProgrammaticNav && !isNavigatingBackRef.current && !currentUser && !isNavigating) {
-          // This is initial load, clear history
-          setNavigationHistory([]);
-        }
-
-        // Update the last user ID
-        lastUserIdRef.current = userData.id;
-        // Reset the flag after processing
-        isProgrammaticNavigationRef.current = false;
-      } else if (userData === null && !userLoading) {
-        // User not found
-        setCurrentUser(null);
-        setLoading(false);
-      }
-    } else {
-      // When no URL ID, use firstUserData
-      if (firstUserData) {
-        setCurrentUser(firstUserData);
-        setLoading(false);
-        // Navigate to the first user's URL
-        navigate(`/user/${firstUserData.url_id}`, { replace: true });
-        // Clear navigation history when starting fresh
-        setNavigationHistory([]);
-        lastUserIdRef.current = firstUserData.id;
-      }
+  } = trpc.getNextUser.useQuery(
+    { direction: 'next' },
+    {
+      enabled: !urlId,
     }
-  }, [userData, firstUserData, userLoading, urlId, navigate, currentUser]);
+  );
+
+  // Handle user data updates - simplified logic for better refresh handling
+  useEffect(() => {
+    if (userData) {
+      // Always update current user when we get new data
+      setCurrentUser(userData);
+      setLoading(false);
+    } else if (userData === null && !userLoading) {
+      // User not found or no users available
+      setCurrentUser(null);
+      setLoading(false);
+    }
+  }, [userData, userLoading]);
+
+  // Handle first user data for homepage
+  useEffect(() => {
+    if (firstUserData && !urlId) {
+      // Navigate to first user's URL
+      navigate(`/user/${firstUserData.url_id}`, { replace: true });
+      setNavigationHistory([]);
+    }
+  }, [firstUserData, urlId, navigate]);
 
   // Handle errors
   useEffect(() => {
@@ -146,39 +134,31 @@ const PublicPage: React.FC = () => {
     }
   }, [currentUser?.id, currentLoggedInUser, incrementViewCountMutation]);
 
-  const handleNext = async () => {
-    if (currentUser && !isNavigating) {
+  const handleNext = () => {
+    console.log('🚀 handleNext called:', { currentUser: currentUser?.id, isNavigating });
+
+    if (currentUser && !isNavigating && currentUser.nextUserUrlId) {
       setIsNavigating(true);
-      isProgrammaticNavigationRef.current = true;
-      try {
-        // Add current user to history before navigating
-        setNavigationHistory(prev => [...prev, currentUser]);
 
-        // Fetch next user with view_count > current
-        const nextUser = await trpcClient.getNextUser.query({
-          currentUserId: currentUser.id,
-          direction: 'next',
-        });
+      // Add current user to history before navigating
+      setNavigationHistory(prev => [...prev, currentUser]);
 
-        if (nextUser) {
-          setCurrentUser(nextUser);
-          navigate(`/user/${nextUser.url_id}`, { replace: true });
-          // Increment view count AFTER setting the user (only for anonymous users)
-          if (!currentLoggedInUser && !viewCountIncrementedRef.current.has(nextUser.id)) {
-            viewCountIncrementedRef.current.add(nextUser.id);
-            incrementViewCountMutation.mutate({ userId: nextUser.id });
-          }
-        }
-      } catch (error) {
-        console.error('Failed to fetch next user:', error);
-        showToast('Failed to load next user', 'error');
-      } finally {
-        setIsNavigating(false);
-        // Reset the flag after a delay to ensure useEffect has run
-        setTimeout(() => {
-          isProgrammaticNavigationRef.current = false;
-        }, 100);
+      console.log('🔄 Navigating to next user:', currentUser.nextUserUrlId);
+
+      // Navigate directly using the nextUserUrlId from the current user data
+      navigate(`/user/${currentUser.nextUserUrlId}`, { replace: true });
+
+      // Increment view count (only for anonymous users)
+      if (!currentLoggedInUser && !viewCountIncrementedRef.current.has(currentUser.id)) {
+        viewCountIncrementedRef.current.add(currentUser.id);
+        incrementViewCountMutation.mutate({ userId: currentUser.id });
       }
+
+      // Reset navigation state immediately to prevent multiple clicks
+      setIsNavigating(false);
+    } else if (currentUser && !currentUser.nextUserUrlId) {
+      console.log('❌ No more users available');
+      showToast('No more users available', 'info');
     }
   };
 
@@ -207,7 +187,7 @@ const PublicPage: React.FC = () => {
   };
 
   // Determine if we're loading
-  const isLoading = loading || (urlId && userLoading) || (!urlId && firstUserLoading) || isNavigating;
+  const isLoading = loading || (urlId ? userLoading : firstUserLoading) || isNavigating;
 
   // Only show full-page states when we have no current user and no loading
   if (!currentUser && !isLoading && !userError && !firstUserError) {
@@ -366,7 +346,27 @@ const PublicPage: React.FC = () => {
                           {currentUser.full_name}
                         </Typography>
                         <Box sx={{ display: 'flex', justifyContent: { xs: 'flex-start', md: 'center' } }}>
-                          <VerificationBadge verifiedBy={currentUser.verified_by} status={currentUser.status} />
+                          {currentUser.status === 'verified' &&
+                            (() => {
+                              try {
+                                const VerifiedUserSchema = z.object({
+                                  verified_by: z.string(),
+                                  verified_by_admin: z.object({ full_name: z.string() }),
+                                  status: z.literal('verified'),
+                                });
+                                const validatedUser = VerifiedUserSchema.parse(currentUser);
+                                return (
+                                  <VerificationBadge
+                                    verifiedBy={validatedUser.verified_by}
+                                    verifiedByAdmin={validatedUser.verified_by_admin}
+                                    status={validatedUser.status}
+                                  />
+                                );
+                              } catch (error) {
+                                console.error('VerificationBadge validation failed:', error);
+                                return null;
+                              }
+                            })()}
                         </Box>
                       </Box>
 
@@ -416,6 +416,9 @@ const PublicPage: React.FC = () => {
                           </Typography>
                           <Typography variant="body2" color="rgba(255,255,255,0.8)" mb={1}>
                             Views: {currentUser.view_count || 0}
+                          </Typography>
+                          <Typography variant="body2" color="rgba(255,255,255,0.8)" mb={1}>
+                            ID: {currentUser.url_id}
                           </Typography>
                           {currentUser.phone_number && (
                             <Box display="flex" alignItems="center" gap={1}>

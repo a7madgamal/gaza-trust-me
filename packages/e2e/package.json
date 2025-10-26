@@ -16,7 +16,7 @@
     "install-browsers": "playwright install",
     "format": "prettier --write . --log-level error",
     "lint": "eslint . --fix --cache --quiet",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit && echo 'E2E Type check completed'"
   },
   "devDependencies": {
     "@playwright/test": "^1.54.2",
